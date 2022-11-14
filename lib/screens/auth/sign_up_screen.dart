@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final formKey = GlobalKey<FormState>();
   bool isVisible = false;
+  bool isLoading = false;
   File? imageFile;
 
   //main section
@@ -23,16 +26,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
     final AppColors appColors = AppColors();
+    FirebaseOperations firebaseOperations = FirebaseOperations();
+    final userEmail =
+        ModalRoute.of(context)!.settings.arguments.toString().trim();
     String password = '';
     String name = '';
 
     //submitting password
-    void submitPassword() {
+    void createAccount() {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
       if (valid) {
+        setState(() {
+          isLoading = true;
+        });
         formKey.currentState!.save();
-        // Navigator.of(context).pushNamed('/login');
+        firebaseOperations.createNewUser(
+          email: userEmail,
+          password: password,
+          name: name,
+          context: context,
+          userImage: imageFile,
+        );
       }
     }
 
@@ -97,16 +112,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
 
                     //profile changing button
-                    IconButton(
-                      onPressed: () {
-                        changeProfilePicture(context);
-                      },
-                      color: appColors.primaryColor,
-                      icon: const Icon(
-                        Iconsax.gallery_edit,
+                    if (!isLoading)
+                      IconButton(
+                        onPressed: () {
+                          changeProfilePicture(context);
+                        },
+                        color: appColors.primaryColor,
+                        icon: const Icon(
+                          Iconsax.gallery_edit,
+                        ),
+                        splashRadius: 20.0,
                       ),
-                      splashRadius: 20.0,
-                    ),
                   ],
                 ),
 
@@ -123,7 +139,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           cursorColor: appColors.primaryColor,
                           key: const ValueKey('username'),
                           textInputAction: TextInputAction.next,
-                          obscureText: !isVisible,
+                          textCapitalization: TextCapitalization.words,
                           //validator
                           validator: (data) {
                             if (data!.isEmpty) {
@@ -260,24 +276,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 10),
                 //Login button
-                SizedBox(
-                  width: screen.width * .8,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: appColors.primaryColor,
-                      foregroundColor: appColors.textLightColor,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                isLoading
+                    ? CircularProgressIndicator(
+                        color: appColors.primaryColor,
+                        strokeWidth: 1.5,
+                      )
+                    : SizedBox(
+                        width: screen.width * .8,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: appColors.primaryColor,
+                            foregroundColor: appColors.textLightColor,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          onPressed: createAccount,
+                          child: const Text(
+                            "Create",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
                       ),
-                    ),
-                    onPressed: submitPassword,
-                    child: const Text(
-                      "Create",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

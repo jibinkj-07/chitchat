@@ -15,24 +15,26 @@ class WelcomeScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //Illustration image part
             SvgPicture.asset(
               'assets/illustrations/welcome.svg',
-              height: screen.height * .7,
+              height: screen.height * .5,
             ),
             //onboard text
             Text(
-              "Chitchat",
+              "Connect with your Favourites through ChitChat",
               style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
                 color: appColors.textDarkColor,
               ),
             ),
+
             //lets start button
             SizedBox(
-              width: screen.width * .8,
+              width: screen.width,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: appColors.primaryColor,

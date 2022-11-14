@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/cubit/user_detail_cubit.dart';
 import 'package:chitchat/screens/auth/authentication_screen.dart';
 import 'package:chitchat/screens/auth/login_screen.dart';
 import 'package:chitchat/screens/auth/sign_up_screen.dart';
 import 'package:chitchat/screens/auth/welcome_screen.dart';
+import 'package:chitchat/screens/home_screen.dart';
 import 'package:chitchat/utils/custom_route_transition.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -68,11 +71,20 @@ class MyApp extends StatelessWidget {
             TargetPlatform.iOS: CustomPageTransitionBuilder(),
           }),
         ),
-        home: const WelcomeScreen(),
+        home: BlocBuilder<UserDetailCubit, UserDetailState>(
+          builder: (context, state) {
+            if (state.isAuthenticated) {
+              return const HomeScreen();
+            } else {
+              return const WelcomeScreen();
+            }
+          },
+        ),
         routes: {
           '/auth': (_) => const AuthenticationScreen(),
           '/login': (_) => const LoginScreen(),
           '/signUp': (_) => const SignUpScreen(),
+          '/homeScreen': (_) => const HomeScreen(),
         },
       ),
     );
