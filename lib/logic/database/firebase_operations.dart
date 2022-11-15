@@ -54,13 +54,20 @@ class FirebaseOperations {
           database.doc(value.user!.uid).set(
             {
               'name': name,
+              'email': email,
               'imageUrl': url,
+              'bio': 'Hey want to chat? ping me',
               'created': DateTime.now(),
             },
             SetOptions(merge: true),
           );
           //Updating bloc
-          userCubit.userAuthenticated(userName: name, imageUrl: url);
+          userCubit.userAuthenticated(
+              email: email,
+              id: value.user!.uid,
+              userName: name,
+              imageUrl: url,
+              bio: 'Hey want to chat? ping me');
           //ROUTING USER TO HOMEPAGE
           Future.delayed(const Duration(seconds: 3), () {
             navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
@@ -73,13 +80,20 @@ class FirebaseOperations {
         database.doc(value.user!.uid).set(
           {
             'name': name,
+            'email': email,
             'imageUrl': '',
+            'bio': 'Hey want to chat? ping me',
             'created': DateTime.now(),
           },
           SetOptions(merge: true),
         );
         //Updating bloc
-        userCubit.userAuthenticated(userName: name, imageUrl: '');
+        userCubit.userAuthenticated(
+            email: email,
+            id: value.user!.uid,
+            userName: name,
+            imageUrl: '',
+            bio: 'Hey want to chat? ping me');
         //ROUTING USER TO HOMEPAGE
         Future.delayed(const Duration(seconds: 2), () {
           navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);

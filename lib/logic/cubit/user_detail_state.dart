@@ -2,11 +2,17 @@ part of 'user_detail_cubit.dart';
 
 @immutable
 class UserDetailState extends Equatable {
-  final String userName;
+  final String id;
+  final String name;
+  final String email;
+  final String bio;
   final String profilePicUrl;
   final bool isAuthenticated;
   const UserDetailState(
-      {required this.userName,
+      {required this.name,
+      required this.id,
+      required this.email,
+      required this.bio,
       required this.profilePicUrl,
       required this.isAuthenticated});
 
@@ -15,7 +21,10 @@ class UserDetailState extends Equatable {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'userName': userName,
+      'id': id,
+      'email': email,
+      'name': name,
+      'bio': bio,
       'profilePicUrl': profilePicUrl,
       'isAuthenticated': isAuthenticated,
     };
@@ -23,7 +32,10 @@ class UserDetailState extends Equatable {
 
   factory UserDetailState.fromMap(Map<String, dynamic> map) {
     return UserDetailState(
-      userName: map['userName'] as String,
+      bio: map['bio'] as String,
+      id: map['id'] as String,
+      email: map['email'] as String,
+      name: map['name'] as String,
       profilePicUrl: map['profilePicUrl'] as String,
       isAuthenticated: map['isAuthenticated'] as bool,
     );
@@ -37,5 +49,11 @@ class UserDetailState extends Equatable {
 
 class UserDetailInitial extends UserDetailState {
   const UserDetailInitial()
-      : super(userName: '', isAuthenticated: false, profilePicUrl: '');
+      : super(
+            name: '',
+            isAuthenticated: false,
+            profilePicUrl: '',
+            email: '',
+            id: '',
+            bio: '');
 }

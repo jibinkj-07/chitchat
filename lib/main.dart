@@ -81,6 +81,7 @@ class MyApp extends StatelessWidget {
           },
         ),
         routes: {
+          '/welcome': (_) => const WelcomeScreen(),
           '/auth': (_) => const AuthenticationScreen(),
           '/login': (_) => const LoginScreen(),
           '/signUp': (_) => const SignUpScreen(),

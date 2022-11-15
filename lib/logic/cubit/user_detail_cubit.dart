@@ -10,16 +10,26 @@ part 'user_detail_state.dart';
 class UserDetailCubit extends Cubit<UserDetailState> with HydratedMixin {
   UserDetailCubit() : super(const UserDetailInitial());
   //user authentication method
-  void userAuthenticated({required String userName, required String imageUrl}) {
-    log('user authentication cubit');
+  void userAuthenticated({
+    required String userName,
+    required String imageUrl,
+    required String id,
+    required String email,
+    required String bio,
+  }) {
+    // log('user authentication cubit');
     emit(UserDetailState(
-        userName: userName, profilePicUrl: imageUrl, isAuthenticated: true));
+        name: userName,
+        email: email,
+        id: id,
+        bio: bio,
+        profilePicUrl: imageUrl,
+        isAuthenticated: true));
   }
 
   //user sign out method
   void userSignOut() {
-    emit(const UserDetailState(
-        userName: '', profilePicUrl: '', isAuthenticated: false));
+    emit(const UserDetailInitial());
   }
 
   @override
