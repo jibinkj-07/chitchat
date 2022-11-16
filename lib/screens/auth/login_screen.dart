@@ -1,6 +1,7 @@
+import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/utils/login_screen_arguments.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
+  FirebaseOperations firebaseOperations = FirebaseOperations();
   bool isVisible = false;
 
   //main section
@@ -18,6 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
     final AppColors appColors = AppColors();
+    FirebaseOperations firebaseOperations = FirebaseOperations();
+    final args =
+        ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
     String password = '';
 
     //submitting password
@@ -26,7 +31,15 @@ class _LoginScreenState extends State<LoginScreen> {
       final valid = formKey.currentState!.validate();
       if (valid) {
         formKey.currentState!.save();
-        // Navigator.of(context).pushNamed('/login');
+        firebaseOperations.loginUser(
+          email: args.email,
+          password: password,
+          name: args.name,
+          id: args.id,
+          bio: args.bio,
+          imageUrl: args.imageUrl,
+          context: context,
+        );
       }
     }
 
@@ -52,23 +65,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: CircleAvatar(
                         radius: 85,
                         backgroundColor: appColors.primaryColor.withOpacity(.8),
-                        child: const CircleAvatar(
-                          radius: 80,
-                          backgroundColor: Colors.white,
-                          backgroundImage:
-                              AssetImage('assets/images/profile.png'),
-                        )
-                        // : CircleAvatar(
-                        //     radius: 80,
-                        //     backgroundColor: Colors.white,
-                        //     backgroundImage: FileImage(imageFile!),
-                        //   ),
-                        ),
+                        child: args.imageUrl == ''
+                            ? const CircleAvatar(
+                                radius: 80,
+                                backgroundColor: Colors.white,
+                                backgroundImage:
+                                    AssetImage('assets/images/profile.png'),
+                              )
+                            : CircleAvatar(
+                                radius: 80,
+                                backgroundColor: Colors.white,
+                                backgroundImage: NetworkImage(args.imageUrl),
+                              )),
                   ),
                   const SizedBox(height: 10),
                   //login text
                   Text(
-                    "Hi User",
+                    'Hi ${args.name}',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -168,7 +181,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   //forget password button
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      Navigator.of(context).pushNamed('/pwReset');
+                    },
                     style: TextButton.styleFrom(
                       foregroundColor: appColors.primaryColor,
                       shape: RoundedRectangleBorder(

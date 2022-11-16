@@ -15,6 +15,11 @@ class Security extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
           backgroundColor: Colors.white,
+          foregroundColor: appColors.primaryColor,
+          title: const Text(
+            "Security",
+          ),
+          titleSpacing: 0,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
@@ -59,7 +64,7 @@ class Security extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 10),
                         child: const Text(
-                          'Change Password',
+                          'Change password',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -97,7 +102,7 @@ class Security extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 10),
                         child: const Text(
-                          'Delete Account',
+                          'Delete account',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -116,29 +121,50 @@ class Security extends StatelessWidget {
             Container(
               width: screen.width * .9,
               margin: const EdgeInsets.only(top: 5),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: appColors.redColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
+              child: TextButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
                   context.read<UserDetailCubit>().userSignOut();
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil('/auth', (route) => false);
                 },
+                style: TextButton.styleFrom(
+                  foregroundColor: appColors.redColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
                 child: const Text(
                   "Logout",
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+              // child: ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: appColors.redColor,
+              //     foregroundColor: Colors.white,
+              //     padding: const EdgeInsets.symmetric(vertical: 10),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(8.0),
+              //     ),
+              //   ),
+              //   onPressed: () {
+              //     FirebaseAuth.instance.signOut();
+              //     context.read<UserDetailCubit>().userSignOut();
+              //     Navigator.of(context)
+              //         .pushNamedAndRemoveUntil('/auth', (route) => false);
+              //   },
+              //   child: const Text(
+              //     "Logout",
+              //     style: TextStyle(
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              // ),
             ),
           ],
         ),

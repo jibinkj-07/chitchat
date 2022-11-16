@@ -8,6 +8,8 @@ import 'package:chitchat/screens/auth/sign_up_screen.dart';
 import 'package:chitchat/screens/auth/welcome_screen.dart';
 import 'package:chitchat/screens/home_screen.dart';
 import 'package:chitchat/utils/custom_route_transition.dart';
+import 'package:chitchat/widgets/general/password_reset.dart';
+import 'package:chitchat/widgets/settings/account.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +88,7 @@ class MyApp extends StatelessWidget {
           '/login': (_) => const LoginScreen(),
           '/signUp': (_) => const SignUpScreen(),
           '/homeScreen': (_) => const HomeScreen(),
+          '/pwReset': (_) => const PasswordReset(),
         },
       ),
     );

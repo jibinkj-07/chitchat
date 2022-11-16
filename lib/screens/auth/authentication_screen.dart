@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../utils/app_colors.dart';
+import '../../utils/login_screen_arguments.dart';
 
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({super.key});
@@ -25,19 +28,28 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
     //submit function
     Future<void> submitEmail(BuildContext ctx) async {
       FocusScope.of(context).unfocus();
-      setState(() {
-        isLoading = true;
-      });
+
       final valid = formKey.currentState!.validate();
       if (valid) {
+        setState(() {
+          isLoading = true;
+        });
         formKey.currentState!.save();
         final result =
             await firebaseOperations.authenticateUser(userEmail: email);
         if (result == 'true') {
+          final result =
+              await firebaseOperations.getLoginUserDetails(email: email);
           if (!mounted) return;
           Navigator.of(ctx).pushNamedAndRemoveUntil(
             '/login',
-            arguments: email,
+            arguments: LoginScreenArguments(
+              result['id']!,
+              result['name']!,
+              result['email']!,
+              result['imageUrl']!,
+              result['bio']!,
+            ),
             (route) => false,
           );
         } else if (result == 'false') {

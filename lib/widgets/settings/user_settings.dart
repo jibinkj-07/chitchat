@@ -1,5 +1,7 @@
 import 'package:chitchat/logic/cubit/user_detail_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/settings/account.dart';
+import 'package:chitchat/widgets/settings/privacy.dart';
 import 'package:chitchat/widgets/settings/security.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ class UserSettings extends StatelessWidget {
     return BlocBuilder<UserDetailCubit, UserDetailState>(builder: (ctx, state) {
       return Column(
         children: [
+          const SizedBox(height: 20),
           //profile image
           Container(
             padding: const EdgeInsets.all(5),
@@ -23,7 +26,7 @@ class UserSettings extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(
                 width: 3,
-                color: appColors.primaryColor,
+                color: Colors.blue,
               ),
             ),
             child: state.profilePicUrl == ''
@@ -44,18 +47,20 @@ class UserSettings extends StatelessWidget {
           Text(
             state.name,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
 
           //email
           Text(
             state.email,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               // fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
           //bio section
@@ -103,7 +108,17 @@ class UserSettings extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8)),
               child: InkWell(
                 splashColor: Colors.blue.withOpacity(.5),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      reverseDuration: const Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
+                      type: PageTransitionType.rightToLeft,
+                      child: const Account(),
+                    ),
+                  );
+                },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   padding:
@@ -149,7 +164,17 @@ class UserSettings extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8)),
               child: InkWell(
                 splashColor: Colors.blue.withOpacity(.5),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      reverseDuration: const Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
+                      type: PageTransitionType.rightToLeft,
+                      child: const Privacy(),
+                    ),
+                  );
+                },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   padding:
@@ -185,7 +210,7 @@ class UserSettings extends StatelessWidget {
             ),
           ),
 
-          //account bar
+          //security bar
           Container(
             width: screen.width * .9,
             margin: const EdgeInsets.only(top: 5),

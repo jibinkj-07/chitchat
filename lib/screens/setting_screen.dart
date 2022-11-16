@@ -1,11 +1,9 @@
-import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/settings/user_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconsax/iconsax.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -13,15 +11,11 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+
     return Scaffold(
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (overscroll) {
-          overscroll.disallowIndicator();
-          return true;
-        },
-        child: CustomScrollView(
-          // A list of sliver widgets.
-          slivers: <Widget>[
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
             BlocBuilder<InternetCubit, InternetState>(
               builder: (context, state) {
                 if (state is InternetEnabled) {
@@ -87,7 +81,7 @@ class SettingScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Text(
-                          'Searching for  network',
+                          'Searching for network',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
@@ -108,16 +102,16 @@ class SettingScreen extends StatelessWidget {
                 }
               },
             ),
-            // This widget fills the remaining space in the viewport.
-            // Drag the scrollable area to collapse the CupertinoSliverNavigationBar.
-            SliverFillRemaining(
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(10.0),
-                child: const UserSettings(),
-              ),
-            ),
-          ],
+          ];
+        },
+        body: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (overscroll) {
+            overscroll.disallowIndicator();
+            return true;
+          },
+          child: const SingleChildScrollView(
+            child: UserSettings(),
+          ),
         ),
       ),
     );
