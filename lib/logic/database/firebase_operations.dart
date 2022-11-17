@@ -1,20 +1,34 @@
 import 'dart:developer';
 import 'dart:io';
-
-import 'package:chitchat/logic/cubit/user_detail_cubit.dart';
+import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FirebaseOperations {
-  //Global vairables
+//GLOBAL VAIRABLES
   final database = FirebaseFirestore.instance.collection('Users');
 
-  //method to authentication the user
+//READING ALL USERS
+  Future<List<Map<String, dynamic>>> getUsers() async {
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot = await database.get();
+    // Get data from docs and convert map to List
+    final allData = querySnapshot.docs
+        .map((data) => {
+              'id': data.id,
+              'name': data.get('name'),
+              'email': data.get('email'),
+              'imageUrl': data.get('imageUrl'),
+              'bio': data.get('bio'),
+            })
+        .toList();
+    return allData;
+  }
+
+  //METHOD TO AUTHENTICATION THE USER
   Future<String> authenticateUser({required String userEmail}) async {
     try {
       final list =
@@ -30,7 +44,7 @@ class FirebaseOperations {
     }
   }
 
-  //method to create new account
+  //METHOD TO CREATE NEW ACCOUNT
   Future<void> createNewUser({
     required String email,
     required String password,
@@ -38,7 +52,6 @@ class FirebaseOperations {
     required BuildContext context,
     File? userImage,
   }) async {
-    final userCubit = context.read<UserDetailCubit>();
     final navigator = Navigator.of(context);
     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
     FirebaseAuth.instance
@@ -63,17 +76,15 @@ class FirebaseOperations {
             },
             SetOptions(merge: true),
           );
-          //Updating bloc
-          userCubit.userAuthenticated(
-              email: email,
-              id: value.user!.uid,
-              userName: name,
-              imageUrl: url,
-              bio: 'Hey want to chat? ping me');
+          addUserDetails(
+            id: value.user!.uid,
+            name: name,
+            email: email,
+            url: url,
+            bio: 'Hey want to chat? ping me',
+          );
           //ROUTING USER TO HOMEPAGE
-          Future.delayed(const Duration(seconds: 3), () {
-            navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-          });
+          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
         });
       }
       //if user have no profile image
@@ -89,23 +100,20 @@ class FirebaseOperations {
           },
           SetOptions(merge: true),
         );
-        //Updating bloc
-        userCubit.userAuthenticated(
-            email: email,
-            id: value.user!.uid,
-            userName: name,
-            imageUrl: '',
-            bio: 'Hey want to chat? ping me');
-        //ROUTING USER TO HOMEPAGE
-        Future.delayed(const Duration(seconds: 2), () {
-          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-        });
+        addUserDetails(
+          id: value.user!.uid,
+          name: name,
+          email: email,
+          url: '',
+          bio: 'Hey want to chat? ping me',
+        );
+        // //ROUTING USER TO HOMEPAGE
+        navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
       }
     });
   }
 
 //USER LOGIN METHOD
-  //method to create new account
   Future<void> loginUser({
     required String email,
     required String password,
@@ -121,17 +129,15 @@ class FirebaseOperations {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
-        context.read<UserDetailCubit>().userAuthenticated(
-              userName: name,
-              imageUrl: imageUrl,
-              id: id,
-              email: email,
-              bio: bio,
-            );
+        addUserDetails(
+          id: id,
+          name: name,
+          email: email,
+          url: imageUrl,
+          bio: bio,
+        );
         //ROUTING USER TO HOMEPAGE
-        Future.delayed(const Duration(seconds: 1), () {
-          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-        });
+        navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
       });
     } catch (e) {
       log('${e.toString()}');
@@ -148,6 +154,7 @@ class FirebaseOperations {
     }
   }
 
+//SNACKBAR
   SnackBar snackBar({required String message}) {
     return SnackBar(
       backgroundColor: AppColors().primaryColor,
@@ -162,7 +169,7 @@ class FirebaseOperations {
     );
   }
 
-  //method to get user details in login page
+  //METHOD TO GET USER DETAILS IN LOGIN PAGE
   Future<Map<String, String>> getLoginUserDetails(
       {required String email}) async {
     final id = await getUseridFromEmail(email: email);
@@ -170,7 +177,7 @@ class FirebaseOperations {
     return data;
   }
 
-//retrieving user id from user email
+//RETRIEVING USER ID FROM USER EMAIL
   Future<String> getUseridFromEmail({required String email}) async {
     String id = '';
     await database.get().then((snapshot) {
@@ -181,7 +188,7 @@ class FirebaseOperations {
     return id;
   }
 
-  //getting single user details
+  //GETTING SINGLE USER DETAILS
   Future<Map<String, String>> getUserDetails({required String userId}) async {
     Map<String, String> details = {};
     await database.doc(userId).get().then((snapshot) {
@@ -195,4 +202,33 @@ class FirebaseOperations {
     });
     return details;
   }
+
+// //DELETING USER IMAGE
+//   Future<void> deleteImage(
+//       {required String id, required BuildContext context}) async {
+//     final userCubit = context.read<UserDetailCubit>();
+//     // final navigator = Navigator.of(context);
+//     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
+//     await storageRef.child('$id.jpg').delete();
+//     userCubit.changeImage(url: '');
+//     await database.doc(id).set({'imageUrl': ''}, SetOptions(merge: true));
+//   }
+
+//   //UPDATING USER IMAGE
+//   Future<void> updateImage(
+//       {required File image,
+//       required String id,
+//       required BuildContext context}) async {
+//     log('Started uploading ${DateTime.now()}');
+//     // final navigator = Navigator.of(context);
+//     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
+//     // await storageRef.child('$id.jpg').delete();
+//     await storageRef.child('$id.jpg').putFile(image).whenComplete(() async {
+//       final url = await storageRef.child('$id.jpg').getDownloadURL();
+//       await database.doc(id).set({'imageUrl': url}, SetOptions(merge: true));
+//       userCubit.changeImage(url: url);
+
+//       log('finished uploading ${DateTime.now()}');
+//     });
+//   }
 }

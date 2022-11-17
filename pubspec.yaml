@@ -40,7 +40,8 @@ dependencies:
   page_transition: "^2.0.9"
   flutter_svg: ^1.1.6
   email_validator: '^2.1.16'
-  image_picker:
+  image_picker: ^0.8.4
+  image_cropper: ^1.4.1
   flutter_bloc: ^8.1.1
   iconsax: ^0.0.8
   equatable: ^2.0.5
@@ -53,11 +54,16 @@ dependencies:
   firebase_auth:
   firebase_storage: ^11.0.5
   custom_navigation_bar: ^0.8.2
+  skeletons: ^0.0.3
+  percent_indicator: ^4.0.1
+  hive_flutter: ^1.1.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator:
+  build_runner:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -1,7 +1,5 @@
 import 'dart:developer';
-
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
-import 'package:chitchat/logic/cubit/user_detail_cubit.dart';
 import 'package:chitchat/screens/auth/authentication_screen.dart';
 import 'package:chitchat/screens/auth/login_screen.dart';
 import 'package:chitchat/screens/auth/sign_up_screen.dart';
@@ -9,8 +7,8 @@ import 'package:chitchat/screens/auth/welcome_screen.dart';
 import 'package:chitchat/screens/home_screen.dart';
 import 'package:chitchat/utils/custom_route_transition.dart';
 import 'package:chitchat/widgets/general/password_reset.dart';
-import 'package:chitchat/widgets/settings/account.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -54,10 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        //cubit for user details feature
-        BlocProvider(
-          create: (_) => UserDetailCubit(),
-        ), //cubit for Connectivity feature
+        //cubit for Connectivity feature
         BlocProvider(
           create: (_) => InternetCubit(connectivity: connectivity),
         ),
@@ -73,13 +68,13 @@ class MyApp extends StatelessWidget {
             TargetPlatform.iOS: CustomPageTransitionBuilder(),
           }),
         ),
-        home: BlocBuilder<UserDetailCubit, UserDetailState>(
-          builder: (context, state) {
-            if (state.isAuthenticated) {
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, snapshot) {
+            if (snapshot.hasData) {
               return const HomeScreen();
-            } else {
-              return const WelcomeScreen();
             }
+            return const WelcomeScreen();
           },
         ),
         routes: {

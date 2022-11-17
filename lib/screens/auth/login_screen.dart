@@ -14,7 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   FirebaseOperations firebaseOperations = FirebaseOperations();
   bool isVisible = false;
-
+  bool isLoading = false;
   //main section
   @override
   Widget build(BuildContext context) {
@@ -30,6 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
       if (valid) {
+        setState(() {
+          isLoading = true;
+        });
         formKey.currentState!.save();
         firebaseOperations.loginUser(
           email: args.email,
@@ -196,24 +199,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   //Login button
-                  SizedBox(
-                    width: screen.width * .8,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: appColors.primaryColor,
-                        foregroundColor: appColors.textLightColor,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                  isLoading
+                      ? CircularProgressIndicator(
+                          color: appColors.primaryColor,
+                          strokeWidth: 1.5,
+                        )
+                      : SizedBox(
+                          width: screen.width * .8,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: appColors.primaryColor,
+                              foregroundColor: appColors.textLightColor,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: submitPassword,
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
                         ),
-                      ),
-                      onPressed: submitPassword,
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),

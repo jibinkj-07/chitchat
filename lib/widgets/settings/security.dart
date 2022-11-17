@@ -1,8 +1,6 @@
-import 'package:chitchat/logic/cubit/user_detail_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Security extends StatelessWidget {
   const Security({super.key});
@@ -124,7 +122,6 @@ class Security extends StatelessWidget {
               child: TextButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
-                  context.read<UserDetailCubit>().userSignOut();
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil('/auth', (route) => false);
                 },

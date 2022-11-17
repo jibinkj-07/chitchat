@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/allUsers/all_users.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -114,35 +115,7 @@ class AllUsersScreen extends StatelessWidget {
               overscroll.disallowIndicator();
               return true;
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Column(
-                children: [
-                  // const SizedBox(height: 30),
-                  CupertinoSearchTextField(
-                    onChanged: (String value) {
-                      log('The text has changed to: $value');
-                    },
-                    onSubmitted: (String value) {
-                      log('Submitted text: $value');
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: 50,
-                      itemBuilder: (BuildContext context, int index) {
-                        return SizedBox(
-                          height: 50,
-                          child: Center(
-                              child: Material(child: Text('Entry $index'))),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: const AllUsers(),
           ),
         ),
       ),

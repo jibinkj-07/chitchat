@@ -3,10 +3,10 @@ import 'dart:io';
 
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/utils/image_chooser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -101,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 radius: 80,
                                 // backgroundColor: Colors.white,
                                 backgroundImage: AssetImage(
-                                    'assets/images/profile_light.png'),
+                                    'assets/images/profile_dark.png'),
                               )
                             : CircleAvatar(
                                 radius: 80,
@@ -309,27 +309,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   // This shows a CupertinoModalPopup which hosts a CupertinoActionSheet.
   void changeProfilePicture(BuildContext ctx) {
+    ImageChooser imageChooser = ImageChooser();
     FocusScope.of(context).unfocus();
     showCupertinoModalPopup<void>(
       context: ctx,
       builder: (BuildContext ctx) => CupertinoActionSheet(
-        title: const Text(
-          'Choose image from',
-          style: TextStyle(
-            fontSize: 14,
-          ),
-        ),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
             /// This parameter indicates the action would be a default
             /// defualt behavior, turns the action's text to bold text.
 
-            onPressed: () {
-              getFromCamera();
+            onPressed: () async {
+              final image = await imageChooser.getFromCamera();
+              if (image == null) return;
+              if (!mounted) return;
+              setState(() {
+                imageFile = image;
+              });
               Navigator.pop(ctx);
             },
             child: const Text(
-              'Camera',
+              'Take Photo',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -338,12 +338,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
           CupertinoActionSheetAction(
-            onPressed: () {
-              getFromGallery();
+            onPressed: () async {
+              final image = await imageChooser.getFromGallery();
+              if (image == null) return;
+              if (!mounted) return;
+              setState(() {
+                imageFile = image;
+              });
               Navigator.pop(ctx);
             },
             child: const Text(
-              'Gallery',
+              'Choose Photo',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -352,35 +357,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
         ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(ctx),
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              // fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors().primaryColor,
+            ),
+          ),
+        ),
       ),
     );
-  }
-
-  /// Get from gallery
-  getFromGallery() async {
-    XFile? pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 400,
-      maxHeight: 400,
-    );
-    if (pickedFile != null) {
-      setState(() {
-        imageFile = File(pickedFile.path);
-      });
-    }
-  }
-
-  /// Get from Camera
-  getFromCamera() async {
-    XFile? pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.camera,
-      maxWidth: 400,
-      maxHeight: 400,
-    );
-    if (pickedFile != null) {
-      setState(() {
-        imageFile = File(pickedFile.path);
-      });
-    }
   }
 }
