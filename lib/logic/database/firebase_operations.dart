@@ -239,11 +239,12 @@ class FirebaseOperations {
   Future<void> updateName({
     required String name,
     required String id,
+    required BuildContext context,
   }) async {
     await database
         .doc(id)
-        .set({'name': name}, SetOptions(merge: true)).then((value) {
-      updateNameHive(name: name);
+        .set({'name': name}, SetOptions(merge: true)).then((value) async {
+      await updateNameHive(name: name);
     });
   }
 

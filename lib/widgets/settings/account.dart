@@ -1,4 +1,5 @@
-import 'package:chitchat/widgets/settings/security/account_deletion.dart';
+import 'package:chitchat/widgets/settings/account/account_deletion.dart';
+import 'package:chitchat/widgets/settings/account/change_name.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import '../../utils/app_colors.dart';
@@ -50,7 +51,17 @@ class Account extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        reverseDuration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
+                        type: PageTransitionType.rightToLeft,
+                        child: ChangeName(id: id),
+                      ),
+                    );
+                  },
                   splashColor: Colors.grey.withOpacity(.5),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
