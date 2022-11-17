@@ -4,19 +4,18 @@ import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/user_profile.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletons/skeletons.dart';
 
-class AllUsers extends StatefulWidget {
-  const AllUsers({super.key});
+class FindFriends extends StatefulWidget {
+  const FindFriends({super.key});
 
   @override
-  State<AllUsers> createState() => _AllUsersState();
+  State<FindFriends> createState() => _FindFriendsState();
 }
 
-class _AllUsersState extends State<AllUsers> {
+class _FindFriendsState extends State<FindFriends> {
   // bool isLoading = false;
   FirebaseOperations firebaseOperations = FirebaseOperations();
   List<Map<String, dynamic>> usersFromDb = [];
@@ -33,6 +32,7 @@ class _AllUsersState extends State<AllUsers> {
   //METHOD TO READ ALL USERS FROM DB
   Future<void> getAllUsers() async {
     final users = await firebaseOperations.getUsers();
+    if (!mounted) return;
     setState(() {
       usersFromDb = users;
     });

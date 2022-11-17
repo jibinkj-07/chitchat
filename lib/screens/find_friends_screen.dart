@@ -1,13 +1,13 @@
 import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
-import 'package:chitchat/widgets/allUsers/all_users.dart';
+import 'package:chitchat/widgets/allUsers/find_friends.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AllUsersScreen extends StatelessWidget {
-  const AllUsersScreen({super.key});
+class FindFriendsScreen extends StatelessWidget {
+  const FindFriendsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class AllUsersScreen extends StatelessWidget {
                         },
                       ),
                       largeTitle: const Text(
-                        'All Users',
+                        'Find Friends',
                         // style: TextStyle(fontSize: 30),
                       ),
                     );
@@ -101,7 +101,7 @@ class AllUsersScreen extends StatelessWidget {
                         ],
                       ),
                       largeTitle: const Text(
-                        'All Users',
+                        'Find Friends',
                         // style: TextStyle(fontSize: 30),
                       ),
                     );
@@ -115,7 +115,7 @@ class AllUsersScreen extends StatelessWidget {
               overscroll.disallowIndicator();
               return true;
             },
-            child: const AllUsers(),
+            child: const FindFriends(),
           ),
         ),
       ),

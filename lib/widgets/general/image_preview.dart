@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'package:chitchat/screens/setting_screen.dart';
+import 'package:chitchat/utils/image_chooser.dart';
+import 'package:chitchat/widgets/general/image_updating.dart';
+import 'package:chitchat/widgets/settings/user_settings.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
@@ -31,39 +35,20 @@ class _ImagePreviewState extends State<ImagePreview> {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     FirebaseOperations firebaseOperations = FirebaseOperations();
-
-    /// Get from gallery
-    getFromGallery() async {
-      XFile? pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 400,
-        maxHeight: 400,
+    ImageChooser imageChooser = ImageChooser();
+    // This shows a CupertinoModalPopup which hosts a CupertinoAlertDialog.
+    void showAlertDialog(BuildContext context) {
+      showCupertinoModalPopup<void>(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => const CupertinoAlertDialog(
+          title: Text('Removing'),
+          content: CupertinoActivityIndicator(
+            radius: 15,
+            color: Colors.black,
+          ),
+        ),
       );
-      if (pickedFile != null) {
-        // firebaseOperations.updateImage(
-        //     image: File(pickedFile.path), id: widget.id, context: context);
-        if (!mounted) return;
-        setState(() {
-          updatedImage = File(pickedFile.path);
-        });
-      }
-    }
-
-    /// Get from Camera
-    getFromCamera() async {
-      XFile? pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.camera,
-        maxWidth: 400,
-        maxHeight: 400,
-      );
-      if (pickedFile != null) {
-        // firebaseOperations.updateImage(
-        //     image: File(pickedFile.path), id: widget.id, context: context);
-        if (!mounted) return;
-        setState(() {
-          updatedImage = File(pickedFile.path);
-        });
-      }
     }
 
     void changeProfilePicture(BuildContext ctx) {
@@ -75,10 +60,13 @@ class _ImagePreviewState extends State<ImagePreview> {
               CupertinoActionSheetAction(
                 /// This parameter indicates the action would be a default
                 /// defualt behavior, turns the action's text to bold text.
-                onPressed: () {
-                  // firebaseOperations.deleteImage(
-                  //     id: widget.id, context: context);
+                onPressed: () async {
                   Navigator.pop(ctx);
+                  showAlertDialog(context);
+                  await firebaseOperations.deleteImage(
+                      id: widget.id, context: context);
+                  if (!mounted) return;
+                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
                 child: Text(
@@ -94,9 +82,20 @@ class _ImagePreviewState extends State<ImagePreview> {
               /// This parameter indicates the action would be a default
               /// defualt behavior, turns the action's text to bold text.
 
-              onPressed: () {
-                getFromCamera();
+              onPressed: () async {
+                final image = await imageChooser.getFromCamera();
+                if (image == null) return;
+
+                //moving to updating page
+                if (!mounted) return;
                 Navigator.pop(ctx);
+                setState(() {
+                  updatedImage = image;
+                });
+                await firebaseOperations.updateImage(
+                    image: image, id: widget.id);
+                if (!mounted) return;
+                Navigator.of(context).pop();
               },
               child: const Text(
                 'Take Photo',
@@ -108,9 +107,20 @@ class _ImagePreviewState extends State<ImagePreview> {
               ),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
-                getFromGallery();
+              onPressed: () async {
+                final image = await imageChooser.getFromGallery();
+                if (image == null) return;
+
+                //moving to updating page
+                if (!mounted) return;
                 Navigator.pop(ctx);
+                setState(() {
+                  updatedImage = image;
+                });
+                await firebaseOperations.updateImage(
+                    image: image, id: widget.id);
+                if (!mounted) return;
+                Navigator.of(context).pop();
               },
               child: const Text(
                 'Choose Photo',
@@ -137,81 +147,54 @@ class _ImagePreviewState extends State<ImagePreview> {
       );
     }
 
-    if (updatedImage != null) {
-      Future.delayed(const Duration(seconds: 9)).then(
-        (_) => Navigator.of(context).pop(),
-      );
-    }
-
     //main
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: appColors.primaryColor,
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: appColors.primaryColor,
-          splashRadius: 20.0,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          widget.isEditable
-              ? TextButton(
-                  onPressed: () {
-                    changeProfilePicture(context);
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: appColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: const Text(
-                    'edit',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                )
-              : const SizedBox()
-        ],
-      ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: updatedImage != null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    'assets/illustrations/progress_indicator.svg',
-                  ),
-                  const Text("Updating image"),
-                  const SizedBox(height: 10),
-                  LinearPercentIndicator(
-                    width: MediaQuery.of(context).size.width,
-                    animation: true,
-                    lineHeight: 8.0,
-                    animationDuration: 8000,
-                    percent: 1,
-                    barRadius: const Radius.circular(20),
-                    curve: Curves.slowMiddle,
-                    progressColor: AppColors().primaryColor,
-                  ),
-                ],
-              )
-            : InteractiveViewer(
+    return updatedImage == null
+        ? Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              foregroundColor: appColors.primaryColor,
+              title: Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                color: appColors.primaryColor,
+                splashRadius: 20.0,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              actions: [
+                widget.isEditable
+                    ? TextButton(
+                        onPressed: () {
+                          changeProfilePicture(context);
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: appColors.primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        child: const Text(
+                          'edit',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    : const SizedBox()
+              ],
+            ),
+            body: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: InteractiveViewer(
                 child: Hero(
                   tag: widget.id,
                   child: widget.url == ''
@@ -219,7 +202,10 @@ class _ImagePreviewState extends State<ImagePreview> {
                       : Image.network(widget.url, fit: BoxFit.contain),
                 ),
               ),
-      ),
-    );
+            ),
+          )
+        : ImageUpdating(
+            image: updatedImage,
+          );
   }
 }

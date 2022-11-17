@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:chitchat/logic/database/hive_operations.dart';
+import 'package:chitchat/logic/database/user_model.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -76,13 +77,14 @@ class FirebaseOperations {
             },
             SetOptions(merge: true),
           );
-          addUserDetails(
+          UserModel user = UserModel(
             id: value.user!.uid,
             name: name,
             email: email,
-            url: url,
+            imageUrl: url,
             bio: 'Hey want to chat? ping me',
           );
+          await addUserDetailsHive(user: user);
           //ROUTING USER TO HOMEPAGE
           navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
         });
@@ -100,13 +102,14 @@ class FirebaseOperations {
           },
           SetOptions(merge: true),
         );
-        addUserDetails(
+        UserModel user = UserModel(
           id: value.user!.uid,
           name: name,
           email: email,
-          url: '',
+          imageUrl: '',
           bio: 'Hey want to chat? ping me',
         );
+        await addUserDetailsHive(user: user);
         // //ROUTING USER TO HOMEPAGE
         navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
       }
@@ -128,14 +131,15 @@ class FirebaseOperations {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((value) {
-        addUserDetails(
+          .then((value) async {
+        UserModel user = UserModel(
           id: id,
           name: name,
           email: email,
-          url: imageUrl,
+          imageUrl: imageUrl,
           bio: bio,
         );
+        await addUserDetailsHive(user: user);
         //ROUTING USER TO HOMEPAGE
         navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
       });
@@ -203,32 +207,89 @@ class FirebaseOperations {
     return details;
   }
 
-// //DELETING USER IMAGE
-//   Future<void> deleteImage(
-//       {required String id, required BuildContext context}) async {
-//     final userCubit = context.read<UserDetailCubit>();
-//     // final navigator = Navigator.of(context);
-//     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
-//     await storageRef.child('$id.jpg').delete();
-//     userCubit.changeImage(url: '');
-//     await database.doc(id).set({'imageUrl': ''}, SetOptions(merge: true));
-//   }
+//DELETING USER IMAGE
+  Future<void> deleteImage(
+      {required String id, required BuildContext context}) async {
+    // final navigator = Navigator.of(context);
+    final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
+    await storageRef.child('$id.jpg').delete();
+    await database.doc(id).set({'imageUrl': ''}, SetOptions(merge: true));
+    await deleteImageHive();
+  }
 
-//   //UPDATING USER IMAGE
-//   Future<void> updateImage(
-//       {required File image,
-//       required String id,
-//       required BuildContext context}) async {
-//     log('Started uploading ${DateTime.now()}');
-//     // final navigator = Navigator.of(context);
-//     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
-//     // await storageRef.child('$id.jpg').delete();
-//     await storageRef.child('$id.jpg').putFile(image).whenComplete(() async {
-//       final url = await storageRef.child('$id.jpg').getDownloadURL();
-//       await database.doc(id).set({'imageUrl': url}, SetOptions(merge: true));
-//       userCubit.changeImage(url: url);
+  //UPDATING USER IMAGE
+  Future<void> updateImage({
+    required File image,
+    required String id,
+  }) async {
+    log('Started uploading ${DateTime.now()}');
+    // final navigator = Navigator.of(context);
+    final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
+    // await storageRef.child('$id.jpg').delete();
+    await storageRef.child('$id.jpg').putFile(image).whenComplete(() async {
+      final url = await storageRef.child('$id.jpg').getDownloadURL();
+      await database.doc(id).set({'imageUrl': url}, SetOptions(merge: true));
+      await updateImageHive(url: url);
+      log('finished uploading ${DateTime.now()}');
+    });
+  }
 
-//       log('finished uploading ${DateTime.now()}');
-//     });
-//   }
+  //UPDATING USER NAME
+  Future<void> updateName({
+    required String name,
+    required String id,
+  }) async {
+    await database
+        .doc(id)
+        .set({'name': name}, SetOptions(merge: true)).then((value) {
+      updateNameHive(name: name);
+    });
+  }
+
+  //UPDATING USER BIO
+  Future<void> updateBio({
+    required String bio,
+    required String id,
+  }) async {
+    await database
+        .doc(id)
+        .set({'bio': bio}, SetOptions(merge: true)).then((value) {
+      updateBioHive(bio: bio);
+    });
+  }
+
+  //DELETING USER
+  Future deleteAccount({
+    required String email,
+    required String password,
+    required BuildContext context,
+    required String id,
+  }) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      AuthCredential credentials =
+          EmailAuthProvider.credential(email: email, password: password);
+      UserCredential result =
+          await user!.reauthenticateWithCredential(credentials);
+      await database.doc(id).delete(); // called from database class
+      await user.delete();
+      deleteAccountHive();
+      return true;
+    } catch (e) {
+      print(e.toString());
+
+      if (e.toString().contains('password is invalid ')) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(snackBar(message: 'Invalid password. Try again'));
+      } else if (e.toString().contains('no user')) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(snackBar(message: 'No user found. Try again'));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            snackBar(message: 'Something went wrong. Try again later'));
+      }
+
+      return null;
+    }
+  }
 }

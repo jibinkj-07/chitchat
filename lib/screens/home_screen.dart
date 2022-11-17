@@ -1,11 +1,12 @@
-import 'package:chitchat/screens/all_users_screen.dart';
+import 'package:chitchat/screens/find_friends_screen.dart';
 import 'package:chitchat/screens/chat_screen.dart';
 import 'package:chitchat/screens/setting_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+
+import '../logic/database/hive_operations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // 'action':[FlatButton(onPressed: onPressed, child: child)]
     },
     {
-      'page': AllUsersScreen(),
+      'page': const FindFriendsScreen(),
       'title': 'Find Friends',
       // 'action':[FlatButton(onPressed: onPressed, child: child)]
     },
@@ -39,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+    //calling hive method to get user detail
+    getUserDetailHive();
     return Scaffold(
       body: SafeArea(
         child: pages[currentIndex]['page'],

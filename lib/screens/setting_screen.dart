@@ -1,4 +1,5 @@
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
+import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/settings/user_settings.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,7 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+
 
     return Scaffold(
       body: NestedScrollView(

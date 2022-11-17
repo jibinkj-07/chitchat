@@ -1,8 +1,16 @@
+import 'package:chitchat/widgets/settings/security/account_deletion.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import '../../utils/app_colors.dart';
 
 class Account extends StatelessWidget {
-  const Account({super.key});
+  final String currentEmail;
+  final String id;
+  const Account({
+    super.key,
+    required this.currentEmail,
+    required this.id,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +96,48 @@ class Account extends StatelessWidget {
                         horizontal: 15, vertical: 10),
                     child: const Text(
                       'Update profile bio',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 50),
+            //account  delete button
+            Container(
+              width: screen.width * .9,
+              margin: const EdgeInsets.only(top: 5),
+              child: Material(
+                color: Colors.grey.withOpacity(.2),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        reverseDuration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
+                        type: PageTransitionType.rightToLeft,
+                        child: AccountDeletion(
+                          currentEmail: currentEmail,
+                          id: id,
+                        ),
+                      ),
+                    );
+                  },
+                  splashColor: Colors.grey.withOpacity(.5),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
+                    child: const Text(
+                      'Delete account',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black,

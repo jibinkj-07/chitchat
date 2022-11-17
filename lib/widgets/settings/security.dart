@@ -1,3 +1,4 @@
+import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -73,44 +74,6 @@ class Security extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                //account  delete button
-                Container(
-                  width: screen.width * .9,
-                  margin: const EdgeInsets.only(top: 5),
-                  child: Material(
-                    color: Colors.grey.withOpacity(.2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    child: InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   PageTransition(
-                        //     reverseDuration: const Duration(milliseconds: 300),
-                        //     duration: const Duration(milliseconds: 300),
-                        //     type: PageTransitionType.rightToLeft,
-                        //     child: const Security(),
-                        //   ),
-                        // );
-                      },
-                      splashColor: Colors.grey.withOpacity(.5),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: const Text(
-                          'Delete account',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
 
@@ -122,8 +85,9 @@ class Security extends StatelessWidget {
               child: TextButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/auth', (route) => false);
+                  deleteAccountHive();
+                  // Navigator.of(context)
+                  //     .pushNamedAndRemoveUntil('/auth', (route) => false);
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: appColors.redColor,
