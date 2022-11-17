@@ -6,6 +6,7 @@ import 'package:chitchat/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class FirebaseOperations {
@@ -267,14 +268,20 @@ class FirebaseOperations {
   }) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
+      final navigator = Navigator.of(context);
       AuthCredential credentials =
           EmailAuthProvider.credential(email: email, password: password);
-      UserCredential result =
-          await user!.reauthenticateWithCredential(credentials);
-      await database.doc(id).delete(); // called from database class
-      await user.delete();
-      deleteAccountHive();
-      return true;
+
+      await user!.reauthenticateWithCredential(credentials).then((value) async {
+        log('success');
+        showAlertDialogDeleting(context);
+        await database.doc(id).delete(); // called from database class
+        await value.user!.delete();
+        await deleteAccountHive();
+        navigator.pushNamedAndRemoveUntil('/welcome', (route) => false);
+      });
+
+      // return true;
     } catch (e) {
       print(e.toString());
 
@@ -289,7 +296,21 @@ class FirebaseOperations {
             snackBar(message: 'Something went wrong. Try again later'));
       }
 
-      return null;
+      return 'error';
     }
+  }
+
+  void showAlertDialogDeleting(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => const CupertinoAlertDialog(
+        title: Text('Deleting Account'),
+        content: CupertinoActivityIndicator(
+          radius: 15,
+          color: Colors.black,
+        ),
+      ),
+    );
   }
 }

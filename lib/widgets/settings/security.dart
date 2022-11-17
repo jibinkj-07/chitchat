@@ -83,11 +83,11 @@ class Security extends StatelessWidget {
               width: screen.width * .9,
               margin: const EdgeInsets.only(top: 5),
               child: TextButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  deleteAccountHive();
-                  // Navigator.of(context)
-                  //     .pushNamedAndRemoveUntil('/auth', (route) => false);
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  await deleteAccountHive();
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/auth', (route) => false);
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: appColors.redColor,

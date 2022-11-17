@@ -60,7 +60,7 @@ class _AccountDeletionState extends State<AccountDeletion> {
     }
 
     //delete account
-    void deleteAccount() {
+    Future<void> deleteAccount() async {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
       if (valid) {
