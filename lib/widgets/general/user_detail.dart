@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/utils/user_profile.dart';
 import 'package:chitchat/widgets/general/image_preview.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,10 @@ class UserDetail extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: appColors.primaryColor,
         title: const Text(
-          'Profile info',
+          'Profile Info',
           style: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
           ),
         ),
         centerTitle: true,
@@ -34,6 +35,7 @@ class UserDetail extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           color: appColors.primaryColor,
+          iconSize: 20,
           splashRadius: 20.0,
           onPressed: () {
             Navigator.of(context).pop();
@@ -58,40 +60,56 @@ class UserDetail extends StatelessWidget {
                         builder: (_) => ImagePreview(
                           id: user.id,
                           url: user.url,
-                          title: 'Profile info',
+                          title: 'Profile Info',
                           isEditable: false,
                         ),
                       ),
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 3,
-                        color: appColors.primaryColor,
-                      ),
-                    ),
-                    child: user.url == ''
-                        ? Hero(
-                            tag: user.id,
-                            child: CircleAvatar(
-                              radius: 80,
-                              backgroundColor: Colors.black.withOpacity(.1),
-                              backgroundImage: const AssetImage(
-                                  'assets/images/profile_dark.png'),
+                  child: user.url == ''
+                      ? Hero(
+                          tag: user.id,
+                          child: Container(
+                            width: 180,
+                            height: 180,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
                             ),
-                          )
-                        : Hero(
-                            tag: user.id,
-                            child: CircleAvatar(
-                              radius: 80,
-                              backgroundColor: Colors.black.withOpacity(.1),
-                              backgroundImage: NetworkImage(user.url),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/images/profile.png',
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
-                  ),
+                        )
+                      : Hero(
+                          tag: user.id,
+                          child: Container(
+                            width: 180,
+                            height: 180,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: user.url,
+                                width: 180,
+                                height: 180,
+                                fit: BoxFit.cover,
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        CircularProgressIndicator(
+                                            color: appColors.primaryColor,
+                                            value: downloadProgress.progress),
+                                errorWidget: (context, url, error) => Icon(
+                                  Icons.error,
+                                  color: appColors.redColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                 ),
 
                 //name

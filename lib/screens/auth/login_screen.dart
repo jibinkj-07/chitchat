@@ -92,8 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Container(
                                 width: 180,
                                 height: 180,
-                                decoration: BoxDecoration(
-                                  color: appColors.primaryColor,
+                                decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                 ),
                                 child: ClipOval(
@@ -115,6 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     progressIndicatorBuilder: (context, url,
                                             downloadProgress) =>
                                         CircularProgressIndicator(
+                                            color: appColors.primaryColor,
                                             value: downloadProgress.progress),
                                     errorWidget: (context, url, error) => Icon(
                                       Icons.error,

@@ -158,7 +158,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                 widget.title,
                 style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               centerTitle: true,
@@ -167,6 +167,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 color: appColors.primaryColor,
                 splashRadius: 20.0,
+                iconSize: 20.0,
                 onPressed: () => Navigator.of(context).pop(),
               ),
               actions: [
@@ -184,7 +185,8 @@ class _ImagePreviewState extends State<ImagePreview> {
                         child: const Text(
                           'edit',
                           style: TextStyle(
-                            fontSize: 16,
+                            // fontSize: 16,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       )
@@ -198,7 +200,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                 child: Hero(
                   tag: widget.id,
                   child: widget.url == ''
-                      ? Image.asset('assets/images/profile_dark.png')
+                      ? Image.asset('assets/images/profile.png')
                       : Image.network(widget.url, fit: BoxFit.contain),
                 ),
               ),

@@ -5,6 +5,7 @@ import 'package:chitchat/utils/app_colors.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../logic/database/hive_operations.dart';
 
@@ -53,14 +54,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           CustomNavigationBarItem(
             icon: const Icon(CupertinoIcons.bubble_left_bubble_right),
+            selectedIcon:
+                const Icon(CupertinoIcons.bubble_left_bubble_right_fill),
             showBadge: true,
             badgeCount: 4,
           ),
           CustomNavigationBarItem(
             icon: const Icon(CupertinoIcons.rectangle_stack_person_crop),
+            selectedIcon:
+                const Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
           ),
           CustomNavigationBarItem(
-            icon: const Icon(CupertinoIcons.settings_solid),
+            icon: const Icon(CupertinoIcons.gear),
+            selectedIcon: const Icon(CupertinoIcons.gear_alt_fill),
           ),
         ],
         currentIndex: currentIndex,

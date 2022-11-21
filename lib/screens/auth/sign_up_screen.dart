@@ -106,9 +106,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         child: Container(
                                           width: 180,
                                           height: 180,
-                                          decoration: BoxDecoration(
+                                          decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
-                                            color: appColors.primaryColor,
                                           ),
                                           child: ClipOval(
                                             child: Image.asset(

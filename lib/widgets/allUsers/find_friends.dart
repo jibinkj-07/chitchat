@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/user_profile.dart';
@@ -42,15 +43,15 @@ class _FindFriendsState extends State<FindFriends> {
         item: SkeletonListTile(
           verticalSpacing: 12,
           leadingStyle: const SkeletonAvatarStyle(
-              width: 60, height: 60, shape: BoxShape.circle),
+              width: 50, height: 50, shape: BoxShape.circle),
           titleStyle: SkeletonLineStyle(
-              height: 16,
-              minLength: 200,
+              height: 10,
+              minLength: 80,
               randomLength: true,
               borderRadius: BorderRadius.circular(12)),
           subtitleStyle: SkeletonLineStyle(
-              height: 12,
-              maxLength: 200,
+              height: 8,
+              maxLength: 120,
               randomLength: true,
               borderRadius: BorderRadius.circular(12)),
           hasSubtitle: true,
@@ -64,19 +65,6 @@ class _FindFriendsState extends State<FindFriends> {
       skeleton: skeletonView(),
       child: Column(
         children: [
-          // const SizedBox(height: 30),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            child: CupertinoSearchTextField(
-              onChanged: (String value) {
-                log('The text has changed to: $value');
-              },
-              onSubmitted: (String value) {
-                log('Submitted text: $value');
-              },
-            ),
-          ),
-          const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               itemCount: usersFromDb.length,
@@ -110,21 +98,34 @@ class _FindFriendsState extends State<FindFriends> {
                     leading: url == ''
                         ? Hero(
                             tag: id,
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundColor: Colors.grey.withOpacity(.6),
-                              backgroundImage: const AssetImage(
-                                'assets/images/profile_dark.png',
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(300),
+                              child: Image.asset(
+                                'assets/images/profile.png',
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
                               ),
                             ),
                           )
                         : Hero(
                             tag: id,
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundColor: Colors.grey.withOpacity(.6),
-                              backgroundImage: NetworkImage(
-                                usersFromDb[index]['imageUrl'],
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(300),
+                              child: CachedNetworkImage(
+                                imageUrl: url,
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    CupertinoActivityIndicator(
+                                  color: appColors.primaryColor,
+                                  radius: 15,
+                                ),
+                                errorWidget: (context, url, error) => Icon(
+                                  Icons.error,
+                                  color: appColors.redColor,
+                                ),
                               ),
                             ),
                           ),
@@ -145,7 +146,7 @@ class _FindFriendsState extends State<FindFriends> {
                                   horizontal: 15, vertical: 0),
                             ),
                             child: const Text(
-                              'Connect',
+                              'Ping',
                               style: TextStyle(fontWeight: FontWeight.w500),
                             ),
                           ),

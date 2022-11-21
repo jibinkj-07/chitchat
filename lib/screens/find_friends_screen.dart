@@ -12,113 +12,103 @@ class FindFriendsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+    final screen = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (overscroll) {
-          overscroll.disallowIndicator();
-          return true;
-        },
-        child: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (overscroll) {
+            overscroll.disallowIndicator();
+            return true;
+          },
+          child: FindFriendsScreenBody(screen: screen, appColors: appColors),
+        ),
+      ),
+    );
+  }
+}
+
+class FindFriendsScreenBody extends StatelessWidget {
+  const FindFriendsScreenBody({
+    Key? key,
+    required this.screen,
+    required this.appColors,
+  }) : super(key: key);
+
+  final Size screen;
+  final AppColors appColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: screen.width,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+          // height: 80,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
               BlocBuilder<InternetCubit, InternetState>(
-                builder: (context, state) {
+                builder: (ctx, state) {
                   if (state is InternetEnabled) {
-                    return CupertinoSliverNavigationBar(
-                      backgroundColor: Colors.white,
-                      leading: BlocBuilder<InternetCubit, InternetState>(
-                        builder: (context, state) {
-                          if (state is InternetEnabled &&
-                              state.connectionType == ConnectionType.wifi) {
-                            return Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 10,
-                                  backgroundColor:
-                                      appColors.greenColor.withOpacity(.5),
-                                  child: CircleAvatar(
-                                    radius: 6,
-                                    backgroundColor: appColors.greenColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                const Icon(
-                                  Icons.network_wifi_rounded,
-                                  size: 22,
-                                  color: Colors.black,
-                                ),
-                              ],
-                            );
-                          } else if (state is InternetEnabled &&
-                              state.connectionType == ConnectionType.mobile) {
-                            return Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 10,
-                                  backgroundColor:
-                                      appColors.greenColor.withOpacity(.5),
-                                  child: CircleAvatar(
-                                    radius: 6,
-                                    backgroundColor: appColors.greenColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                const Icon(
-                                  Icons.network_cell_rounded,
-                                  size: 22,
-                                  color: Colors.black,
-                                ),
-                              ],
-                            );
-                          }
-                          return const SizedBox();
-                        },
-                      ),
-                      largeTitle: const Text(
-                        'Find Friends',
-                        // style: TextStyle(fontSize: 30),
-                      ),
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 8.0,
+                          backgroundColor: appColors.greenColor.withOpacity(.5),
+                          child: CircleAvatar(
+                            radius: 5.0,
+                            backgroundColor: appColors.greenColor,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        const Text(
+                          "Active",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      ],
                     );
                   } else {
-                    return CupertinoSliverNavigationBar(
-                      backgroundColor: Colors.white,
-                      middle: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Searching for network',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black,
-                            ),
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Searching for network",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
                           ),
-                          SizedBox(width: 10),
-                          CupertinoActivityIndicator(
-                            color: Colors.black,
-                          )
-                        ],
-                      ),
-                      largeTitle: const Text(
-                        'Find Friends',
-                        // style: TextStyle(fontSize: 30),
-                      ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(width: 5),
+                        CupertinoActivityIndicator(
+                          color: Colors.black,
+                          radius: 8.0,
+                        ),
+                      ],
                     );
                   }
                 },
               ),
-            ];
-          },
-          body: NotificationListener<OverscrollIndicatorNotification>(
-            onNotification: (overscroll) {
-              overscroll.disallowIndicator();
-              return true;
-            },
-            child: const FindFriends(),
+              const Text(
+                "Find Friends",
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              CupertinoSearchTextField(),
+            ],
           ),
         ),
-      ),
+        Expanded(child: FindFriends())
+      ],
     );
   }
 }
