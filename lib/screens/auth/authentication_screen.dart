@@ -1,10 +1,11 @@
 import 'dart:developer';
 
+import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../utils/app_colors.dart';
 import '../../utils/login_screen_arguments.dart';
 
@@ -60,6 +61,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
             (route) => false,
           );
         } else {
+          log('called');
           if (!mounted) return;
           setState(() {
             isLoading = false;
@@ -85,10 +87,18 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                   children: [
                     //illustration image
                     SvgPicture.asset(
-                      'assets/illustrations/login.svg',
+                      'assets/illustrations/auth.svg',
                       height: screen.height * .4,
                     ),
                     const SizedBox(height: 30),
+                    const Text(
+                      "Continue with your email",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     //email textfield
                     SizedBox(
                       width: screen.width * .8,
@@ -159,24 +169,37 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                             strokeWidth: 1.5,
                           )
                         : SizedBox(
-                            width: screen.width * .8,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: appColors.primaryColor,
-                                foregroundColor: appColors.textLightColor,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              onPressed: () {
-                                submitEmail(context);
+                            width: screen.width * .6,
+                            child: BlocBuilder<InternetCubit, InternetState>(
+                              builder: (ctx, state) {
+                                if (state is InternetEnabled) {
+                                  return ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: appColors.primaryColor,
+                                      foregroundColor: appColors.textLightColor,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      submitEmail(context);
+                                    },
+                                    child: const Text(
+                                      "Next",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  );
+                                } else {
+                                  return Text(
+                                    "Turn on Mobile data or Wifi to continue",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: appColors.redColor),
+                                  );
+                                }
                               },
-                              child: const Text(
-                                "Next",
-                                style: TextStyle(fontSize: 16),
-                              ),
                             ),
                           ),
                   ],

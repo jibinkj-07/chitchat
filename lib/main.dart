@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/user_model.dart';
+import 'package:chitchat/sample.dart';
 import 'package:chitchat/screens/auth/authentication_screen.dart';
 import 'package:chitchat/screens/auth/login_screen.dart';
 import 'package:chitchat/screens/auth/sign_up_screen.dart';
@@ -67,7 +68,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Chit Chat',
         theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
+          primarySwatch: Colors.blue,
           fontFamily: 'Poppins',
           //Overall app pagetransition theme
           pageTransitionsTheme: PageTransitionsTheme(builders: {
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
             return const WelcomeScreen();
           },
         ),
+        // home: LoginScreen(),
         routes: {
           '/welcome': (_) => const WelcomeScreen(),
           '/auth': (_) => const AuthenticationScreen(),

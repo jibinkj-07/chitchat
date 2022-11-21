@@ -47,7 +47,7 @@ class FirebaseOperations {
   }
 
   //METHOD TO CREATE NEW ACCOUNT
-  Future<void> createNewUser({
+  Future<String> createNewUser({
     required String email,
     required String password,
     required String name,
@@ -56,23 +56,49 @@ class FirebaseOperations {
   }) async {
     final navigator = Navigator.of(context);
     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
-    FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password)
-        .then((value) async {
-      //if user have profile image to upload
-      if (userImage != null) {
-        log('user have image');
-        await storageRef
-            .child('${value.user!.uid}.jpg')
-            .putFile(userImage)
-            .whenComplete(() async {
-          final url =
-              await storageRef.child('${value.user!.uid}.jpg').getDownloadURL();
+    String status = '';
+    try {
+      FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+        //if user have profile image to upload
+        if (userImage != null) {
+          log('user have image');
+          await storageRef
+              .child('${value.user!.uid}.jpg')
+              .putFile(userImage)
+              .whenComplete(() async {
+            final url = await storageRef
+                .child('${value.user!.uid}.jpg')
+                .getDownloadURL();
+            database.doc(value.user!.uid).set(
+              {
+                'name': name,
+                'email': email,
+                'imageUrl': url,
+                'bio': 'Hey want to chat? ping me',
+                'created': DateTime.now(),
+              },
+              SetOptions(merge: true),
+            );
+            UserModel user = UserModel(
+              id: value.user!.uid,
+              name: name,
+              email: email,
+              imageUrl: url,
+              bio: 'Hey want to chat? ping me',
+            );
+            await addUserDetailsHive(user: user);
+          });
+        }
+        //if user have no profile image
+        else {
+          log('user not have image');
           database.doc(value.user!.uid).set(
             {
               'name': name,
               'email': email,
-              'imageUrl': url,
+              'imageUrl': '',
               'bio': 'Hey want to chat? ping me',
               'created': DateTime.now(),
             },
@@ -82,43 +108,25 @@ class FirebaseOperations {
             id: value.user!.uid,
             name: name,
             email: email,
-            imageUrl: url,
+            imageUrl: '',
             bio: 'Hey want to chat? ping me',
           );
           await addUserDetailsHive(user: user);
-          //ROUTING USER TO HOMEPAGE
-          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-        });
-      }
-      //if user have no profile image
-      else {
-        log('user not have image');
-        database.doc(value.user!.uid).set(
-          {
-            'name': name,
-            'email': email,
-            'imageUrl': '',
-            'bio': 'Hey want to chat? ping me',
-            'created': DateTime.now(),
-          },
-          SetOptions(merge: true),
-        );
-        UserModel user = UserModel(
-          id: value.user!.uid,
-          name: name,
-          email: email,
-          imageUrl: '',
-          bio: 'Hey want to chat? ping me',
-        );
-        await addUserDetailsHive(user: user);
-        // //ROUTING USER TO HOMEPAGE
-        navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-      }
-    });
+          status = 'success';
+        }
+      });
+    } catch (e) {
+      log(e.toString());
+      status = 'error';
+      ScaffoldMessenger.of(context).showSnackBar(
+        snackBar(message: 'Somethink went wrong. Try again later'),
+      );
+    }
+    return status;
   }
 
 //USER LOGIN METHOD
-  Future<void> loginUser({
+  Future<String> loginUser({
     required String email,
     required String password,
     required String name,
@@ -127,8 +135,7 @@ class FirebaseOperations {
     required String imageUrl,
     required BuildContext context,
   }) async {
-    final navigator = Navigator.of(context);
-
+    String status = '';
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
@@ -141,11 +148,11 @@ class FirebaseOperations {
           bio: bio,
         );
         await addUserDetailsHive(user: user);
-        //ROUTING USER TO HOMEPAGE
-        navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
+        status = 'success';
       });
     } catch (e) {
-      log('${e.toString()}');
+      status = 'error';
+      log(e.toString());
       if (e.toString().contains('unusual activity')) {
         ScaffoldMessenger.of(context).showSnackBar(
             snackBar(message: 'Too many attempts found. Try again later'));
@@ -157,6 +164,7 @@ class FirebaseOperations {
             snackBar(message: 'Something went wrong. Try again later.'));
       }
     }
+    return status;
   }
 
 //SNACKBAR
