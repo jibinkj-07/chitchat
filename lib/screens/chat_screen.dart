@@ -53,7 +53,7 @@ class ChatScreenBody extends StatelessWidget {
                 builder: (ctx, state) {
                   if (state is InternetEnabled) {
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CircleAvatar(
                           radius: 8.0,
@@ -64,10 +64,12 @@ class ChatScreenBody extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 5),
-                        const Text(
+                        Text(
                           "Active",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
+                            color: appColors.greenColor,
+                            fontSize: 12,
                           ),
                         )
                       ],
@@ -79,7 +81,7 @@ class ChatScreenBody extends StatelessWidget {
                         Text(
                           "Searching for network",
                           style: TextStyle(
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.normal,
                           ),
                           textAlign: TextAlign.center,
                         ),

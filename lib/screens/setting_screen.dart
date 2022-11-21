@@ -1,10 +1,12 @@
+import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
-import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
-import 'package:chitchat/widgets/settings/user_settings.dart';
+import 'package:chitchat/widgets/allUsers/find_friends.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../widgets/settings/user_settings.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -12,110 +14,107 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
-
+    final screen = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            BlocBuilder<InternetCubit, InternetState>(
-              builder: (context, state) {
-                if (state is InternetEnabled) {
-                  return CupertinoSliverNavigationBar(
-                    backgroundColor: Colors.white,
-                    leading: BlocBuilder<InternetCubit, InternetState>(
-                      builder: (context, state) {
-                        if (state is InternetEnabled &&
-                            state.connectionType == ConnectionType.wifi) {
-                          return Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor:
-                                    appColors.greenColor.withOpacity(.5),
-                                child: CircleAvatar(
-                                  radius: 6,
-                                  backgroundColor: appColors.greenColor,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              const Icon(
-                                Icons.network_wifi_rounded,
-                                size: 22,
-                                color: Colors.black,
-                              ),
-                            ],
-                          );
-                        } else if (state is InternetEnabled &&
-                            state.connectionType == ConnectionType.mobile) {
-                          return Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor:
-                                    appColors.greenColor.withOpacity(.5),
-                                child: CircleAvatar(
-                                  radius: 6,
-                                  backgroundColor: appColors.greenColor,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              const Icon(
-                                Icons.network_cell_rounded,
-                                size: 22,
-                                color: Colors.black,
-                              ),
-                            ],
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                    ),
-                    largeTitle: const Text(
-                      'Settings',
-                      // style: TextStyle(fontSize: 30),
-                    ),
-                  );
-                } else {
-                  return CupertinoSliverNavigationBar(
-                    backgroundColor: Colors.white,
-                    middle: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          'Searching for network',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        CupertinoActivityIndicator(
-                          color: Colors.black,
-                        )
-                      ],
-                    ),
-                    largeTitle: const Text(
-                      'Settings',
-                      // style: TextStyle(fontSize: 30),
-                    ),
-                  );
-                }
-              },
-            ),
-          ];
-        },
-        body: NotificationListener<OverscrollIndicatorNotification>(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
             overscroll.disallowIndicator();
             return true;
           },
-          child: const SingleChildScrollView(
-            child: UserSettings(),
-          ),
+          child: SettingScreenBody(screen: screen, appColors: appColors),
         ),
       ),
+    );
+  }
+}
+
+class SettingScreenBody extends StatelessWidget {
+  const SettingScreenBody({
+    Key? key,
+    required this.screen,
+    required this.appColors,
+  }) : super(key: key);
+
+  final Size screen;
+  final AppColors appColors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: screen.width,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+          // height: 80,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              BlocBuilder<InternetCubit, InternetState>(
+                builder: (ctx, state) {
+                  if (state is InternetEnabled) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CircleAvatar(
+                          radius: 8.0,
+                          backgroundColor: appColors.greenColor.withOpacity(.5),
+                          child: CircleAvatar(
+                            radius: 5.0,
+                            backgroundColor: appColors.greenColor,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Active",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: appColors.greenColor,
+                          ),
+                        )
+                      ],
+                    );
+                  } else {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Searching for network",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(width: 5),
+                        CupertinoActivityIndicator(
+                          color: Colors.black,
+                          radius: 8.0,
+                        ),
+                      ],
+                    );
+                  }
+                },
+              ),
+              const Text(
+                "Settings",
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              //implement search bar here
+            ],
+          ),
+        ),
+        const Expanded(
+          child: UserSettings(),
+        ),
+      ],
     );
   }
 }

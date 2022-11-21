@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/settings/account.dart';
@@ -6,6 +7,7 @@ import 'package:chitchat/widgets/settings/privacy.dart';
 import 'package:chitchat/widgets/settings/security.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:page_transition/page_transition.dart';
 import '../../logic/database/user_model.dart';
 import '../general/image_preview.dart';
@@ -15,283 +17,277 @@ class UserSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;
+    AppColors appColors = AppColors();
     return ValueListenableBuilder(
         valueListenable: userDetailNotifier,
         builder: (BuildContext ctx, List<UserModel> userDetail, Widget? child) {
           try {
-            return Column(
-              children: [
-                const SizedBox(height: 20),
-                //profile image
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ImagePreview(
-                          id: userDetail[0].id,
-                          url: userDetail[0].imageUrl,
-                          title: 'Settings',
-                          isEditable: true,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Hero(
-                    tag: userDetail[0].id,
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          width: 3,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      child: userDetail[0].imageUrl == ''
-                          ? CircleAvatar(
-                              radius: 80,
-                              backgroundColor: Colors.black.withOpacity(.1),
-                              backgroundImage: const AssetImage(
-                                  'assets/images/profile_dark.png'),
-                            )
-                          : CircleAvatar(
-                              radius: 80,
-                              backgroundColor: Colors.black.withOpacity(.1),
-                              backgroundImage:
-                                  NetworkImage(userDetail[0].imageUrl),
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  //profile section
+                  Column(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //user image
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              transitionDuration:
+                                  const Duration(milliseconds: 800),
+                              reverseTransitionDuration:
+                                  const Duration(milliseconds: 800),
+                              pageBuilder: (_, __, ___) => ImagePreview(
+                                id: userDetail[0].id,
+                                url: userDetail[0].imageUrl,
+                                title: 'Settings',
+                                isEditable: true,
+                              ),
                             ),
-                    ),
-                  ),
-                ),
-
-                //name
-                Text(
-                  userDetail[0].name,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                //email
-                Text(
-                  userDetail[0].email,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    // fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                //bio section
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 8),
-                      child: Text(
-                        "Bio",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black54,
+                          );
+                        },
+                        child: Hero(
+                          tag: userDetail[0].id,
+                          child: userDetail[0].imageUrl == ''
+                              ? Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      'assets/images/profile.png',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: ClipOval(
+                                    child: CachedNetworkImage(
+                                      imageUrl: userDetail[0].imageUrl,
+                                      progressIndicatorBuilder: (context, url,
+                                              downloadProgress) =>
+                                          CircularProgressIndicator(
+                                              color: appColors.primaryColor,
+                                              value: downloadProgress.progress),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(
+                                        Icons.error,
+                                        color: appColors.redColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
-                    ),
-                    Container(
-                      width: screen.width * .9,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      margin: const EdgeInsets.only(top: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(.2),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Text(
-                        userDetail[0].bio,
+                      const SizedBox(height: 10),
+                      //name and email
+
+                      Text(
+                        userDetail[0].name,
                         style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                //account bar
-                Container(
-                  width: screen.width * .9,
-                  margin: const EdgeInsets.only(top: 5),
-                  child: Material(
-                    color: Colors.blue.withOpacity(.2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    child: InkWell(
-                      splashColor: Colors.blue.withOpacity(.5),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                            reverseDuration: const Duration(milliseconds: 300),
-                            duration: const Duration(milliseconds: 300),
-                            type: PageTransitionType.rightToLeft,
-                            child: Account(
-                              currentEmail: userDetail[0].email,
-                              id: userDetail[0].id,
-                            ),
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: const [
-                                Icon(
-                                  CupertinoIcons.person_alt,
-                                  size: 28,
-                                  color: Colors.blue,
-                                ),
-                                Text(
-                                  'Account',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.blue,
-                            ),
-                          ],
+                      //setting section
+                      CupertinoButton(
+                        child: Text(
+                          'Edit Profile',
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: appColors.primaryColor,
+                              fontFamily: 'Poppins'),
                         ),
+                        onPressed: () {},
                       ),
-                    ),
+                    ],
                   ),
-                ),
 
-                //privacy bar
-                Container(
-                  width: screen.width * .9,
-                  margin: const EdgeInsets.only(top: 5),
-                  child: Material(
-                    color: Colors.blue.withOpacity(.2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    child: InkWell(
-                      splashColor: Colors.blue.withOpacity(.5),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                            reverseDuration: const Duration(milliseconds: 300),
-                            duration: const Duration(milliseconds: 300),
-                            type: PageTransitionType.rightToLeft,
-                            child: const Privacy(),
+                  //bio
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          "Bio",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black54,
                           ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: const [
-                                Icon(
-                                  CupertinoIcons.lock,
-                                  size: 28,
-                                  color: Colors.blue,
-                                ),
-                                Text(
-                                  'Privacy',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.blue,
-                            ),
-                          ],
                         ),
+                      ),
+                      Container(
+                        width: screen.width,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: Text(
+                          userDetail[0].bio,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    height: 10,
+                    thickness: 1,
+                  ),
+                  const SizedBox(height: 25),
+                  //account
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          reverseDuration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 300),
+                          type: PageTransitionType.rightToLeft,
+                          child: Account(
+                            currentEmail: userDetail[0].email,
+                            id: userDetail[0].id,
+                          ),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(
+                                Iconsax.user,
+                                size: 25,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Account',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          //arrow icon
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20,
+                            color: Colors.grey,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                ),
-
-                //security bar
-                Container(
-                  width: screen.width * .9,
-                  margin: const EdgeInsets.only(top: 5),
-                  child: Material(
-                    color: Colors.blue.withOpacity(.2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                            reverseDuration: const Duration(milliseconds: 300),
-                            duration: const Duration(milliseconds: 300),
-                            type: PageTransitionType.rightToLeft,
-                            child: const Security(),
-                          ),
-                        );
-                      },
-                      splashColor: Colors.blue.withOpacity(.5),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: const [
-                                Icon(
-                                  CupertinoIcons.shield,
-                                  size: 28,
-                                  color: Colors.blue,
-                                ),
-                                Text(
-                                  'Security',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.blue,
-                            ),
-                          ],
+//privacy
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          reverseDuration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 300),
+                          type: PageTransitionType.rightToLeft,
+                          child: const Privacy(),
                         ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(
+                                Iconsax.key,
+                                size: 25,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Privacy',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          //arrow icon
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20,
+                            color: Colors.grey,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                  //security
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          reverseDuration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 300),
+                          type: PageTransitionType.rightToLeft,
+                          child: const Security(),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(
+                                Iconsax.shield_tick,
+                                size: 25,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Security',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          //arrow icon
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20,
+                            color: Colors.grey,
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             );
           } catch (e) {
             log("error at user setting ${e.toString()}");

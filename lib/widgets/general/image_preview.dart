@@ -153,7 +153,7 @@ class _ImagePreviewState extends State<ImagePreview> {
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
-              foregroundColor: appColors.primaryColor,
+              foregroundColor: Colors.black,
               title: Text(
                 widget.title,
                 style: const TextStyle(
@@ -165,7 +165,7 @@ class _ImagePreviewState extends State<ImagePreview> {
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                color: appColors.primaryColor,
+                color: Colors.black,
                 splashRadius: 20.0,
                 iconSize: 20.0,
                 onPressed: () => Navigator.of(context).pop(),
@@ -177,7 +177,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                           changeProfilePicture(context);
                         },
                         style: TextButton.styleFrom(
-                          foregroundColor: appColors.primaryColor,
+                          foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),

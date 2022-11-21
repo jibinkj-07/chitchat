@@ -55,7 +55,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                 builder: (ctx, state) {
                   if (state is InternetEnabled) {
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CircleAvatar(
                           radius: 8.0,
@@ -66,10 +66,12 @@ class FindFriendsScreenBody extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 5),
-                        const Text(
+                        Text(
                           "Active",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: appColors.greenColor,
                           ),
                         )
                       ],
