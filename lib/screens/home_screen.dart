@@ -57,16 +57,63 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedIcon:
                 const Icon(CupertinoIcons.bubble_left_bubble_right_fill),
             showBadge: true,
+            title: const Text(
+              'Chats',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+            ),
+            selectedTitle: Text(
+              'Chats',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: appColors.primaryColor,
+              ),
+            ),
             badgeCount: 4,
           ),
           CustomNavigationBarItem(
-            icon: const Icon(CupertinoIcons.rectangle_stack_person_crop),
-            selectedIcon:
-                const Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+            icon: const Icon(CupertinoIcons.person_2_square_stack),
+            selectedIcon: const Icon(CupertinoIcons.person_2_square_stack_fill),
+            title: const Text(
+              'Friends',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+            ),
+            selectedTitle: Text(
+              'Friends',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: appColors.primaryColor,
+              ),
+            ),
           ),
           CustomNavigationBarItem(
-            icon: const Icon(CupertinoIcons.gear),
-            selectedIcon: const Icon(CupertinoIcons.gear_alt_fill),
+            icon: const Icon(CupertinoIcons.person),
+            selectedIcon: const Icon(CupertinoIcons.person_fill),
+            title: const Text(
+              'Profile',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+            ),
+            selectedTitle: Text(
+              'Profile',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: appColors.primaryColor,
+              ),
+            ),
           ),
         ],
         currentIndex: currentIndex,

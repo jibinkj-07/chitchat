@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
-
-import '../../utils/app_colors.dart';
+import 'package:iconsax/iconsax.dart';
 
 class ImageUpdating extends StatelessWidget {
   File? image;
@@ -16,51 +14,87 @@ class ImageUpdating extends StatelessWidget {
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors().primaryColor,
-          leading: const Icon(
-            Icons.abc,
-            color: Colors.white,
-          ),
-          centerTitle: true,
-          elevation: 0,
-          title: const Text(
-            "Updating image",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CupertinoActivityIndicator(
-                radius: 15,
-                color: AppColors().primaryColor,
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: screen.width,
-                height: screen.height * .4,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.file(
-                    image!,
-                    fit: BoxFit.cover,
-                    // color: Colors.white.withOpacity(.7),
-                    // colorBlendMode: BlendMode.modulate,
+        body: SafeArea(
+          child: SizedBox(
+            width: screen.width,
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Updating',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                // decoration: BoxDecoration(
-                //   color: const Color(0xff7c94b6),
-                //   borderRadius: BorderRadius.circular(10.0),
-                // ),
-              ),
-            ],
+                const Divider(
+                  height: 0,
+                ),
+
+                //image
+                Expanded(
+                  child: SizedBox(
+                    width: screen.width,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        Container(
+                          width: screen.width * .9,
+                          height: screen.height * .4,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Image.file(
+                              image!,
+                              fit: BoxFit.cover,
+                              // color: Colors.white.withOpacity(.7),
+                              // colorBlendMode: BlendMode.modulate,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        const CupertinoActivityIndicator(
+                          radius: 15,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(height: 30),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Iconsax.information,
+                                size: 25,
+                                color: Colors.black54,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                "Please wait, your photo is updating and will automatically move to the Profile screen once complete",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black54,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

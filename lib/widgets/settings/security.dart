@@ -1,10 +1,13 @@
-import 'package:chitchat/logic/database/hive_operations.dart';
-import 'package:chitchat/utils/app_colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+import '../../utils/app_colors.dart';
 
 class Security extends StatelessWidget {
-  const Security({super.key});
+  final String id;
+  const Security({
+    super.key,
+    required this.id,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,122 +15,153 @@ class Security extends StatelessWidget {
     final screen = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: appColors.primaryColor,
-          title: const Text(
-            "Security",
-          ),
-          titleSpacing: 0,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            color: appColors.primaryColor,
-            splashRadius: 20.0,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          )),
-      body: Container(
-        width: screen.width,
-        padding: const EdgeInsets.only(bottom: 30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            //bottom column
-            Column(
-              children: [
-                //password change button
-                Container(
-                  width: screen.width * .9,
-                  margin: const EdgeInsets.only(top: 5),
-                  child: Material(
-                    color: Colors.grey.withOpacity(.2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    child: InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   PageTransition(
-                        //     reverseDuration: const Duration(milliseconds: 300),
-                        //     duration: const Duration(milliseconds: 300),
-                        //     type: PageTransitionType.rightToLeft,
-                        //     child: const Security(),
-                        //   ),
-                        // );
-                      },
-                      splashColor: Colors.grey.withOpacity(.5),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: const Text(
-                          'Change password',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
+      body: SafeArea(
+        child: SizedBox(
+          width: screen.width,
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //top column
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                        color: Colors.black,
+                        splashRadius: 20.0,
+                        iconSize: 20.0,
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      const Text(
+                        'Security',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+                      const IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.transparent,
+                        ),
+                        color: Colors.white,
+                        splashRadius: 20.0,
+                        iconSize: 20.0,
+                        onPressed: null,
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    height: 0,
+                  ),
+                  const SizedBox(height: 5),
+                  //account page buttons],),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(
+                        Iconsax.information,
+                        size: 15,
+                        color: Colors.black54,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        "Manage and review your security related settings",
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                  InkWell(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   PageTransition(
+                      //     reverseDuration: const Duration(milliseconds: 300),
+                      //     duration: const Duration(milliseconds: 300),
+                      //     type: PageTransitionType.rightToLeft,
+                      //     child: Account(
+                      //       currentEmail: userDetail[0].email,
+                      //       id: userDetail[0].id,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            'Password',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          //arrow icon
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 20,
+                            color: Colors.grey,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            //log out button
+              //bottom column
 
-            Container(
-              width: screen.width * .9,
-              margin: const EdgeInsets.only(top: 5),
-              child: TextButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  await deleteAccountHive();
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/auth', (route) => false);
+              InkWell(
+                onTap: () {
+                  // Navigator.push(
+                  //   context,
+                  //   PageTransition(
+                  //     reverseDuration: const Duration(milliseconds: 300),
+                  //     duration: const Duration(milliseconds: 300),
+                  //     type: PageTransitionType.rightToLeft,
+                  //     child: Account(
+                  //       currentEmail: userDetail[0].email,
+                  //       id: userDetail[0].id,
+                  //     ),
+                  //   ),
+                  // );
                 },
-                style: TextButton.styleFrom(
-                  foregroundColor: appColors.redColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  "Logout",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                splashColor: appColors.redColor.withOpacity(.2),
+                borderRadius: BorderRadius.circular(8.0),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: appColors.redColor,
+                        ),
+                      ),
+                      //arrow icon
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 20,
+                        color: appColors.redColor,
+                      )
+                    ],
                   ),
                 ),
               ),
-              // child: ElevatedButton(
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor: appColors.redColor,
-              //     foregroundColor: Colors.white,
-              //     padding: const EdgeInsets.symmetric(vertical: 10),
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(8.0),
-              //     ),
-              //   ),
-              //   onPressed: () {
-              //     FirebaseAuth.instance.signOut();
-              //     context.read<UserDetailCubit>().userSignOut();
-              //     Navigator.of(context)
-              //         .pushNamedAndRemoveUntil('/auth', (route) => false);
-              //   },
-              //   child: const Text(
-              //     "Logout",
-              //     style: TextStyle(
-              //       fontSize: 16,
-              //       fontWeight: FontWeight.w500,
-              //     ),
-              //   ),
-              // ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

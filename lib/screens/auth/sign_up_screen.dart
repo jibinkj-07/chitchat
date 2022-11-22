@@ -371,7 +371,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // This shows a CupertinoModalPopup which hosts a CupertinoActionSheet.
   void changeProfilePicture() {
     ImageChooser imageChooser = ImageChooser();
     showModalBottomSheet<void>(
@@ -379,8 +378,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext ctx) {
         return Container(
-          height: 100,
-          margin: const EdgeInsets.symmetric(horizontal: 8),
+          // height: 100,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10),

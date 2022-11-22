@@ -38,9 +38,9 @@ class UserSettings extends StatelessWidget {
                             context,
                             PageRouteBuilder(
                               transitionDuration:
-                                  const Duration(milliseconds: 800),
+                                  const Duration(milliseconds: 500),
                               reverseTransitionDuration:
-                                  const Duration(milliseconds: 800),
+                                  const Duration(milliseconds: 500),
                               pageBuilder: (_, __, ___) => ImagePreview(
                                 id: userDetail[0].id,
                                 url: userDetail[0].imageUrl,
@@ -69,8 +69,12 @@ class UserSettings extends StatelessWidget {
                               : Container(
                                   width: 100,
                                   height: 100,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    border: Border.all(
+                                      width: .5,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                   child: ClipOval(
                                     child: CachedNetworkImage(
@@ -115,39 +119,43 @@ class UserSettings extends StatelessWidget {
                   ),
 
                   //bio
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8),
-                        child: Text(
-                          "Bio",
+                  SizedBox(
+                    width: screen.width,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Profile Bio",
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             color: Colors.black54,
+                            fontSize: 12,
                           ),
                         ),
-                      ),
-                      Container(
-                        width: screen.width,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        child: Text(
+                        Text(
                           userDetail[0].bio,
                           style: const TextStyle(
-                            fontSize: 17,
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const Divider(
-                    height: 10,
-                    thickness: 1,
-                  ),
+
                   const SizedBox(height: 25),
+                  SizedBox(
+                    width: screen.width,
+                    child: const Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
                   //account
                   InkWell(
                     onTap: () {
@@ -205,7 +213,9 @@ class UserSettings extends StatelessWidget {
                           reverseDuration: const Duration(milliseconds: 300),
                           duration: const Duration(milliseconds: 300),
                           type: PageTransitionType.rightToLeft,
-                          child: const Privacy(),
+                          child: Privacy(
+                            id: userDetail[0].id,
+                          ),
                         ),
                       );
                     },
@@ -250,7 +260,9 @@ class UserSettings extends StatelessWidget {
                           reverseDuration: const Duration(milliseconds: 300),
                           duration: const Duration(milliseconds: 300),
                           type: PageTransitionType.rightToLeft,
-                          child: const Security(),
+                          child: Security(
+                            id: userDetail[0].id,
+                          ),
                         ),
                       );
                     },

@@ -85,7 +85,9 @@ class MyApp extends StatelessWidget {
             return const WelcomeScreen();
           },
         ),
-        // home: LoginScreen(),
+        // home: ImageUpdating(
+        //   image: null,
+        // ),
         routes: {
           '/welcome': (_) => const WelcomeScreen(),
           '/auth': (_) => const AuthenticationScreen(),

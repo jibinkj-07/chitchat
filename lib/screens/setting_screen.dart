@@ -100,7 +100,7 @@ class SettingScreenBody extends StatelessWidget {
                 },
               ),
               const Text(
-                "Settings",
+                "Profile",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                   fontSize: 28,

@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/screens/setting_screen.dart';
 import 'package:chitchat/utils/image_chooser.dart';
 import 'package:chitchat/widgets/general/image_updating.dart';
 import 'package:chitchat/widgets/settings/user_settings.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,7 +37,6 @@ class _ImagePreviewState extends State<ImagePreview> {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     FirebaseOperations firebaseOperations = FirebaseOperations();
-    ImageChooser imageChooser = ImageChooser();
     // This shows a CupertinoModalPopup which hosts a CupertinoAlertDialog.
     void showAlertDialog(BuildContext context) {
       showCupertinoModalPopup<void>(
@@ -52,156 +53,221 @@ class _ImagePreviewState extends State<ImagePreview> {
     }
 
     void changeProfilePicture(BuildContext ctx) {
-      showCupertinoModalPopup<void>(
-        context: ctx,
-        builder: (BuildContext ctx) => CupertinoActionSheet(
-          actions: <CupertinoActionSheetAction>[
-            if (widget.url != '')
-              CupertinoActionSheetAction(
-                /// This parameter indicates the action would be a default
-                /// defualt behavior, turns the action's text to bold text.
-                onPressed: () async {
-                  Navigator.pop(ctx);
-                  showAlertDialog(context);
-                  await firebaseOperations.deleteImage(
-                      id: widget.id, context: context);
-                  if (!mounted) return;
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Delete Photo',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: appColors.redColor,
+      ImageChooser imageChooser = ImageChooser();
+      showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext ctx) {
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () async {
+                      final image = await imageChooser.getFromGallery();
+                      if (image == null) return;
+
+                      //moving to updating page
+                      if (!mounted) return;
+                      Navigator.pop(ctx);
+                      setState(() {
+                        updatedImage = image;
+                      });
+                      await firebaseOperations.updateImage(
+                          image: image, id: widget.id);
+                      if (!mounted) return;
+                      Navigator.of(context).pop();
+                    },
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        children: const [
+                          SizedBox(width: 10),
+                          Icon(Iconsax.gallery),
+                          SizedBox(width: 15),
+                          Text(
+                            "Choose from library",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            CupertinoActionSheetAction(
-              /// This parameter indicates the action would be a default
-              /// defualt behavior, turns the action's text to bold text.
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () async {
+                      final image = await imageChooser.getFromCamera();
+                      if (image == null) return;
 
-              onPressed: () async {
-                final image = await imageChooser.getFromCamera();
-                if (image == null) return;
-
-                //moving to updating page
-                if (!mounted) return;
-                Navigator.pop(ctx);
-                setState(() {
-                  updatedImage = image;
-                });
-                await firebaseOperations.updateImage(
-                    image: image, id: widget.id);
-                if (!mounted) return;
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Take Photo',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                      //moving to updating page
+                      if (!mounted) return;
+                      Navigator.pop(ctx);
+                      setState(() {
+                        updatedImage = image;
+                      });
+                      await firebaseOperations.updateImage(
+                          image: image, id: widget.id);
+                      if (!mounted) return;
+                      Navigator.of(context).pop();
+                    },
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        children: const [
+                          SizedBox(width: 10),
+                          Icon(Iconsax.camera),
+                          SizedBox(width: 15),
+                          Text(
+                            "Take photo",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                if (widget.url != '')
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        showAlertDialog(context);
+                        await firebaseOperations.deleteImage(
+                            id: widget.id, context: context);
+                        if (!mounted) return;
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 10),
+                            Icon(
+                              Iconsax.trash,
+                              color: appColors.redColor,
+                            ),
+                            const SizedBox(width: 15),
+                            Text(
+                              "Remove current photo",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: appColors.redColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            CupertinoActionSheetAction(
-              onPressed: () async {
-                final image = await imageChooser.getFromGallery();
-                if (image == null) return;
-
-                //moving to updating page
-                if (!mounted) return;
-                Navigator.pop(ctx);
-                setState(() {
-                  updatedImage = image;
-                });
-                await firebaseOperations.updateImage(
-                    image: image, id: widget.id);
-                if (!mounted) return;
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Choose Photo',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                // fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors().primaryColor,
-              ),
-            ),
-          ),
-        ),
+          );
+        },
       );
     }
 
     //main
     return updatedImage == null
         ? Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              title: Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              centerTitle: true,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                color: Colors.black,
-                splashRadius: 20.0,
-                iconSize: 20.0,
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              actions: [
-                widget.isEditable
-                    ? TextButton(
-                        onPressed: () {
-                          changeProfilePicture(context);
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+            body: SafeArea(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                          color: Colors.black,
+                          splashRadius: 20.0,
+                          iconSize: 20.0,
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        Text(
+                          widget.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        child: const Text(
-                          'edit',
-                          style: TextStyle(
-                            // fontSize: 16,
-                            fontWeight: FontWeight.normal,
+                        TextButton(
+                          onPressed: widget.isEditable
+                              ? () {
+                                  changeProfilePicture(context);
+                                }
+                              : null,
+                          style: TextButton.styleFrom(
+                            foregroundColor: appColors.primaryColor,
+                            disabledForegroundColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            ),
                           ),
+                          child: const Text(
+                            'Edit',
+                            style: TextStyle(
+                              // fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    const Divider(
+                      height: 0,
+                    ),
+                    Expanded(
+                      child: InteractiveViewer(
+                        child: Hero(
+                          tag: widget.id,
+                          child: widget.url == ''
+                              ? Image.asset('assets/images/profile.png')
+                              : CachedNetworkImage(
+                                  imageUrl: widget.url,
+                                  width: MediaQuery.of(context).size.width,
+                                  fit: BoxFit.contain,
+                                  placeholder: (context, url) =>
+                                      CupertinoActivityIndicator(
+                                    color: appColors.primaryColor,
+                                    radius: 15,
+                                  ),
+                                  errorWidget: (context, url, error) => Icon(
+                                    Icons.error,
+                                    color: appColors.redColor,
+                                  ),
+                                ),
                         ),
-                      )
-                    : const SizedBox()
-              ],
-            ),
-            body: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: InteractiveViewer(
-                child: Hero(
-                  tag: widget.id,
-                  child: widget.url == ''
-                      ? Image.asset('assets/images/profile.png')
-                      : Image.network(widget.url, fit: BoxFit.contain),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
