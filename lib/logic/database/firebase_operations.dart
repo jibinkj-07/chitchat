@@ -255,28 +255,39 @@ class FirebaseOperations {
   }
 
   //UPDATING USER NAME
-  Future<void> updateName({
+  Future<bool> updateName({
     required String name,
     required String id,
-    required BuildContext context,
   }) async {
-    await database
-        .doc(id)
-        .set({'name': name}, SetOptions(merge: true)).then((value) async {
-      await updateNameHive(name: name);
-    });
+    try {
+      await database
+          .doc(id)
+          .set({'name': name}, SetOptions(merge: true)).then((value) async {
+        await updateNameHive(name: name);
+      });
+    } catch (e) {
+      log('error in update bio ${e.toString()}');
+      return false;
+    }
+    return true;
   }
 
   //UPDATING USER BIO
-  Future<void> updateBio({
+  Future<bool> updateBio({
     required String bio,
     required String id,
   }) async {
-    await database
-        .doc(id)
-        .set({'bio': bio}, SetOptions(merge: true)).then((value) {
-      updateBioHive(bio: bio);
-    });
+    try {
+      await database
+          .doc(id)
+          .set({'bio': bio}, SetOptions(merge: true)).then((value) {
+        updateBioHive(bio: bio);
+      });
+    } catch (e) {
+      log('error in update bio ${e.toString()}');
+      return false;
+    }
+    return true;
   }
 
   //DELETING USER

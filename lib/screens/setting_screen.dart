@@ -112,7 +112,9 @@ class SettingScreenBody extends StatelessWidget {
           ),
         ),
         const Expanded(
-          child: UserSettings(),
+          child: SingleChildScrollView(
+            child: UserSettings(),
+          ),
         ),
       ],
     );

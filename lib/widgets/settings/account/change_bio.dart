@@ -7,16 +7,16 @@ import 'package:iconsax/iconsax.dart';
 import '../../../logic/database/hive_operations.dart';
 import '../../../logic/database/user_model.dart';
 
-class ChangeName extends StatefulWidget {
-  const ChangeName({
+class ChangeBio extends StatefulWidget {
+  const ChangeBio({
     super.key,
   });
 
   @override
-  State<ChangeName> createState() => _ChangeNameState();
+  State<ChangeBio> createState() => _ChangeBioState();
 }
 
-class _ChangeNameState extends State<ChangeName> {
+class _ChangeBioState extends State<ChangeBio> {
   final formKey = GlobalKey<FormState>();
   bool isVisible = false;
   bool isLoading = false;
@@ -24,7 +24,7 @@ class _ChangeNameState extends State<ChangeName> {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;
-    String name = '';
+    String bio = '';
     void showAlertDialog({
       required BuildContext context,
       required String title,
@@ -64,20 +64,20 @@ class _ChangeNameState extends State<ChangeName> {
     }
 
     //delete account
-    Future<void> changeName(String id) async {
+    Future<void> changeBio(String id) async {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
       if (valid) {
         formKey.currentState!.save();
-        bool result = await FirebaseOperations().updateName(
-          name: name.trim(),
+        bool result = await FirebaseOperations().updateBio(
+          bio: bio,
           id: id,
         );
         if (result) {
           showAlertDialog(
             context: context,
             title: "Done",
-            content: "Profile name updated successfully",
+            content: "Profile bio updated successfully",
           );
         } else {
           showAlertDialog(
@@ -110,7 +110,7 @@ class _ChangeNameState extends State<ChangeName> {
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Text(
-                        'Profile Name',
+                        'Profile Bio',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -144,7 +144,7 @@ class _ChangeNameState extends State<ChangeName> {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "Profile name will be used everywhere in Chitchat. The old profile name will be replaced with the new one immediately.",
+                          "Users who ever visiting your profile can see your profile bio. The old profile bio will be replaced with the new one immediately.",
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.normal,
@@ -159,7 +159,7 @@ class _ChangeNameState extends State<ChangeName> {
                   SizedBox(
                     width: screen.width * .9,
                     child: const Text(
-                      "Enter new profile name",
+                      "Enter new profile bio",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -177,18 +177,20 @@ class _ChangeNameState extends State<ChangeName> {
                           width: screen.width * .9,
                           child: TextFormField(
                             cursorColor: appColors.primaryColor,
-                            key: const ValueKey('name'),
-                            textInputAction: TextInputAction.done,
-                            textCapitalization: TextCapitalization.words,
+                            key: const ValueKey('bio'),
+                            textInputAction: TextInputAction.newline,
+                            textCapitalization: TextCapitalization.sentences,
+                            maxLines: 4,
+                            // expands: true,
                             //validator
                             validator: (data) {
-                              if (data!.trim().isEmpty) {
+                              if (data!.isEmpty) {
                                 return 'Name is empty';
                               }
                               return null;
                             },
                             onSaved: (value) {
-                              name = value.toString().trim();
+                              bio = value.toString().trim();
                             },
                             style: const TextStyle(
                                 fontSize: 16.0,
@@ -199,7 +201,7 @@ class _ChangeNameState extends State<ChangeName> {
                             decoration: InputDecoration(
                               contentPadding:
                                   const EdgeInsets.symmetric(horizontal: 15),
-                              hintText: userDetail[0].name,
+                              hintText: userDetail[0].bio,
                               hintStyle: const TextStyle(
                                 color: Colors.grey,
                               ),
@@ -249,7 +251,7 @@ class _ChangeNameState extends State<ChangeName> {
                         ),
                       ),
                       onPressed: () {
-                        changeName(userDetail[0].id);
+                        changeBio(userDetail[0].id);
                       },
                       child: const Text(
                         "Update",

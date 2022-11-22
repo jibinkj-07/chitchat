@@ -1,16 +1,20 @@
+import 'package:chitchat/widgets/settings/account/change_name.dart';
 import 'package:chitchat/widgets/settings/account/personal_info.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../utils/app_colors.dart';
 import 'account/account_deletion.dart';
+import 'account/change_bio.dart';
 
 class Account extends StatelessWidget {
   final String currentEmail;
   final String id;
+  final String name;
   const Account({
     super.key,
     required this.currentEmail,
     required this.id,
+    required this.name,
   });
 
   @override
@@ -86,7 +90,7 @@ class Account extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => PersonalInfo(),
+                          builder: (_) => const PersonalInfo(),
                         ),
                       );
                     },
@@ -116,18 +120,11 @@ class Account extends StatelessWidget {
 
                   InkWell(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     reverseDuration: const Duration(milliseconds: 300),
-                      //     duration: const Duration(milliseconds: 300),
-                      //     type: PageTransitionType.rightToLeft,
-                      //     child: Account(
-                      //       currentEmail: userDetail[0].email,
-                      //       id: userDetail[0].id,
-                      //     ),
-                      //   ),
-                      // );
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ChangeName(),
+                        ),
+                      );
                     },
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(
@@ -154,18 +151,11 @@ class Account extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     reverseDuration: const Duration(milliseconds: 300),
-                      //     duration: const Duration(milliseconds: 300),
-                      //     type: PageTransitionType.rightToLeft,
-                      //     child: Account(
-                      //       currentEmail: userDetail[0].email,
-                      //       id: userDetail[0].id,
-                      //     ),
-                      //   ),
-                      // );
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ChangeBio(),
+                        ),
+                      );
                     },
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(
@@ -218,7 +208,7 @@ class Account extends StatelessWidget {
                           Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 20,
-                            color: appColors.redColor.withOpacity(.5),
+                            color: appColors.redColor,
                           )
                         ],
                       ),

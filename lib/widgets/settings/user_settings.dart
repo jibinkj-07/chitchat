@@ -168,6 +168,7 @@ class UserSettings extends StatelessWidget {
                           child: Account(
                             currentEmail: userDetail[0].email,
                             id: userDetail[0].id,
+                            name: userDetail[0].name,
                           ),
                         ),
                       );
