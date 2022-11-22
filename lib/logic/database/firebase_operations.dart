@@ -47,17 +47,18 @@ class FirebaseOperations {
   }
 
   //METHOD TO CREATE NEW ACCOUNT
-  Future<String> createNewUser({
+  Future<bool> createNewUser({
     required String email,
     required String password,
     required String name,
     required BuildContext context,
     File? userImage,
   }) async {
-    final navigator = Navigator.of(context);
     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
-    String status = '';
+    final navigator = Navigator.of(context);
+
     try {
+      final createdTime = DateTime.now();
       FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) async {
@@ -77,7 +78,7 @@ class FirebaseOperations {
                 'email': email,
                 'imageUrl': url,
                 'bio': 'Hey want to chat? ping me',
-                'created': DateTime.now(),
+                'created': createdTime,
               },
               SetOptions(merge: true),
             );
@@ -87,8 +88,11 @@ class FirebaseOperations {
               email: email,
               imageUrl: url,
               bio: 'Hey want to chat? ping me',
+              joined: createdTime,
             );
             await addUserDetailsHive(user: user);
+            // //ROUTING USER TO HOMEPAGE
+            navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
           });
         }
         //if user have no profile image
@@ -100,7 +104,7 @@ class FirebaseOperations {
               'email': email,
               'imageUrl': '',
               'bio': 'Hey want to chat? ping me',
-              'created': DateTime.now(),
+              'created': createdTime,
             },
             SetOptions(merge: true),
           );
@@ -110,32 +114,36 @@ class FirebaseOperations {
             email: email,
             imageUrl: '',
             bio: 'Hey want to chat? ping me',
+            joined: createdTime,
           );
           await addUserDetailsHive(user: user);
-          status = 'success';
+          // //ROUTING USER TO HOMEPAGE
+          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
         }
       });
     } catch (e) {
       log(e.toString());
-      status = 'error';
+
       ScaffoldMessenger.of(context).showSnackBar(
-        snackBar(message: 'Somethink went wrong. Try again later'),
+        snackBar(message: 'Something went wrong. Try again later'),
       );
+      return false;
     }
-    return status;
+    return true;
   }
 
 //USER LOGIN METHOD
-  Future<String> loginUser({
+  Future<bool> loginUser({
     required String email,
     required String password,
     required String name,
     required String id,
     required String bio,
     required String imageUrl,
+    required DateTime joined,
     required BuildContext context,
   }) async {
-    String status = '';
+    final navigator = Navigator.of(context);
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
@@ -146,12 +154,13 @@ class FirebaseOperations {
           email: email,
           imageUrl: imageUrl,
           bio: bio,
+          joined: joined,
         );
         await addUserDetailsHive(user: user);
-        status = 'success';
+        // //ROUTING USER TO HOMEPAGE
+        navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
       });
     } catch (e) {
-      status = 'error';
       log(e.toString());
       if (e.toString().contains('unusual activity')) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -163,14 +172,15 @@ class FirebaseOperations {
         ScaffoldMessenger.of(context).showSnackBar(
             snackBar(message: 'Something went wrong. Try again later.'));
       }
+      return false;
     }
-    return status;
+    return true;
   }
 
 //SNACKBAR
   SnackBar snackBar({required String message}) {
     return SnackBar(
-      backgroundColor: AppColors().primaryColor,
+      backgroundColor: AppColors().redColor,
       content: Text(
         message,
         style: const TextStyle(
@@ -183,10 +193,10 @@ class FirebaseOperations {
   }
 
   //METHOD TO GET USER DETAILS IN LOGIN PAGE
-  Future<Map<String, String>> getLoginUserDetails(
+  Future<Map<String, dynamic>> getLoginUserDetails(
       {required String email}) async {
     final id = await getUseridFromEmail(email: email);
-    Map<String, String> data = await getUserDetails(userId: id);
+    Map<String, dynamic> data = await getUserDetails(userId: id);
     return data;
   }
 
@@ -202,8 +212,8 @@ class FirebaseOperations {
   }
 
   //GETTING SINGLE USER DETAILS
-  Future<Map<String, String>> getUserDetails({required String userId}) async {
-    Map<String, String> details = {};
+  Future<Map<String, dynamic>> getUserDetails({required String userId}) async {
+    Map<String, dynamic> details = {};
     await database.doc(userId).get().then((snapshot) {
       details = {
         'id': snapshot.id,
@@ -211,6 +221,7 @@ class FirebaseOperations {
         'email': snapshot.get('email'),
         'imageUrl': snapshot.get('imageUrl'),
         'bio': snapshot.get('bio'),
+        'joined': snapshot.get('created').toDate(),
       };
     });
     return details;

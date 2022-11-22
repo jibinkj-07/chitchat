@@ -17,11 +17,15 @@ class UserModel {
 
   @HiveField(4)
   String bio;
+
+  @HiveField(5)
+  DateTime joined;
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.imageUrl,
     required this.bio,
+    required this.joined,
   });
 }

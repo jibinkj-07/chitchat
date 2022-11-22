@@ -1,3 +1,4 @@
+import 'package:chitchat/widgets/settings/account/personal_info.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../utils/app_colors.dart';
@@ -82,18 +83,11 @@ class Account extends StatelessWidget {
                   //buttons
                   InkWell(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     reverseDuration: const Duration(milliseconds: 300),
-                      //     duration: const Duration(milliseconds: 300),
-                      //     type: PageTransitionType.rightToLeft,
-                      //     child: Account(
-                      //       currentEmail: userDetail[0].email,
-                      //       id: userDetail[0].id,
-                      //     ),
-                      //   ),
-                      // );
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PersonalInfo(),
+                        ),
+                      );
                     },
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(

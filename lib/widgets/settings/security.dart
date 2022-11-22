@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../logic/database/hive_operations.dart';
 import '../../utils/app_colors.dart';
 
 class Security extends StatelessWidget {
@@ -13,6 +15,7 @@ class Security extends StatelessWidget {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;
+    final navigator = Navigator.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -121,7 +124,7 @@ class Security extends StatelessWidget {
               //bottom column
 
               InkWell(
-                onTap: () {
+                onTap: () async {
                   // Navigator.push(
                   //   context,
                   //   PageTransition(
@@ -134,6 +137,10 @@ class Security extends StatelessWidget {
                   //     ),
                   //   ),
                   // );
+                  FirebaseAuth.instance.signOut();
+                  await deleteAccountHive();
+
+                  navigator.pushNamedAndRemoveUntil('/auth', (route) => false);
                 },
                 splashColor: appColors.redColor.withOpacity(.2),
                 borderRadius: BorderRadius.circular(8.0),

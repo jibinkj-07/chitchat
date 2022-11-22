@@ -7,6 +7,14 @@ class LoginScreenArguments {
   final String email;
   final String imageUrl;
   final String bio;
+  final DateTime joined;
 
-  LoginScreenArguments(this.id, this.name, this.email, this.imageUrl, this.bio);
+  LoginScreenArguments(
+    this.id,
+    this.name,
+    this.email,
+    this.imageUrl,
+    this.bio,
+    this.joined,
+  );
 }

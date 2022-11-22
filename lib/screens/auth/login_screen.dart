@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
@@ -31,25 +33,23 @@ class _LoginScreenState extends State<LoginScreen> {
     void submitPassword() async {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
-      final navigator = Navigator.of(context);
       if (valid) {
         setState(() {
           isLoading = true;
         });
         formKey.currentState!.save();
-        final result = await firebaseOperations.loginUser(
+        bool result = await firebaseOperations.loginUser(
           email: args.email,
           password: password,
           name: args.name,
           id: args.id,
           bio: args.bio,
           imageUrl: args.imageUrl,
+          joined: args.joined,
           context: context,
         );
-        if (result.toString().contains('success')) {
-          //ROUTING USER TO HOMEPAGE
-          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-        } else {
+        log('result is $result');
+        if (!result) {
           setState(() {
             isLoading = false;
           });

@@ -36,7 +36,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     //submitting password
     void createAccount() async {
-      final navigator = Navigator.of(context);
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
       if (valid) {
@@ -44,17 +43,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           isLoading = true;
         });
         formKey.currentState!.save();
-        final result = await firebaseOperations.createNewUser(
+        bool result = await firebaseOperations.createNewUser(
           email: userEmail,
           password: password,
           name: name,
           context: context,
           userImage: imageFile,
         );
-        if (result == 'success') {
-          // //ROUTING USER TO HOMEPAGE
-          navigator.pushNamedAndRemoveUntil('/homeScreen', (route) => false);
-        } else {
+        log('value of result is in sign up is $result');
+        if (!result) {
           setState(() {
             isLoading = false;
           });

@@ -50,6 +50,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
               result['email']!,
               result['imageUrl']!,
               result['bio']!,
+              result['joined'] as DateTime,
             ),
             (route) => false,
           );
