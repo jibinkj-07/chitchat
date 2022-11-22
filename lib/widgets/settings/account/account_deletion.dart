@@ -205,7 +205,7 @@ class _AccountDeletionState extends State<AccountDeletion> {
                             ],
                           ),
                         ),
-
+                        const SizedBox(height: 20),
                         //delete button
                         SizedBox(
                           width: screen.width * .5,

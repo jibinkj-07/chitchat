@@ -180,12 +180,12 @@ class _ChangeBioState extends State<ChangeBio> {
                             key: const ValueKey('bio'),
                             textInputAction: TextInputAction.newline,
                             textCapitalization: TextCapitalization.sentences,
-                            maxLines: 4,
+                            maxLines: 6,
                             // expands: true,
                             //validator
                             validator: (data) {
                               if (data!.isEmpty) {
-                                return 'Name is empty';
+                                return 'Profile bio is empty';
                               }
                               return null;
                             },

@@ -183,7 +183,7 @@ class _ChangeNameState extends State<ChangeName> {
                             //validator
                             validator: (data) {
                               if (data!.trim().isEmpty) {
-                                return 'Name is empty';
+                                return 'Profile name is empty';
                               }
                               return null;
                             },
