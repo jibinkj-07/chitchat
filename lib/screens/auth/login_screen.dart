@@ -4,6 +4,7 @@ import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/login_screen_arguments.dart';
+import 'package:chitchat/widgets/settings/security/password_reset.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -223,7 +224,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: () {
                             ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            Navigator.of(context).pushNamed('/pwReset');
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    PasswordReset(email: args.email),
+                              ),
+                            );
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: appColors.primaryColor,

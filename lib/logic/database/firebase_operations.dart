@@ -228,8 +228,7 @@ class FirebaseOperations {
   }
 
 //DELETING USER IMAGE
-  Future<void> deleteImage(
-      {required String id, required BuildContext context}) async {
+  Future<void> deleteImage({required String id}) async {
     // final navigator = Navigator.of(context);
     final storageRef = FirebaseStorage.instance.ref().child("Profile Images");
     await storageRef.child('$id.jpg').delete();
@@ -343,5 +342,17 @@ class FirebaseOperations {
         ),
       ),
     );
+  }
+
+  //RESET PASSWORD
+  Future<String> resetPassword({required String email}) async {
+    String status = 'success';
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email).then((_) {
+      log('auth helper pw reset done ');
+    }).catchError((e) {
+      log('error in pw reset ${e.toString()}');
+      status = e.toString();
+    });
+    return status;
   }
 }

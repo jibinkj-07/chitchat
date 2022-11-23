@@ -9,7 +9,7 @@ import 'package:chitchat/screens/auth/welcome_screen.dart';
 import 'package:chitchat/screens/home_screen.dart';
 import 'package:chitchat/utils/custom_route_transition.dart';
 import 'package:chitchat/widgets/general/image_updating.dart';
-import 'package:chitchat/widgets/general/password_reset.dart';
+import 'package:chitchat/widgets/settings/security/password_reset.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (ctx, snapshot) {
             if (snapshot.hasData) {
-              return const HomeScreen();
+              return HomeScreen(index: 0);
             }
             return const WelcomeScreen();
           },
@@ -93,8 +93,7 @@ class MyApp extends StatelessWidget {
           '/auth': (_) => const AuthenticationScreen(),
           '/login': (_) => const LoginScreen(),
           '/signUp': (_) => const SignUpScreen(),
-          '/homeScreen': (_) => const HomeScreen(),
-          '/pwReset': (_) => const PasswordReset(),
+          '/homeScreen': (_) => HomeScreen(index: 0),
         },
       ),
     );

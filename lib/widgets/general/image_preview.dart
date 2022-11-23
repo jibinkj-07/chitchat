@@ -8,6 +8,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../screens/home_screen.dart';
 import '../../utils/app_colors.dart';
 
 class ImagePreview extends StatefulWidget {
@@ -59,30 +60,19 @@ class _ImagePreviewState extends State<ImagePreview> {
               'Make sure you have turned on Mobile data or Wifi to continue.'),
           actions: <CupertinoDialogAction>[
             CupertinoDialogAction(
-              /// This parameter indicates this action is the default,
-              /// and turns the action's text to bold text.
               isDefaultAction: true,
               onPressed: () {
                 Navigator.pop(context);
               },
               child: const Text('Ok'),
             ),
-            // CupertinoDialogAction(
-            //   /// This parameter indicates the action would perform
-            //   /// a destructive action such as deletion, and turns
-            //   /// the action's text color to red.
-            //   isDestructiveAction: true,
-            //   onPressed: () {
-            //     Navigator.pop(context);
-            //   },
-            //   child: const Text('Yes'),
-            // ),
           ],
         ),
       );
     }
 
     void changeProfilePicture(BuildContext ctx) {
+      final navigator = Navigator.of(context);
       ImageChooser imageChooser = ImageChooser();
       showModalBottomSheet<void>(
         context: context,
@@ -116,8 +106,11 @@ class _ImagePreviewState extends State<ImagePreview> {
                       });
                       await firebaseOperations.updateImage(
                           image: image, id: widget.id);
-                      if (!mounted) return;
-                      Navigator.of(context).pop();
+                      navigator.pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => HomeScreen(index: 2),
+                          ),
+                          (route) => false);
                     },
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(10),
@@ -157,8 +150,11 @@ class _ImagePreviewState extends State<ImagePreview> {
                       });
                       await firebaseOperations.updateImage(
                           image: image, id: widget.id);
-                      if (!mounted) return;
-                      Navigator.of(context).pop();
+                      navigator.pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => HomeScreen(index: 2),
+                          ),
+                          (route) => false);
                     },
                     child: SizedBox(
                       height: 50,
@@ -186,11 +182,12 @@ class _ImagePreviewState extends State<ImagePreview> {
                       onTap: () async {
                         Navigator.pop(ctx);
                         showAlertDialog(context);
-                        await firebaseOperations.deleteImage(
-                            id: widget.id, context: context);
-                        if (!mounted) return;
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
+                        await firebaseOperations.deleteImage(id: widget.id);
+                        navigator.pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (_) => HomeScreen(index: 2),
+                            ),
+                            (route) => false);
                       },
                       child: SizedBox(
                         height: 50,

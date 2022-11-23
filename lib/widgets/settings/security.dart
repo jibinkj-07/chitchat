@@ -1,3 +1,5 @@
+import 'package:chitchat/widgets/general/user_detail.dart';
+import 'package:chitchat/widgets/settings/security/password_reset.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -6,9 +8,11 @@ import '../../utils/app_colors.dart';
 
 class Security extends StatelessWidget {
   final String id;
+  final String email;
   const Security({
     super.key,
     required this.id,
+    required this.email,
   });
 
   @override
@@ -82,18 +86,11 @@ class Security extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     reverseDuration: const Duration(milliseconds: 300),
-                      //     duration: const Duration(milliseconds: 300),
-                      //     type: PageTransitionType.rightToLeft,
-                      //     child: Account(
-                      //       currentEmail: userDetail[0].email,
-                      //       id: userDetail[0].id,
-                      //     ),
-                      //   ),
-                      // );
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PasswordReset(email: email),
+                        ),
+                      );
                     },
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(
@@ -125,18 +122,6 @@ class Security extends StatelessWidget {
 
               InkWell(
                 onTap: () async {
-                  // Navigator.push(
-                  //   context,
-                  //   PageTransition(
-                  //     reverseDuration: const Duration(milliseconds: 300),
-                  //     duration: const Duration(milliseconds: 300),
-                  //     type: PageTransitionType.rightToLeft,
-                  //     child: Account(
-                  //       currentEmail: userDetail[0].email,
-                  //       id: userDetail[0].id,
-                  //     ),
-                  //   ),
-                  // );
                   FirebaseAuth.instance.signOut();
                   await deleteAccountHive();
 

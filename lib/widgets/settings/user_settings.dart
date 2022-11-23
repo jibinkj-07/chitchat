@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/settings/account.dart';
+import 'package:chitchat/widgets/settings/edit_profile.dart';
 import 'package:chitchat/widgets/settings/privacy.dart';
 import 'package:chitchat/widgets/settings/security.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,8 +55,8 @@ class UserSettings extends StatelessWidget {
                           tag: userDetail[0].id,
                           child: userDetail[0].imageUrl == ''
                               ? Container(
-                                  width: 100,
-                                  height: 100,
+                                  width: 150,
+                                  height: 150,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                   ),
@@ -67,8 +68,8 @@ class UserSettings extends StatelessWidget {
                                   ),
                                 )
                               : Container(
-                                  width: 100,
-                                  height: 100,
+                                  width: 150,
+                                  height: 150,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
@@ -100,7 +101,7 @@ class UserSettings extends StatelessWidget {
                       Text(
                         userDetail[0].name,
                         style: const TextStyle(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -113,7 +114,23 @@ class UserSettings extends StatelessWidget {
                               color: appColors.primaryColor,
                               fontFamily: 'Poppins'),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              reverseDuration:
+                                  const Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
+                              type: PageTransitionType.bottomToTop,
+                              child: EditProfile(
+                                id: userDetail[0].id,
+                                name: userDetail[0].name,
+                                url: userDetail[0].imageUrl,
+                                bio: userDetail[0].bio,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -156,6 +173,7 @@ class UserSettings extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const Divider(),
                   //account
                   InkWell(
                     onTap: () {
@@ -263,6 +281,7 @@ class UserSettings extends StatelessWidget {
                           type: PageTransitionType.rightToLeft,
                           child: Security(
                             id: userDetail[0].id,
+                            email: userDetail[0].email,
                           ),
                         ),
                       );
