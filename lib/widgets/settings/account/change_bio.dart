@@ -133,7 +133,20 @@ class _ChangeBioState extends State<ChangeBio> {
                   const Divider(
                     height: 0,
                   ),
-
+                  const SizedBox(height: 5),
+                  CircleAvatar(
+                    radius: 45,
+                    backgroundColor: appColors.primaryColor.withOpacity(.2),
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: appColors.primaryColor,
+                      child: const Icon(
+                        Iconsax.document_text5,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -157,7 +170,8 @@ class _ChangeBioState extends State<ChangeBio> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+
+                  const SizedBox(height: 10),
                   SizedBox(
                     width: screen.width * .9,
                     child: const Text(

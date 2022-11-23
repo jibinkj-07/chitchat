@@ -88,7 +88,20 @@ class _AccountDeletionState extends State<AccountDeletion> {
               const Divider(
                 height: 0,
               ),
-
+              const SizedBox(height: 5),
+              CircleAvatar(
+                radius: 45,
+                backgroundColor: appColors.redColor.withOpacity(.2),
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: appColors.redColor,
+                  child: const Icon(
+                    Iconsax.user_remove,
+                    size: 40,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
               //body
               Expanded(
                 child: SingleChildScrollView(

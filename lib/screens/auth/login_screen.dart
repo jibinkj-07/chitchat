@@ -5,9 +5,11 @@ import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/login_screen_arguments.dart';
 import 'package:chitchat/widgets/settings/security/password_reset.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsax/iconsax.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -169,8 +171,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: appColors.primaryColor,
                                   icon: Icon(
                                     isVisible
-                                        ? Icons.lock_outline
-                                        : Icons.lock_open,
+                                        ? Icons.visibility_off_rounded
+                                        : Icons.visibility_rounded,
                                     // size: 20,
                                     // color: appColors.primaryColor,
                                   ),

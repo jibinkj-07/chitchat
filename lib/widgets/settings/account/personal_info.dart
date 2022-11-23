@@ -49,6 +49,20 @@ class PersonalInfo extends StatelessWidget {
             ),
             const Divider(height: 0),
             //main body
+            const SizedBox(height: 5),
+            CircleAvatar(
+              radius: 45,
+              backgroundColor: appColors.primaryColor.withOpacity(.2),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: appColors.primaryColor,
+                child: const Icon(
+                  Iconsax.user,
+                  size: 40,
+                  color: Colors.white,
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
