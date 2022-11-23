@@ -84,6 +84,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                           "Searching for network",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
+                            fontSize: 12,
                           ),
                           textAlign: TextAlign.center,
                         ),

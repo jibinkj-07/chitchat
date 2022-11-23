@@ -2,8 +2,10 @@ import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../logic/cubit/internet_cubit.dart';
 import '../../../logic/database/hive_operations.dart';
 import '../../../logic/database/user_model.dart';
 
@@ -144,7 +146,7 @@ class _ChangeBioState extends State<ChangeBio> {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "Users who ever visiting your profile can see your profile bio. The old profile bio will be replaced with the new one immediately.",
+                          "Friends who ever visiting your profile can see your profile bio. Share about yourself,who your are or what you think.",
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.normal,
@@ -199,8 +201,7 @@ class _ChangeBioState extends State<ChangeBio> {
 
                             //decoration
                             decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
+                              contentPadding: const EdgeInsets.all(10),
                               hintText: userDetail[0].bio,
                               hintStyle: const TextStyle(
                                 color: Colors.grey,
@@ -239,25 +240,41 @@ class _ChangeBioState extends State<ChangeBio> {
                   ),
                   const SizedBox(height: 20),
                   //delete button
-                  SizedBox(
-                    width: screen.width * .5,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: appColors.primaryColor,
-                        foregroundColor: appColors.textLightColor,
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      onPressed: () {
-                        changeBio(userDetail[0].id);
-                      },
-                      child: const Text(
-                        "Update",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                  BlocBuilder<InternetCubit, InternetState>(
+                    builder: (context, state) {
+                      if (state is InternetEnabled) {
+                        return SizedBox(
+                          width: screen.width * .5,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: appColors.primaryColor,
+                              foregroundColor: appColors.textLightColor,
+                              padding: const EdgeInsets.symmetric(vertical: 0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              changeBio(userDetail[0].id);
+                            },
+                            child: const Text(
+                              "Update",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const Text(
+                          "Turn on Mobile data or Wifi to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.center,
+                        );
+                      }
+                    },
                   ),
                 ],
               );

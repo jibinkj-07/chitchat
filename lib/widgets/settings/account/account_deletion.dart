@@ -1,8 +1,10 @@
+import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -207,23 +209,40 @@ class _AccountDeletionState extends State<AccountDeletion> {
                         ),
                         const SizedBox(height: 20),
                         //delete button
-                        SizedBox(
-                          width: screen.width * .5,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: appColors.redColor,
-                              foregroundColor: appColors.textLightColor,
-                              padding: const EdgeInsets.symmetric(vertical: 0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            onPressed: deleteAccount,
-                            child: const Text(
-                              "Delete",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
+                        BlocBuilder<InternetCubit, InternetState>(
+                          builder: (context, state) {
+                            if (state is InternetEnabled) {
+                              return SizedBox(
+                                width: screen.width * .5,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: appColors.redColor,
+                                    foregroundColor: appColors.textLightColor,
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  onPressed: deleteAccount,
+                                  child: const Text(
+                                    "Delete",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return const Text(
+                                "Turn on Mobile data or Wifi to continue",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black54,
+                                ),
+                                textAlign: TextAlign.center,
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),

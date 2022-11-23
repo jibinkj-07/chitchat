@@ -1,7 +1,9 @@
+import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../logic/database/hive_operations.dart';
@@ -144,7 +146,7 @@ class _ChangeNameState extends State<ChangeName> {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "Profile name will be used everywhere in Chitchat. The old profile name will be replaced with the new one immediately.",
+                          "Friends will discover your account by your profile name. Provide your full name, nickname or business name.",
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.normal,
@@ -237,25 +239,41 @@ class _ChangeNameState extends State<ChangeName> {
                   ),
                   const SizedBox(height: 20),
                   //delete button
-                  SizedBox(
-                    width: screen.width * .5,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: appColors.primaryColor,
-                        foregroundColor: appColors.textLightColor,
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      onPressed: () {
-                        changeName(userDetail[0].id);
-                      },
-                      child: const Text(
-                        "Update",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                  BlocBuilder<InternetCubit, InternetState>(
+                    builder: (context, state) {
+                      if (state is InternetEnabled) {
+                        return SizedBox(
+                          width: screen.width * .5,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: appColors.primaryColor,
+                              foregroundColor: appColors.textLightColor,
+                              padding: const EdgeInsets.symmetric(vertical: 0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              changeName(userDetail[0].id);
+                            },
+                            child: const Text(
+                              "Update",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const Text(
+                          "Turn on Mobile data or Wifi to continue",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.center,
+                        );
+                      }
+                    },
                   ),
                 ],
               );

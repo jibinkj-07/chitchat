@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chitchat/screens/setting_screen.dart';
+import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/image_chooser.dart';
 import 'package:chitchat/widgets/general/image_updating.dart';
-import 'package:chitchat/widgets/settings/user_settings.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../utils/app_colors.dart';
 
 class ImagePreview extends StatefulWidget {
@@ -48,6 +45,39 @@ class _ImagePreviewState extends State<ImagePreview> {
             radius: 15,
             color: Colors.black,
           ),
+        ),
+      );
+    }
+
+    //dialog box for no internet warning
+    void showAlertDialogForNoInternet(BuildContext context) {
+      showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: const Text('Network Error'),
+          content: const Text(
+              'Make sure you have turned on Mobile data or Wifi to continue.'),
+          actions: <CupertinoDialogAction>[
+            CupertinoDialogAction(
+              /// This parameter indicates this action is the default,
+              /// and turns the action's text to bold text.
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Ok'),
+            ),
+            // CupertinoDialogAction(
+            //   /// This parameter indicates the action would perform
+            //   /// a destructive action such as deletion, and turns
+            //   /// the action's text color to red.
+            //   isDestructiveAction: true,
+            //   onPressed: () {
+            //     Navigator.pop(context);
+            //   },
+            //   child: const Text('Yes'),
+            // ),
+          ],
         ),
       );
     }
@@ -218,26 +248,34 @@ class _ImagePreviewState extends State<ImagePreview> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        TextButton(
-                          onPressed: widget.isEditable
-                              ? () {
-                                  changeProfilePicture(context);
-                                }
-                              : null,
-                          style: TextButton.styleFrom(
-                            foregroundColor: appColors.primaryColor,
-                            disabledForegroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                          ),
-                          child: const Text(
-                            'Edit',
-                            style: TextStyle(
-                              // fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                        BlocBuilder<InternetCubit, InternetState>(
+                          builder: (context, state) {
+                            return TextButton(
+                              onPressed: widget.isEditable
+                                  ? (state is InternetEnabled)
+                                      ? () {
+                                          changeProfilePicture(context);
+                                        }
+                                      : () {
+                                          showAlertDialogForNoInternet(context);
+                                        }
+                                  : null,
+                              style: TextButton.styleFrom(
+                                foregroundColor: appColors.primaryColor,
+                                disabledForegroundColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: const Text(
+                                'Edit',
+                                style: TextStyle(
+                                  // fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          },
                         )
                       ],
                     ),

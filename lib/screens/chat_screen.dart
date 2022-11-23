@@ -81,7 +81,8 @@ class ChatScreenBody extends StatelessWidget {
                         Text(
                           "Searching for network",
                           style: TextStyle(
-                            fontWeight: FontWeight.normal,
+                          fontWeight: FontWeight.w500,
+                            fontSize: 12,
                           ),
                           textAlign: TextAlign.center,
                         ),
