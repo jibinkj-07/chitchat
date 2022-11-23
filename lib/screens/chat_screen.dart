@@ -46,33 +46,19 @@ class ChatScreenBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
           width: screen.width,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               BlocBuilder<InternetCubit, InternetState>(
                 builder: (ctx, state) {
                   if (state is InternetEnabled) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 8.0,
-                          backgroundColor: appColors.greenColor.withOpacity(.5),
-                          child: CircleAvatar(
-                            radius: 5.0,
-                            backgroundColor: appColors.greenColor,
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          "Active",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: appColors.greenColor,
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
+                    return CircleAvatar(
+                      radius: 8.0,
+                      backgroundColor: appColors.greenColor.withOpacity(.5),
+                      child: CircleAvatar(
+                        radius: 5.0,
+                        backgroundColor: appColors.greenColor,
+                      ),
                     );
                   } else {
                     return Row(
@@ -81,7 +67,7 @@ class ChatScreenBody extends StatelessWidget {
                         Text(
                           "Searching for network",
                           style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w500,
                             fontSize: 12,
                           ),
                           textAlign: TextAlign.center,

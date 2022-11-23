@@ -1,7 +1,9 @@
 import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/allUsers/allFriends_search.dart';
 import 'package:chitchat/widgets/allUsers/find_friends.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,33 +50,19 @@ class FindFriendsScreenBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
           // height: 80,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               BlocBuilder<InternetCubit, InternetState>(
                 builder: (ctx, state) {
                   if (state is InternetEnabled) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 8.0,
-                          backgroundColor: appColors.greenColor.withOpacity(.5),
-                          child: CircleAvatar(
-                            radius: 5.0,
-                            backgroundColor: appColors.greenColor,
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          "Active",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            color: appColors.greenColor,
-                          ),
-                        )
-                      ],
+                    return CircleAvatar(
+                      radius: 8.0,
+                      backgroundColor: appColors.greenColor.withOpacity(.5),
+                      child: CircleAvatar(
+                        radius: 5.0,
+                        backgroundColor: appColors.greenColor,
+                      ),
                     );
                   } else {
                     return Row(
@@ -98,19 +86,38 @@ class FindFriendsScreenBody extends StatelessWidget {
                   }
                 },
               ),
-              const Text(
-                "Find Friends",
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Find Friends",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => AllFriendsSearch(
+                              currentUserid:
+                                  FirebaseAuth.instance.currentUser!.uid),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      CupertinoIcons.search,
+                    ),
+                    splashRadius: 20.0,
+                  ),
+                ],
               ),
-              CupertinoSearchTextField(),
             ],
           ),
         ),
-        Expanded(child: FindFriends())
+        const Expanded(child: FindFriends())
       ],
     );
   }

@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chitchat/utils/user_profile.dart';
 import 'package:chitchat/widgets/general/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../logic/database/user_profile.dart';
 import '../../utils/app_colors.dart';
 
 class UserDetail extends StatelessWidget {
@@ -74,14 +74,14 @@ class UserDetail extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (_) => ImagePreview(
                                   id: user.id,
-                                  url: user.url,
+                                  url: user.imageUrl,
                                   title: 'Find Friends',
                                   isEditable: false,
                                 ),
                               ),
                             );
                           },
-                          child: user.url == ''
+                          child: user.imageUrl == ''
                               ? Container(
                                   width: 180,
                                   height: 180,
@@ -107,7 +107,7 @@ class UserDetail extends StatelessWidget {
                                   ),
                                   child: ClipOval(
                                     child: CachedNetworkImage(
-                                      imageUrl: user.url,
+                                      imageUrl: user.imageUrl,
                                       width: 180,
                                       height: 180,
                                       fit: BoxFit.cover,
@@ -125,12 +125,12 @@ class UserDetail extends StatelessWidget {
                                   ),
                                 ),
                         ),
-
+                        const SizedBox(height: 5),
                         //Name
                         Text(
                           user.name,
                           style: const TextStyle(
-                            fontSize: 25,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -138,7 +138,7 @@ class UserDetail extends StatelessWidget {
 
                         //email
                         Text(
-                          user.email,
+                          user.username,
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,

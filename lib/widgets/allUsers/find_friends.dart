@@ -2,12 +2,13 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
-import 'package:chitchat/utils/user_profile.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletons/skeletons.dart';
+
+import '../../logic/database/user_profile.dart';
 
 class FindFriends extends StatefulWidget {
   const FindFriends({super.key});
@@ -20,12 +21,9 @@ class _FindFriendsState extends State<FindFriends> {
   // bool isLoading = false;
   FirebaseOperations firebaseOperations = FirebaseOperations();
   List<Map<String, dynamic>> usersFromDb = [];
-  List<Map<String, dynamic>> allUsers = [];
-  late TextEditingController searchTextController;
 
   @override
   void initState() {
-    searchTextController = TextEditingController();
     getAllUsers();
     super.initState();
   }
@@ -82,9 +80,9 @@ class _FindFriendsState extends State<FindFriends> {
                       UserProfile user = UserProfile(
                         id: id,
                         name: name,
-                        email: email,
+                        username: 'username',
                         bio: bio,
-                        url: url,
+                        imageUrl: url,
                       );
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -129,8 +127,12 @@ class _FindFriendsState extends State<FindFriends> {
                               ),
                             ),
                           ),
-                    title: Text(name),
-                    subtitle: Text(email),
+                    title: Text(
+                      name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     trailing: currentId == id
                         ? null
                         : ElevatedButton(
