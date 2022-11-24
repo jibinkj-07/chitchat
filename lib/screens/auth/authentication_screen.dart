@@ -45,12 +45,13 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           Navigator.of(ctx).pushNamedAndRemoveUntil(
             '/login',
             arguments: LoginScreenArguments(
-              result['id']!,
-              result['name']!,
-              result['email']!,
-              result['imageUrl']!,
-              result['bio']!,
-              result['joined'] as DateTime,
+              id: result['id']!,
+              username: result['username']!,
+              name: result['name']!,
+              email: result['email']!,
+              imageUrl: result['imageUrl']!,
+              bio: result['bio']!,
+              joined: result['joined'] as DateTime,
             ),
             (route) => false,
           );

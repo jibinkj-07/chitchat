@@ -7,21 +7,25 @@ class UserModel {
   String id;
 
   @HiveField(1)
-  String name;
+  String username;
 
   @HiveField(2)
-  String email;
+  String name;
 
   @HiveField(3)
-  String imageUrl;
+  String email;
 
   @HiveField(4)
-  String bio;
+  String imageUrl;
 
   @HiveField(5)
+  String bio;
+
+  @HiveField(6)
   DateTime joined;
   UserModel({
     required this.id,
+    required this.username,
     required this.name,
     required this.email,
     required this.imageUrl,

@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/user_profile.dart';
+import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -143,27 +145,84 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                       child: allUsers.isNotEmpty
                           ? ListView.builder(
                               itemBuilder: (context, index) {
-                                return ListTile(
-                                  onTap: () {
-                                    UserProfile user = UserProfile(
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  child: ListTile(
+                                    onTap: () {
+                                      UserProfile user = UserProfile(
                                         id: allUsers[index]['id'],
                                         name: allUsers[index]['name'],
                                         username: 'username',
+                                        bio: allUsers[index]['bio'],
                                         imageUrl: allUsers[index]['imageUrl'],
-                                        bio: allUsers[index]['bio']);
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => UserDetail(
-                                          user: user,
-                                          currentId: widget.currentUserid,
+                                      );
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => UserDetail(
+                                            user: user,
+                                            currentId: widget.currentUserid,
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    leading: allUsers[index]['imageUrl'] == ''
+                                        ? Hero(
+                                            tag: allUsers[index]['id'],
+                                            child: Container(
+                                              width: 50,
+                                              height: 50,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  'assets/images/profile.png',
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : Hero(
+                                            tag: allUsers[index]['id'],
+                                            child: Container(
+                                              width: 50,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  width: .5,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              child: ClipOval(
+                                                child: CachedNetworkImage(
+                                                  imageUrl: allUsers[index]
+                                                      ['imageUrl'],
+                                                  progressIndicatorBuilder: (context,
+                                                          url,
+                                                          downloadProgress) =>
+                                                      CircularProgressIndicator(
+                                                          color: AppColors()
+                                                              .primaryColor,
+                                                          value:
+                                                              downloadProgress
+                                                                  .progress),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Icon(
+                                                    Icons.error,
+                                                    color: AppColors().redColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                    title: Text(
+                                      allUsers[index]['name'],
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                    );
-                                  },
-                                  title: Text(
-                                    allUsers[index]['name'],
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 );

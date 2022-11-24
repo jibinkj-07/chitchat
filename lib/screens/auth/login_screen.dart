@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
           email: args.email,
           password: password,
           name: args.name,
+          username: args.username,
           id: args.id,
           bio: args.bio,
           imageUrl: args.imageUrl,
@@ -152,11 +153,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               obscureText: !isVisible,
                               //validator
                               validator: (data) {
-                                if (data!.isEmpty) {
+                                if (data!.trim().isEmpty) {
                                   return 'Enter a password';
-                                } else if (data.length < 6) {
+                                } else if (data.trim().length < 6) {
                                   return 'Minimum 6 characters required';
                                 }
+                                return null;
                               },
                               onSaved: (value) {
                                 password = value.toString().trim();

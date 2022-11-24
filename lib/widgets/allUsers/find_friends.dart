@@ -69,6 +69,7 @@ class _FindFriendsState extends State<FindFriends> {
               itemBuilder: (BuildContext context, int index) {
                 final currentId = FirebaseAuth.instance.currentUser!.uid;
                 final id = usersFromDb[index]['id'];
+                final username = usersFromDb[index]['username'];
                 final name = usersFromDb[index]['name'];
                 final bio = usersFromDb[index]['bio'];
                 final url = usersFromDb[index]['imageUrl'];
@@ -79,7 +80,7 @@ class _FindFriendsState extends State<FindFriends> {
                       UserProfile user = UserProfile(
                         id: id,
                         name: name,
-                        username: 'username',
+                        username: username,
                         bio: bio,
                         imageUrl: url,
                       );

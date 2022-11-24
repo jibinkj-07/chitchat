@@ -66,7 +66,7 @@ class UserDetail extends StatelessWidget {
                     width: screen.width,
                     child: Column(
                       children: [
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 30),
                         //user image section
                         GestureDetector(
                           onTap: () {
@@ -153,46 +153,65 @@ class UserDetail extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
 
-                        //message button
-                        if (currentId != user.id)
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Iconsax.message_circle5,
-                            ),
-                            color: appColors.primaryColor,
-                            iconSize: 50,
-                            splashColor: appColors.primaryColor.withOpacity(.5),
-                            splashRadius: 30,
-                          ),
                         const SizedBox(height: 20),
                         //bio
                         Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Profile Bio",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.black54,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                user.bio,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: appColors.primaryColor,
-                                ),
-                              ),
-                            ],
+                          width: screen.width,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 10),
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(.2),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Text(
+                            user.bio,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Iconsax.information,
+                              size: 15,
+                              color: appColors.redColor.withOpacity(.8),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              '0 Users reported this account',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.normal,
+                                color: appColors.redColor.withOpacity(.8),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30), //message button
+                        if (currentId != user.id)
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: appColors.primaryColor,
+                              foregroundColor: appColors.textLightColor,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 30),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              "Message",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
                       ],
                     ),
                   ),

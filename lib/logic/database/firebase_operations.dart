@@ -23,6 +23,7 @@ class FirebaseOperations {
               'id': data.id,
               'name': data.get('name'),
               'email': data.get('email'),
+              'username': data.get('username'),
               'imageUrl': data.get('imageUrl'),
               'bio': data.get('bio'),
             })
@@ -46,11 +47,27 @@ class FirebaseOperations {
     }
   }
 
+  //CHECK FOR USERNAME
+  Future<bool> checkForUsername({required String username}) async {
+    QuerySnapshot querySnapshot = await database.get();
+    try {
+      final allData = querySnapshot.docs.firstWhere((element) {
+        log('names are ${element.get('name')}');
+        return element.get('username') == username;
+      });
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
   //METHOD TO CREATE NEW ACCOUNT
   Future<bool> createNewUser({
     required String email,
     required String password,
     required String name,
+    required String username,
     required BuildContext context,
     File? userImage,
   }) async {
@@ -76,6 +93,7 @@ class FirebaseOperations {
               {
                 'name': name,
                 'email': email,
+                'username': username,
                 'imageUrl': url,
                 'bio': 'Hey want to chat? ping me',
                 'created': createdTime,
@@ -85,6 +103,7 @@ class FirebaseOperations {
             UserModel user = UserModel(
               id: value.user!.uid,
               name: name,
+              username: username,
               email: email,
               imageUrl: url,
               bio: 'Hey want to chat? ping me',
@@ -103,6 +122,7 @@ class FirebaseOperations {
               'name': name,
               'email': email,
               'imageUrl': '',
+              'username': username,
               'bio': 'Hey want to chat? ping me',
               'created': createdTime,
             },
@@ -112,6 +132,7 @@ class FirebaseOperations {
             id: value.user!.uid,
             name: name,
             email: email,
+            username: username,
             imageUrl: '',
             bio: 'Hey want to chat? ping me',
             joined: createdTime,
@@ -139,6 +160,7 @@ class FirebaseOperations {
     required String name,
     required String id,
     required String bio,
+    required String username,
     required String imageUrl,
     required DateTime joined,
     required BuildContext context,
@@ -152,6 +174,7 @@ class FirebaseOperations {
           id: id,
           name: name,
           email: email,
+          username: username,
           imageUrl: imageUrl,
           bio: bio,
           joined: joined,
@@ -218,6 +241,7 @@ class FirebaseOperations {
       details = {
         'id': snapshot.id,
         'name': snapshot.get('name'),
+        'username': snapshot.get('username'),
         'email': snapshot.get('email'),
         'imageUrl': snapshot.get('imageUrl'),
         'bio': snapshot.get('bio'),

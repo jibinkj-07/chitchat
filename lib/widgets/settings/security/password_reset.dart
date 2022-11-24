@@ -136,9 +136,11 @@ class PasswordReset extends StatelessWidget {
                         "Follow below instructions to reset your password",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -147,6 +149,7 @@ class PasswordReset extends StatelessWidget {
                             '1. ',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
+                              fontSize: 16,
                             ),
                           ),
                           SizedBox(
@@ -155,6 +158,7 @@ class PasswordReset extends StatelessWidget {
                               "Click on the 'Send Mail' button below to send password reset mail",
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
+                                fontSize: 16,
                               ),
                             ),
                           ),
@@ -169,6 +173,7 @@ class PasswordReset extends StatelessWidget {
                             '2. ',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
+                              fontSize: 16,
                             ),
                           ),
                           SizedBox(
@@ -177,6 +182,7 @@ class PasswordReset extends StatelessWidget {
                               "Go to your mailbox and check for Password Reset mail",
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
+                                fontSize: 16,
                               ),
                             ),
                           ),
@@ -215,6 +221,7 @@ class PasswordReset extends StatelessWidget {
                             '3. ',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
+                              fontSize: 16,
                             ),
                           ),
                           SizedBox(
@@ -223,6 +230,7 @@ class PasswordReset extends StatelessWidget {
                               "Click on the link provided in mail and reset your password",
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
+                                fontSize: 16,
                               ),
                             ),
                           ),

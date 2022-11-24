@@ -98,7 +98,7 @@ class PersonalInfo extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Name',
+                          'Profile Name',
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
@@ -107,6 +107,23 @@ class PersonalInfo extends StatelessWidget {
                         ),
                         Text(
                           userDetail[0].name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Username',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black54,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          userDetail[0].username,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             color: Colors.black,

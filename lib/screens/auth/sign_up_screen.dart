@@ -19,9 +19,17 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final formKey = GlobalKey<FormState>();
+  TextEditingController userNameController = TextEditingController();
   bool isVisible = false;
   bool isLoading = false;
+  bool isUsernameExist = false;
   File? imageFile;
+
+  @override
+  void dispose() {
+    userNameController.dispose();
+    super.dispose();
+  }
 
   //main section
   @override
@@ -33,12 +41,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ModalRoute.of(context)!.settings.arguments.toString().trim();
     String password = '';
     String name = '';
+    String userName = '';
 
     //submitting password
     void createAccount() async {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
-      if (valid) {
+      if (valid && !isUsernameExist) {
         setState(() {
           isLoading = true;
         });
@@ -49,6 +58,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           name: name,
           context: context,
           userImage: imageFile,
+          username: userName,
         );
         log('value of result is in sign up is $result');
         if (!result) {
@@ -56,6 +66,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
             isLoading = false;
           });
         }
+      }
+    }
+
+    void checkUserNameAvailability(String data) async {
+      bool result = await firebaseOperations.checkForUsername(username: data);
+      log('Value odf result $result');
+      if (result) {
+        if (!mounted) return;
+        setState(() {
+          isUsernameExist = true;
+        });
+      } else {
+        if (!mounted) return;
+        setState(() {
+          isUsernameExist = false;
+        });
       }
     }
 
@@ -155,6 +181,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               key: formKey,
                               child: Column(
                                 children: [
+                                  //username
                                   //user name field
                                   SizedBox(
                                     width: screen.width * .8,
@@ -163,12 +190,99 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       key: const ValueKey('username'),
                                       textInputAction: TextInputAction.next,
                                       textCapitalization:
+                                          TextCapitalization.none,
+                                      //validator
+                                      validator: (data) {
+                                        if (data!.trim().isEmpty) {
+                                          return 'Username is empty';
+                                        } else if (data.trim().length < 4) {
+                                          return 'Username contain atleast 4 letters';
+                                        } else if (data.trim().contains(' ')) {
+                                          return 'No whitespace are allowed';
+                                        }
+                                        return null;
+                                      },
+                                      onSaved: (value) {
+                                        userName = value.toString().trim();
+                                      },
+                                      onChanged: ((value) {
+                                        checkUserNameAvailability(value.trim());
+                                      }),
+                                      style: const TextStyle(
+                                          fontSize: 16.0,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w500),
+
+                                      //decoration
+                                      decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                        hintText: 'Username',
+                                        hintStyle: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                            width: 1,
+                                            color: Colors.grey.withOpacity(.3),
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                            width: 1.5,
+                                            color: appColors.primaryColor,
+                                          ),
+                                        ),
+                                        errorBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              width: 1,
+                                              color: appColors.redColor),
+                                        ),
+                                        focusedErrorBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                            width: 1.5,
+                                            color: appColors.primaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (isUsernameExist)
+                                    Text(
+                                      "Username is already exist. Try another one!",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.normal,
+                                        color: appColors.redColor,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+
+                                  const SizedBox(height: 8),
+                                  //profile name field
+                                  SizedBox(
+                                    width: screen.width * .8,
+                                    child: TextFormField(
+                                      cursorColor: appColors.primaryColor,
+                                      key: const ValueKey('name'),
+                                      textInputAction: TextInputAction.next,
+                                      textCapitalization:
                                           TextCapitalization.words,
                                       //validator
                                       validator: (data) {
-                                        if (data!.isEmpty) {
-                                          return 'Name is empty';
+                                        if (data!.trim().isEmpty) {
+                                          return 'Profile name is empty';
                                         }
+                                        return null;
                                       },
                                       onSaved: (value) {
                                         name = value.toString().trim();
@@ -183,7 +297,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                                 horizontal: 15),
-                                        hintText: 'Name',
+                                        hintText: 'Profile name',
                                         hintStyle: const TextStyle(
                                           color: Colors.grey,
                                         ),
@@ -232,11 +346,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       obscureText: !isVisible,
                                       //validator
                                       validator: (data) {
-                                        if (data!.isEmpty) {
+                                        if (data!.trim().isEmpty) {
                                           return 'Enter a password';
-                                        } else if (data.length < 6) {
+                                        } else if (data.trim().length < 6) {
                                           return 'Minimum 6 characters required';
                                         }
+                                        return null;
                                       },
                                       onSaved: (value) {
                                         password = value.toString().trim();
@@ -354,6 +469,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       },
                                     ),
                                   ),
+                            const SizedBox(height: 10),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Iconsax.information,
+                                  size: 15,
+                                  color: Colors.black54,
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Username must be unique and it cannot be edited later. eg:abr_2345',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.black54,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
