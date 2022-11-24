@@ -56,8 +56,8 @@ class _ImagePreviewState extends State<ImagePreview> {
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
           title: const Text('Network Error'),
-          content: const Text(
-              'Make sure you have turned on Mobile data or Wifi to continue.'),
+          content:
+              const Text('Make sure you have turned on Mobile data or Wifi.'),
           actions: <CupertinoDialogAction>[
             CupertinoDialogAction(
               isDefaultAction: true,

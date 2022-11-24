@@ -70,7 +70,6 @@ class _FindFriendsState extends State<FindFriends> {
                 final currentId = FirebaseAuth.instance.currentUser!.uid;
                 final id = usersFromDb[index]['id'];
                 final name = usersFromDb[index]['name'];
-                final email = usersFromDb[index]['email'];
                 final bio = usersFromDb[index]['bio'];
                 final url = usersFromDb[index]['imageUrl'];
                 return Container(
@@ -96,33 +95,44 @@ class _FindFriendsState extends State<FindFriends> {
                     leading: url == ''
                         ? Hero(
                             tag: id,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(300),
-                              child: Image.asset(
-                                'assets/images/profile.png',
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/profile.png',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           )
                         : Hero(
                             tag: id,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(300),
-                              child: CachedNetworkImage(
-                                imageUrl: url,
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) =>
-                                    CupertinoActivityIndicator(
-                                  color: appColors.primaryColor,
-                                  radius: 15,
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  width: .5,
+                                  color: Colors.grey,
                                 ),
-                                errorWidget: (context, url, error) => Icon(
-                                  Icons.error,
-                                  color: appColors.redColor,
+                              ),
+                              child: ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: url,
+                                  progressIndicatorBuilder:
+                                      (context, url, downloadProgress) =>
+                                          CircularProgressIndicator(
+                                              color: appColors.primaryColor,
+                                              value: downloadProgress.progress),
+                                  errorWidget: (context, url, error) => Icon(
+                                    Icons.error,
+                                    color: appColors.redColor,
+                                  ),
                                 ),
                               ),
                             ),
@@ -148,7 +158,7 @@ class _FindFriendsState extends State<FindFriends> {
                                   horizontal: 15, vertical: 0),
                             ),
                             child: const Text(
-                              'Ping',
+                              'Message',
                               style: TextStyle(fontWeight: FontWeight.w500),
                             ),
                           ),

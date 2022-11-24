@@ -26,6 +26,7 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
   List<Map<String, dynamic>> allUsers = [];
   String query = '';
   late TextEditingController searchTextController;
+  FocusNode focusNode = FocusNode();
 
   //METHOD TO READ ALL USERS FROM DB
   Future<void> getAllUsers() async {
@@ -40,21 +41,33 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
   @override
   void initState() {
     searchTextController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(focusNode);
+    });
     getAllUsers();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchTextController.dispose();
+    focusNode.dispose();
+    super.dispose();
   }
 
   //main
   @override
   Widget build(BuildContext context) {
+    //opening keyboard
+
     //search method
     void searchUser(String query) {
       final users = allUsersFromDB.where((user) {
         final nameLower = user['name'].toString().toLowerCase();
-        final emailLower = user['email'].toString().toLowerCase();
+        // final emailLower = user['email'].toString().toLowerCase();
         final searchQuery = query.toLowerCase();
-        return nameLower.contains(searchQuery) ||
-            emailLower.contains(searchQuery);
+        return nameLower.contains(searchQuery);
+        // emailLower.contains(searchQuery);
       }).toList();
       setState(() {
         this.query = query;
@@ -67,49 +80,33 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
       body: SafeArea(
         child: Column(
           children: [
-            //top bar
+            //search bar
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   color: Colors.black,
                   splashRadius: 20.0,
                   iconSize: 20.0,
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    Navigator.of(context).pop();
+                  },
                 ),
-                const Text(
-                  'Search people',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CupertinoSearchTextField(
+                      focusNode: focusNode,
+                      controller: searchTextController,
+                      placeholder: 'Search people',
+                      onChanged: (value) {
+                        searchUser(value.toString());
+                      },
+                    ),
                   ),
-                ),
-                const IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.transparent,
-                  ),
-                  color: Colors.white,
-                  splashRadius: 20.0,
-                  iconSize: 20.0,
-                  onPressed: null,
                 ),
               ],
-            ),
-            const Divider(
-              height: 0,
-            ),
-            //search bar
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CupertinoSearchTextField(
-                controller: searchTextController,
-                placeholder: 'Search people',
-                onChanged: (value) {
-                  searchUser(value.toString());
-                },
-              ),
             ),
             //body
             // search result

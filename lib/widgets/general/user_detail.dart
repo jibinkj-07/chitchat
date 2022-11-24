@@ -82,44 +82,51 @@ class UserDetail extends StatelessWidget {
                             );
                           },
                           child: user.imageUrl == ''
-                              ? Container(
-                                  width: 180,
-                                  height: 180,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.asset(
-                                      'assets/images/profile.png',
-                                      fit: BoxFit.contain,
+                              ? Hero(
+                                  tag: user.id,
+                                  child: Container(
+                                    width: 180,
+                                    height: 180,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'assets/images/profile.png',
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
                                 )
-                              : Container(
-                                  width: 180,
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      width: .5,
-                                      color: Colors.grey,
+                              : Hero(
+                                  tag: user.id,
+                                  child: Container(
+                                    width: 180,
+                                    height: 180,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        width: .5,
+                                        color: Colors.grey,
+                                      ),
                                     ),
-                                  ),
-                                  child: ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl: user.imageUrl,
-                                      width: 180,
-                                      height: 180,
-                                      fit: BoxFit.cover,
-                                      progressIndicatorBuilder: (context, url,
-                                              downloadProgress) =>
-                                          CircularProgressIndicator(
-                                              color: appColors.primaryColor,
-                                              value: downloadProgress.progress),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(
-                                        Icons.error,
-                                        color: appColors.redColor,
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: user.imageUrl,
+                                        width: 180,
+                                        height: 180,
+                                        fit: BoxFit.cover,
+                                        progressIndicatorBuilder: (context, url,
+                                                downloadProgress) =>
+                                            CircularProgressIndicator(
+                                                color: appColors.primaryColor,
+                                                value:
+                                                    downloadProgress.progress),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(
+                                          Icons.error,
+                                          color: appColors.redColor,
+                                        ),
                                       ),
                                     ),
                                   ),
