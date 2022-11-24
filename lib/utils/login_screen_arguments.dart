@@ -8,6 +8,7 @@ class LoginScreenArguments {
   final String imageUrl;
   final String bio;
   final String username;
+  final bool verified;
   final DateTime joined;
 
   LoginScreenArguments({
@@ -15,6 +16,7 @@ class LoginScreenArguments {
     required this.name,
     required this.email,
     required this.username,
+    required this.verified,
     required this.imageUrl,
     required this.bio,
     required this.joined,

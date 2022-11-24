@@ -6,6 +6,7 @@ import 'package:chitchat/widgets/settings/account.dart';
 import 'package:chitchat/widgets/settings/edit_profile.dart';
 import 'package:chitchat/widgets/settings/privacy.dart';
 import 'package:chitchat/widgets/settings/security.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -105,6 +106,39 @@ class UserSettings extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
+                      StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('Users')
+                              .doc(userDetail[0].id)
+                              .snapshots(),
+                          builder:
+                              (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                            if (snapshot.data!.get('verified')) {
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Iconsax.verify5,
+                                    size: 20,
+                                    color: appColors.primaryColor,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    'Verified Account',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: appColors.primaryColor,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return const SizedBox();
+                            }
+                          }),
                       //setting section
                       CupertinoButton(
                         child: Text(

@@ -1,14 +1,10 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/user_profile.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-
 import '../../logic/database/firebase_operations.dart';
 
 class AllFriendsSearch extends StatefulWidget {
@@ -153,7 +149,8 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                       UserProfile user = UserProfile(
                                         id: allUsers[index]['id'],
                                         name: allUsers[index]['name'],
-                                        username: 'username',
+                                        username: allUsers[index]['username'],
+                                        isVerified: allUsers[index]['verified'],
                                         bio: allUsers[index]['bio'],
                                         imageUrl: allUsers[index]['imageUrl'],
                                       );

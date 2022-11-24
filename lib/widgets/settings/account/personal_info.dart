@@ -102,7 +102,7 @@ class PersonalInfo extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ),
                         Text(
@@ -119,7 +119,7 @@ class PersonalInfo extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
-                            fontSize: 10,
+                            fontSize: 11,
                           ),
                         ),
                         Text(
@@ -136,7 +136,7 @@ class PersonalInfo extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ),
                         Text(
@@ -153,7 +153,7 @@ class PersonalInfo extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ),
                         Text(
@@ -170,7 +170,7 @@ class PersonalInfo extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ),
                         Text(

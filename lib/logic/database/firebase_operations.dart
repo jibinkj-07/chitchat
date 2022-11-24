@@ -26,6 +26,7 @@ class FirebaseOperations {
               'username': data.get('username'),
               'imageUrl': data.get('imageUrl'),
               'bio': data.get('bio'),
+              'verified': data.get('verified'),
             })
         .toList();
     return allData;
@@ -51,7 +52,7 @@ class FirebaseOperations {
   Future<bool> checkForUsername({required String username}) async {
     QuerySnapshot querySnapshot = await database.get();
     try {
-      final allData = querySnapshot.docs.firstWhere((element) {
+      querySnapshot.docs.firstWhere((element) {
         log('names are ${element.get('name')}');
         return element.get('username') == username;
       });
@@ -96,6 +97,7 @@ class FirebaseOperations {
                 'username': username,
                 'imageUrl': url,
                 'bio': 'Hey want to chat? ping me',
+                'verified': false,
                 'created': createdTime,
               },
               SetOptions(merge: true),
@@ -123,6 +125,7 @@ class FirebaseOperations {
               'email': email,
               'imageUrl': '',
               'username': username,
+              'verified': false,
               'bio': 'Hey want to chat? ping me',
               'created': createdTime,
             },
@@ -162,6 +165,7 @@ class FirebaseOperations {
     required String bio,
     required String username,
     required String imageUrl,
+    required bool verified,
     required DateTime joined,
     required BuildContext context,
   }) async {
@@ -244,6 +248,7 @@ class FirebaseOperations {
         'username': snapshot.get('username'),
         'email': snapshot.get('email'),
         'imageUrl': snapshot.get('imageUrl'),
+        'verified': snapshot.get('verified'),
         'bio': snapshot.get('bio'),
         'joined': snapshot.get('created').toDate(),
       };

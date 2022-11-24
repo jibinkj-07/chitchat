@@ -50,6 +50,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
               name: result['name']!,
               email: result['email']!,
               imageUrl: result['imageUrl']!,
+              verified: result['verified']!,
               bio: result['bio']!,
               joined: result['joined'] as DateTime,
             ),

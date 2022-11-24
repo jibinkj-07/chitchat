@@ -144,6 +144,7 @@ class UserDetail extends StatelessWidget {
                         ),
 
                         //email
+
                         Text(
                           user.username,
                           style: const TextStyle(
@@ -152,6 +153,29 @@ class UserDetail extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
+
+                        //verfication mark
+                        if (user.isVerified)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Iconsax.verify5,
+                                size: 15,
+                                color: appColors.primaryColor,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                'Verified Account',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: appColors.primaryColor,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
 
                         const SizedBox(height: 20),
                         //bio
@@ -174,26 +198,27 @@ class UserDetail extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Iconsax.information,
-                              size: 15,
-                              color: appColors.redColor.withOpacity(.8),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              '0 Users reported this account',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
+                        if (!user.isVerified)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Iconsax.information,
+                                size: 15,
                                 color: appColors.redColor.withOpacity(.8),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                              const SizedBox(width: 5),
+                              Text(
+                                '0 Users reported this account',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.normal,
+                                  color: appColors.redColor.withOpacity(.8),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         const SizedBox(height: 30), //message button
                         if (currentId != user.id)
                           ElevatedButton(

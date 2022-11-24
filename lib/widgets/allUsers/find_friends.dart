@@ -70,6 +70,7 @@ class _FindFriendsState extends State<FindFriends> {
                 final currentId = FirebaseAuth.instance.currentUser!.uid;
                 final id = usersFromDb[index]['id'];
                 final username = usersFromDb[index]['username'];
+                final verified = usersFromDb[index]['verified'];
                 final name = usersFromDb[index]['name'];
                 final bio = usersFromDb[index]['bio'];
                 final url = usersFromDb[index]['imageUrl'];
@@ -81,6 +82,7 @@ class _FindFriendsState extends State<FindFriends> {
                         id: id,
                         name: name,
                         username: username,
+                        isVerified: verified,
                         bio: bio,
                         imageUrl: url,
                       );

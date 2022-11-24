@@ -21,7 +21,7 @@ class UserModel {
   @HiveField(5)
   String bio;
 
-  @HiveField(6)
+  @HiveField(7)
   DateTime joined;
   UserModel({
     required this.id,

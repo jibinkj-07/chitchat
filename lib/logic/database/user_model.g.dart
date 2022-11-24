@@ -23,7 +23,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       email: fields[3] as String,
       imageUrl: fields[4] as String,
       bio: fields[5] as String,
-      joined: fields[6] as DateTime,
+      joined: fields[7] as DateTime,
     );
   }
 
@@ -43,7 +43,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..write(obj.imageUrl)
       ..writeByte(5)
       ..write(obj.bio)
-      ..writeByte(6)
+      ..writeByte(7)
       ..write(obj.joined);
   }
 

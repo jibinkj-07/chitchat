@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
           email: args.email,
           password: password,
           name: args.name,
+          verified: args.verified,
           username: args.username,
           id: args.id,
           bio: args.bio,
