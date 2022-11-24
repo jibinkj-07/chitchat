@@ -136,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.normal,
                             color: Colors.black54,
                           ),
+                          textAlign: TextAlign.center,
                         ),
 
                         const SizedBox(height: 8),
