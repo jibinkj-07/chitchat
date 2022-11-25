@@ -6,6 +6,7 @@ import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:skeletons/skeletons.dart';
 
 import '../../logic/database/user_profile.dart';
@@ -140,31 +141,42 @@ class _FindFriendsState extends State<FindFriends> {
                               ),
                             ),
                           ),
-                    title: Text(
-                      name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    trailing: currentId == id
-                        ? null
-                        : ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey.withOpacity(.2),
-                              foregroundColor: Colors.black,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 0),
-                            ),
-                            child: const Text(
-                              'Message',
-                              style: TextStyle(fontWeight: FontWeight.w500),
-                            ),
+                    title: Row(
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+                        if (verified)
+                          Icon(
+                            Iconsax.verify5,
+                            color: appColors.primaryColor,
+                            size: 20,
+                          ),
+                      ],
+                    ),
+                    // trailing: currentId == id
+                    //     ? null
+                    //     : ElevatedButton(
+                    //         onPressed: () {},
+                    //         style: ElevatedButton.styleFrom(
+                    //           backgroundColor: Colors.grey.withOpacity(.2),
+                    //           foregroundColor: Colors.black,
+                    //           elevation: 0,
+                    //           shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(8),
+                    //           ),
+                    //           padding: const EdgeInsets.symmetric(
+                    //               horizontal: 15, vertical: 0),
+                    //         ),
+                    //         child: const Text(
+                    //           'Message',
+                    //           style: TextStyle(fontWeight: FontWeight.w500),
+                    //         ),
+                    //       ),
                   ),
                 );
               },

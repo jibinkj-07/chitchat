@@ -215,11 +215,22 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                               ),
                                             ),
                                           ),
-                                    title: Text(
-                                      allUsers[index]['name'],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          allUsers[index]['name'],
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        if (allUsers[index]['verified'])
+                                          Icon(
+                                            Iconsax.verify5,
+                                            color: AppColors().primaryColor,
+                                            size: 20,
+                                          ),
+                                      ],
                                     ),
                                   ),
                                 );
