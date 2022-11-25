@@ -384,4 +384,53 @@ class FirebaseOperations {
     });
     return status;
   }
+
+  //-----------------CHAT OPERATIONS-----------------------
+
+  void sendMessage(
+      {required String senderId,
+      required String targetId,
+      required String body}) {
+    final time = DateTime.now();
+    final senderFolder =
+        database.doc(senderId).collection("messages").doc(targetId);
+    final targetFolder =
+        database.doc(targetId).collection("messages").doc(senderId);
+
+    //creating copy in sender folder
+    senderFolder.collection('chats').doc().set({
+      'body': body.trim(),
+      'type': 'text',
+      'read': true,
+      'sentByMe': true,
+      'time': time,
+    }, SetOptions(merge: true));
+
+    senderFolder.set(
+      {
+        'last_message': body,
+        'time': time,
+        'isNew': false,
+      },
+      SetOptions(merge: true),
+    );
+
+    //creating copy in tager folder
+    targetFolder.collection('chats').doc().set({
+      'body': body.trim(),
+      'type': 'text',
+      'read': false,
+      'sentByMe': false,
+      'time': time,
+    }, SetOptions(merge: true));
+
+    targetFolder.set(
+      {
+        'last_message': body,
+        'time': time,
+        'isNew': true,
+      },
+      SetOptions(merge: true),
+    );
+  }
 }

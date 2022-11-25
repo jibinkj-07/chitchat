@@ -1,5 +1,5 @@
 import 'package:chitchat/screens/find_friends_screen.dart';
-import 'package:chitchat/screens/chat_screen.dart';
+import 'package:chitchat/screens/chat/chat_screen.dart';
 import 'package:chitchat/screens/profile_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';

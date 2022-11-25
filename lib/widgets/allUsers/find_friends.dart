@@ -4,15 +4,17 @@ import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:skeletons/skeletons.dart';
-
 import '../../logic/database/user_profile.dart';
 
 class FindFriends extends StatefulWidget {
-  const FindFriends({super.key});
+  final UserProfile currentUser;
+  const FindFriends({
+    super.key,
+    required this.currentUser,
+  });
 
   @override
   State<FindFriends> createState() => _FindFriendsState();
@@ -75,6 +77,7 @@ class _FindFriendsState extends State<FindFriends> {
                 final name = usersFromDb[index]['name'];
                 final bio = usersFromDb[index]['bio'];
                 final url = usersFromDb[index]['imageUrl'];
+
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 5),
                   child: ListTile(
@@ -87,11 +90,12 @@ class _FindFriendsState extends State<FindFriends> {
                         bio: bio,
                         imageUrl: url,
                       );
+
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => UserDetail(
-                            user: user,
-                            currentId: currentId,
+                            targetUser: user,
+                            currentUser: widget.currentUser,
                           ),
                         ),
                       );

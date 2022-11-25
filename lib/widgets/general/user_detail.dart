@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chitchat/screens/chat/single_chat_screen.dart';
 import 'package:chitchat/widgets/general/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -6,12 +7,12 @@ import '../../logic/database/user_profile.dart';
 import '../../utils/app_colors.dart';
 
 class UserDetail extends StatelessWidget {
-  final UserProfile user;
-  final String currentId;
+  final UserProfile targetUser;
+  final UserProfile currentUser;
   const UserDetail({
     super.key,
-    required this.user,
-    required this.currentId,
+    required this.targetUser,
+    required this.currentUser,
   });
 
   @override
@@ -73,17 +74,17 @@ class UserDetail extends StatelessWidget {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => ImagePreview(
-                                  id: user.id,
-                                  url: user.imageUrl,
+                                  id: targetUser.id,
+                                  url: targetUser.imageUrl,
                                   title: 'Find Friends',
                                   isEditable: false,
                                 ),
                               ),
                             );
                           },
-                          child: user.imageUrl == ''
+                          child: targetUser.imageUrl == ''
                               ? Hero(
-                                  tag: user.id,
+                                  tag: targetUser.id,
                                   child: Container(
                                     width: 180,
                                     height: 180,
@@ -99,7 +100,7 @@ class UserDetail extends StatelessWidget {
                                   ),
                                 )
                               : Hero(
-                                  tag: user.id,
+                                  tag: targetUser.id,
                                   child: Container(
                                     width: 180,
                                     height: 180,
@@ -112,7 +113,7 @@ class UserDetail extends StatelessWidget {
                                     ),
                                     child: ClipOval(
                                       child: CachedNetworkImage(
-                                        imageUrl: user.imageUrl,
+                                        imageUrl: targetUser.imageUrl,
                                         width: 180,
                                         height: 180,
                                         fit: BoxFit.cover,
@@ -135,7 +136,7 @@ class UserDetail extends StatelessWidget {
                         const SizedBox(height: 5),
                         //Name
                         Text(
-                          user.name,
+                          targetUser.name,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -146,7 +147,7 @@ class UserDetail extends StatelessWidget {
                         //email
 
                         Text(
-                          user.username,
+                          targetUser.username,
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -155,7 +156,7 @@ class UserDetail extends StatelessWidget {
                         ),
 
                         //verfication mark
-                        if (user.isVerified)
+                        if (targetUser.isVerified)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -189,7 +190,7 @@ class UserDetail extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Text(
-                            user.bio,
+                            targetUser.bio,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -198,7 +199,7 @@ class UserDetail extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        if (!user.isVerified)
+                        if (!targetUser.isVerified)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -220,7 +221,7 @@ class UserDetail extends StatelessWidget {
                             ],
                           ),
                         const SizedBox(height: 30), //message button
-                        if (currentId != user.id)
+                        if (currentUser.id != targetUser.id)
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: appColors.primaryColor,
@@ -231,7 +232,16 @@ class UserDetail extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => SingleChatScreen(
+                                    targetUser: targetUser,
+                                    currentUser: currentUser,
+                                  ),
+                                ),
+                              );
+                            },
                             child: const Text(
                               "Message",
                               style: TextStyle(fontSize: 16),

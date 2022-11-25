@@ -8,10 +8,10 @@ import 'package:iconsax/iconsax.dart';
 import '../../logic/database/firebase_operations.dart';
 
 class AllFriendsSearch extends StatefulWidget {
-  final String currentUserid;
+  final UserProfile currentUser;
   const AllFriendsSearch({
     super.key,
-    required this.currentUserid,
+    required this.currentUser,
   });
 
   @override
@@ -157,8 +157,8 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (_) => UserDetail(
-                                            user: user,
-                                            currentId: widget.currentUserid,
+                                            targetUser: user,
+                                            currentUser: widget.currentUser,
                                           ),
                                         ),
                                       );
