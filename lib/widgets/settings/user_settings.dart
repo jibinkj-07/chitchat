@@ -114,30 +114,32 @@ class UserSettings extends StatelessWidget {
                               .snapshots(),
                           builder:
                               (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                            if (snapshot.data!.get('verified')) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Iconsax.verify5,
-                                    size: 20,
-                                    color: appColors.primaryColor,
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    'Verified Account',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                            if (snapshot.hasData) {
+                              if (snapshot.data!.get('verified')) {
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Iconsax.verify5,
+                                      size: 20,
                                       color: appColors.primaryColor,
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              );
-                            } else {
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      'Verified Account',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: appColors.primaryColor,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                );
+                              } else {}
                               return const SizedBox();
                             }
+                            return const SizedBox();
                           }),
                       //setting section
                       CupertinoButton(

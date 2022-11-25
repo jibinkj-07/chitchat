@@ -189,6 +189,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       cursorColor: appColors.primaryColor,
                                       key: const ValueKey('username'),
                                       textInputAction: TextInputAction.next,
+                                      maxLength: 15,
+
                                       textCapitalization:
                                           TextCapitalization.none,
                                       //validator
@@ -215,6 +217,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                                       //decoration
                                       decoration: InputDecoration(
+                                        counter: const SizedBox(),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                                 horizontal: 15),
