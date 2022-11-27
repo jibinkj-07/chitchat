@@ -1,10 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chitchat/logic/database/user_profile.dart';
+import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/chat/message_body.dart';
 import 'package:chitchat/widgets/chat/message_controls.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -132,7 +131,9 @@ class SingleChatScreen extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                                 color: snapshot.data!.get('status') == 'online'
                                     ? appColors.greenColor
-                                    : Colors.grey,
+                                    : snapshot.data!.get('status') == 'away'
+                                        ? appColors.yellowColor
+                                        : Colors.grey,
                               ),
                             )
                           ],

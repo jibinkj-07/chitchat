@@ -418,39 +418,179 @@ class FirebaseOperations {
         database.doc(targetId).collection("messages").doc(senderId);
 
     //creating copy in sender folder
-    senderFolder.collection('chats').doc().set({
-      'body': body.trim(),
-      'type': 'text',
-      'read': true,
-      'sentByMe': true,
-      'time': time,
-    }, SetOptions(merge: true));
-
-    senderFolder.set(
-      {
-        'last_message': body,
-        'time': time,
-        'isNew': false,
-      },
-      SetOptions(merge: true),
-    );
-
-    //creating copy in tager folder
-    targetFolder.collection('chats').doc().set({
+    senderFolder.collection('chats').add({
       'body': body.trim(),
       'type': 'text',
       'read': false,
-      'sentByMe': false,
+      'readTime': null,
+      'sentByMe': true,
       'time': time,
-    }, SetOptions(merge: true));
-
-    targetFolder.set(
-      {
-        'last_message': body,
+    }).then((value) {
+      //creating copy in tager folder
+      targetFolder.collection('chats').doc(value.id).set({
+        'body': body.trim(),
+        'type': 'text',
+        'read': false,
+        'readTime': null,
+        'sentByMe': false,
         'time': time,
-        'isNew': true,
-      },
+      });
+
+      senderFolder.set(
+        {
+          'last_message': body,
+          'time': time,
+          'isNew': false,
+          'id': value.id,
+        },
+        SetOptions(merge: true),
+      );
+
+      targetFolder.set(
+        {
+          'last_message': body,
+          'time': time,
+          'isNew': true,
+          'id': value.id,
+        },
+        SetOptions(merge: true),
+      );
+    });
+  }
+
+  void changeNewMessageStatus(
+      {required String senderId, required String targetId}) {
+    database.doc(senderId).collection('messages').doc(targetId).set(
+      {'isNew': false},
       SetOptions(merge: true),
     );
+  }
+
+  void changeReadMessageStatus({
+    required String senderId,
+    required String targetId,
+    required String messageId,
+  }) {
+    final ref = database
+        .doc(targetId)
+        .collection('messages')
+        .doc(senderId)
+        .collection('chats')
+        .doc(messageId);
+
+    ref.get().then((value) {
+      if (!value.get('read')) {
+        ref.set({
+          'read': true,
+          'readTime': DateTime.now(),
+        }, SetOptions(merge: true));
+      }
+    });
+  }
+
+//deleting message of self
+  void deleteMessageForMe(
+      {required String messageId,
+      required String senderId,
+      required String targetId}) async {
+    String id = '';
+    final deleteMsg = database
+        .doc(senderId)
+        .collection('messages')
+        .doc(targetId)
+        .collection('chats')
+        .doc(messageId);
+
+    //getting last message id
+    await database
+        .doc(senderId)
+        .collection('messages')
+        .doc(targetId)
+        .get()
+        .then((value) {
+      id = value.get('id');
+    });
+    if (id == messageId) {
+      deleteMsg.delete();
+      database.doc(senderId).collection('messages').doc(targetId).set(
+        {
+          'last_message': 'Deleted for you',
+          'time': DateTime.now(),
+          'isNew': false,
+          'id': '',
+        },
+        SetOptions(merge: true),
+      );
+    } else {
+      deleteMsg.delete();
+    }
+  }
+
+  //deleting message for all
+  void deleteMessageForAll(
+      {required String messageId,
+      required String senderId,
+      required String targetId}) async {
+    String targetMsgId = '', senderMsgId = '';
+    final deleteMsgSender = database
+        .doc(senderId)
+        .collection('messages')
+        .doc(targetId)
+        .collection('chats')
+        .doc(messageId);
+    final deleteMsgTarget = database
+        .doc(targetId)
+        .collection('messages')
+        .doc(senderId)
+        .collection('chats')
+        .doc(messageId);
+
+    //getting last message id for sender
+    await database
+        .doc(senderId)
+        .collection('messages')
+        .doc(targetId)
+        .get()
+        .then((value) {
+      senderMsgId = value.get('id');
+    });
+    if (senderMsgId == messageId) {
+      deleteMsgSender.delete();
+      database.doc(senderId).collection('messages').doc(targetId).set(
+        {
+          'last_message': 'Deleted for all',
+          'time': DateTime.now(),
+          'isNew': false,
+          'id': '',
+        },
+        SetOptions(merge: true),
+      );
+    } else {
+      deleteMsgSender.delete();
+    }
+
+    //getting last message id for target
+    await database
+        .doc(targetId)
+        .collection('messages')
+        .doc(senderId)
+        .get()
+        .then((value) {
+      targetMsgId = value.get('id');
+    });
+    if (targetMsgId == messageId) {
+      deleteMsgTarget.delete();
+      database.doc(targetId).collection('messages').doc(senderId).set(
+        {
+          'last_message': 'Deleted for all',
+          'time': DateTime.now(),
+          'isNew': false,
+          'id': '',
+        },
+        SetOptions(merge: true),
+      );
+    } else {
+      deleteMsgTarget.delete();
+    }
   }
 }
