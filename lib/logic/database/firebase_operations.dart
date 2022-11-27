@@ -479,11 +479,15 @@ class FirebaseOperations {
         .doc(messageId);
 
     ref.get().then((value) {
-      if (!value.get('read')) {
-        ref.set({
-          'read': true,
-          'readTime': DateTime.now(),
-        }, SetOptions(merge: true));
+      try {
+        if (!value.get('read')) {
+          ref.set({
+            'read': true,
+            'readTime': DateTime.now(),
+          }, SetOptions(merge: true));
+        }
+      } catch (e) {
+        log('error from fb ${e.toString()}');
       }
     });
   }
@@ -492,7 +496,8 @@ class FirebaseOperations {
   void deleteMessageForMe(
       {required String messageId,
       required String senderId,
-      required String targetId}) async {
+      required String targetId,
+      required String message}) async {
     String id = '';
     final deleteMsg = database
         .doc(senderId)
@@ -514,7 +519,7 @@ class FirebaseOperations {
       deleteMsg.delete();
       database.doc(senderId).collection('messages').doc(targetId).set(
         {
-          'last_message': 'Deleted for you',
+          'last_message': message,
           'time': DateTime.now(),
           'isNew': false,
           'id': '',
@@ -531,43 +536,20 @@ class FirebaseOperations {
       {required String messageId,
       required String senderId,
       required String targetId}) async {
-    String targetMsgId = '', senderMsgId = '';
-    final deleteMsgSender = database
-        .doc(senderId)
-        .collection('messages')
-        .doc(targetId)
-        .collection('chats')
-        .doc(messageId);
+    String targetMsgId = '';
+
+    deleteMessageForMe(
+        messageId: messageId,
+        senderId: senderId,
+        targetId: targetId,
+        message: 'Deleted for all');
+
     final deleteMsgTarget = database
         .doc(targetId)
         .collection('messages')
         .doc(senderId)
         .collection('chats')
         .doc(messageId);
-
-    //getting last message id for sender
-    await database
-        .doc(senderId)
-        .collection('messages')
-        .doc(targetId)
-        .get()
-        .then((value) {
-      senderMsgId = value.get('id');
-    });
-    if (senderMsgId == messageId) {
-      deleteMsgSender.delete();
-      database.doc(senderId).collection('messages').doc(targetId).set(
-        {
-          'last_message': 'Deleted for all',
-          'time': DateTime.now(),
-          'isNew': false,
-          'id': '',
-        },
-        SetOptions(merge: true),
-      );
-    } else {
-      deleteMsgSender.delete();
-    }
 
     //getting last message id for target
     await database
@@ -592,5 +574,67 @@ class FirebaseOperations {
     } else {
       deleteMsgTarget.delete();
     }
+  }
+
+  //clear chat for me
+  Future<void> clearChatForMe(
+      {required String senderId,
+      required String targetId,
+      required String message}) async {
+    // database.doc(senderId).collection('messages').doc(targetId).collection('chats').
+
+    final instance = FirebaseFirestore.instance;
+    final batch = instance.batch();
+    var collection = database
+        .doc(senderId)
+        .collection('messages')
+        .doc(targetId)
+        .collection('chats');
+    var snapshots = await collection.get();
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+
+    database.doc(senderId).collection('messages').doc(targetId).set(
+      {
+        'last_message': message,
+        'time': DateTime.now(),
+        'isNew': false,
+        'id': '',
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  //clear chat for all
+  Future<void> clearChatForAll(
+      {required String senderId,
+      required String targetId,
+      required String message}) async {
+    // database.doc(senderId).collection('messages').doc(targetId).collection('chats').
+    clearChatForMe(senderId: senderId, targetId: targetId, message: message);
+    final instance = FirebaseFirestore.instance;
+    final batch = instance.batch();
+    var collection = database
+        .doc(targetId)
+        .collection('messages')
+        .doc(senderId)
+        .collection('chats');
+    var snapshots = await collection.get();
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+
+    database.doc(targetId).collection('messages').doc(senderId).set(
+      {
+        'last_message': message,
+        'time': DateTime.now(),
+        'isNew': false,
+        'id': '',
+      },
+      SetOptions(merge: true),
+    );
   }
 }

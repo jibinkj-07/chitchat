@@ -6,7 +6,10 @@ import 'package:chitchat/widgets/chat/message_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/parser.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MessageBody extends StatelessWidget {
   final String currentUserid;
@@ -38,14 +41,35 @@ class MessageBody extends StatelessWidget {
               child: CupertinoActivityIndicator(),
             );
           }
-//changing newMessage read status
-          FirebaseOperations().changeNewMessageStatus(
-            senderId: currentUserid,
-            targetId: targetUserid,
-          );
 
           if (snapshot.hasData) {
-            log('has data');
+            log('length is ${snapshot.data!.docs.length}');
+            if (snapshot.data!.docs.isEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/illustrations/add_chat.svg',
+                    width: 300,
+                  ),
+                  Text(
+                    "Say Hello!",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors().primaryColor,
+                    ),
+                  )
+                ],
+              );
+            }
+            //changing newMessage read status
+            FirebaseOperations().changeNewMessageStatus(
+              senderId: currentUserid,
+              targetId: targetUserid,
+            );
+
+            // log('has data');
             //changing single message read status
 
             return ListView.builder(

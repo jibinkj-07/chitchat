@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
@@ -137,6 +139,18 @@ class SingleChatScreen extends StatelessWidget {
                               ),
                             )
                           ],
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              onPressed: () {
+                                showBottom(context);
+                              },
+                              icon: const Icon(Iconsax.broom),
+                              splashRadius: 20.0,
+                            ),
+                          ),
                         )
                       ],
                     );
@@ -162,6 +176,121 @@ class SingleChatScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  //bottom sheet
+
+  showBottom(BuildContext ctx) {
+    AppColors appColors = AppColors();
+    FirebaseOperations firebaseOperations = FirebaseOperations();
+    showModalBottomSheet<void>(
+      context: ctx,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+            color: Colors.white,
+          ),
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Clear chat',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    firebaseOperations.clearChatForAll(
+                        senderId: currentUserid,
+                        targetId: targetUserid,
+                        message: 'Cleared chat history for both');
+                    Navigator.of(ctx).pop(true);
+                  },
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    // height: 50,
+                    width: double.infinity,
+                    child: Text(
+                      "For both",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: appColors.redColor),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    firebaseOperations.clearChatForMe(
+                        senderId: currentUserid,
+                        targetId: targetUserid,
+                        message: 'Cleared chat history for me');
+                    Navigator.of(ctx).pop(true);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    width: double.infinity,
+                    child: Text(
+                      "Only for me",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: appColors.redColor),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+
+              //cancel button
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    width: double.infinity,
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: appColors.primaryColor),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

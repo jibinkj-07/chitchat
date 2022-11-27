@@ -194,6 +194,7 @@ class MessageBubble extends StatelessWidget {
                       messageId: messageId,
                       senderId: currentUserid,
                       targetId: targetUserid,
+                      message: 'Deleted for you',
                     );
                     Navigator.of(ctx).pop(true);
                   },
