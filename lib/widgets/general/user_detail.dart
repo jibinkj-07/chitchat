@@ -8,11 +8,11 @@ import '../../utils/app_colors.dart';
 
 class UserDetail extends StatelessWidget {
   final UserProfile targetUser;
-  final UserProfile currentUser;
+  final String currentUserid;
   const UserDetail({
     super.key,
     required this.targetUser,
-    required this.currentUser,
+    required this.currentUserid,
   });
 
   @override
@@ -142,6 +142,7 @@ class UserDetail extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
+                          textAlign: TextAlign.center,
                         ),
 
                         //email
@@ -221,7 +222,7 @@ class UserDetail extends StatelessWidget {
                             ],
                           ),
                         const SizedBox(height: 30), //message button
-                        if (currentUser.id != targetUser.id)
+                        if (currentUserid != targetUser.id)
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: appColors.primaryColor,
@@ -236,8 +237,8 @@ class UserDetail extends StatelessWidget {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => SingleChatScreen(
-                                    targetUser: targetUser,
-                                    currentUser: currentUser,
+                                    targetUserid: targetUser.id,
+                                    currentUserid: currentUserid,
                                   ),
                                 ),
                               );

@@ -1,73 +1,62 @@
+import 'dart:developer';
+
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/chat/message_bubble.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MessageBody extends StatelessWidget {
-  const MessageBody({super.key});
+  final String currentUserid;
+  final String targetUserid;
+  const MessageBody({
+    super.key,
+    required this.currentUserid,
+    required this.targetUserid,
+  });
 
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-    return Column(
-      children: [
-        //sender message
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          width: screen.width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(.2),
-                  borderRadius: BorderRadius.only(
-                    // topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                  ),
-                ),
-                child: Text("text message"),
-              )
-            ],
-          ),
-        ),
+    return Container(
+      width: screen.width,
+      decoration: BoxDecoration(color: Colors.white),
+      child: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('Users')
+            .doc(currentUserid)
+            .collection('messages')
+            .doc(targetUserid)
+            .collection('chats')
+            .orderBy('time', descending: true)
+            .snapshots(),
+        builder: (ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CupertinoActivityIndicator(),
+            );
+          }
 
-        //self message
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          width: screen.width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors().primaryColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                    // bottomRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  "text message new from self",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ],
+          if (snapshot.hasData) {
+            log('has data');
+            return ListView.builder(
+                reverse: true,
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (ctx, i) {
+                  final message = snapshot.data!.docs[i].get('body');
+                  final time = snapshot.data!.docs[i].get('time').toDate();
+                  final isMe = snapshot.data!.docs[i].get('sentByMe');
+
+                  return MessageBubble(
+                    message: message,
+                    time: time,
+                    isMe: isMe,
+                  );
+                });
+          }
+          return const SizedBox();
+        },
+      ),
     );
   }
 }

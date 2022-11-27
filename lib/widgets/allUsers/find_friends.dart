@@ -10,10 +10,10 @@ import 'package:skeletons/skeletons.dart';
 import '../../logic/database/user_profile.dart';
 
 class FindFriends extends StatefulWidget {
-  final UserProfile currentUser;
+  final String currentUserid;
   const FindFriends({
     super.key,
-    required this.currentUser,
+    required this.currentUserid,
   });
 
   @override
@@ -74,6 +74,7 @@ class _FindFriendsState extends State<FindFriends> {
                 final id = usersFromDb[index]['id'];
                 final username = usersFromDb[index]['username'];
                 final verified = usersFromDb[index]['verified'];
+                final status = usersFromDb[index]['status'];
                 final name = usersFromDb[index]['name'];
                 final bio = usersFromDb[index]['bio'];
                 final url = usersFromDb[index]['imageUrl'];
@@ -88,6 +89,7 @@ class _FindFriendsState extends State<FindFriends> {
                         username: username,
                         isVerified: verified,
                         bio: bio,
+                        status: status,
                         imageUrl: url,
                       );
 
@@ -95,7 +97,7 @@ class _FindFriendsState extends State<FindFriends> {
                         MaterialPageRoute(
                           builder: (_) => UserDetail(
                             targetUser: user,
-                            currentUser: widget.currentUser,
+                            currentUserid: widget.currentUserid,
                           ),
                         ),
                       );
@@ -147,13 +149,21 @@ class _FindFriendsState extends State<FindFriends> {
                           ),
                     title: Row(
                       children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        name.toString().length > 30
+                            ? Text(
+                                '${name.toString().substring(0, 28)}..',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
+                            : Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                         if (verified)
                           Icon(
                             Iconsax.verify5,

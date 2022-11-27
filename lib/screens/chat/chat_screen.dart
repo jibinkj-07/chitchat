@@ -1,6 +1,8 @@
-import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/chat/chat_list_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +42,7 @@ class ChatScreenBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserid = FirebaseAuth.instance.currentUser!.uid;
     return Column(
       children: [
         Container(
@@ -90,18 +93,38 @@ class ChatScreenBody extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              CupertinoSearchTextField(),
+              // CupertinoSearchTextField(),
             ],
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemBuilder: (ctx, i) {
-              return ListTile(
-                leading: CircleAvatar(),
-                title: Text('User ${i + 1}'),
-                subtitle: Text("New message"),
-              );
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('Users')
+                .doc(currentUserid)
+                .collection('messages')
+                .orderBy('time', descending: true)
+                .snapshots(),
+            builder: (ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (ctx, i) {
+                    final lstMsg =
+                        snapshot.data!.docs[i].get('last_message').toString();
+                    final isNew = snapshot.data!.docs[i].get('isNew');
+                    final time = snapshot.data!.docs[i].get('time').toDate();
+                    return ChatListItem(
+                      userId: snapshot.data!.docs[i].id,
+                      isNew: isNew,
+                      lstMsg: lstMsg,
+                      time: time,
+                      currentUserid: currentUserid,
+                    );
+                  },
+                );
+              }
+              return const SizedBox();
             },
           ),
         )

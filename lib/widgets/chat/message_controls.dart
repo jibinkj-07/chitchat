@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,42 +26,94 @@ class _MessageControlsState extends State<MessageControls> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+    final screen = MediaQuery.of(context).size;
     FirebaseOperations firebaseOperations = FirebaseOperations();
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 5),
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      // color: Colors.black,
+      margin: const EdgeInsets.only(bottom: 8, top: 0),
+      padding: const EdgeInsets.all(0.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
-            child: SizedBox(
-              // height: 40,
-              child: CupertinoTextField(
-                controller: controller,
-                minLines: 1,
-                maxLines: 5,
-                textCapitalization: TextCapitalization.sentences,
-                placeholder: "Type message",
-                onChanged: (value) {
-                  setState(() {
-                    _msg = value;
-                  });
-                },
-                clearButtonMode: OverlayVisibilityMode.editing,
-                cursorColor: appColors.primaryColor,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(width: 1, color: Colors.grey),
-                ),
+            child: Container(
+              padding: const EdgeInsets.all(6.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: Colors.grey.withOpacity(.2),
+              ),
+              child: Row(
+                crossAxisAlignment: _msg.contains('\n')
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.center,
+                children: [
+                  //emoji icon button
+                  SizedBox(
+                    height: 25,
+                    width: 25,
+                    child: IconButton(
+                      onPressed: () {},
+                      padding: const EdgeInsets.all(0.0),
+                      icon: const Icon(Iconsax.happyemoji),
+                      color: appColors.primaryColor,
+                      iconSize: 20,
+                      splashRadius: 15.0,
+                    ),
+                  ),
+
+                  //textfield
+                  Expanded(
+                    child: CupertinoTextField(
+                      controller: controller,
+                      minLines: 1,
+                      maxLines: 5,
+                      textCapitalization: TextCapitalization.sentences,
+                      placeholder: "Type message",
+                      onChanged: (value) {
+                        setState(() {
+                          _msg = value;
+                        });
+                      },
+                      clearButtonMode: OverlayVisibilityMode.editing,
+                      cursorColor: appColors.primaryColor,
+                      decoration: const BoxDecoration(),
+                    ),
+                  ),
+
+                  //camera button
+                  _msg.trim() == ''
+                      ? SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: IconButton(
+                            onPressed: () {},
+                            padding: const EdgeInsets.all(0.0),
+                            icon: const Icon(Iconsax.camera),
+                            color: appColors.primaryColor,
+                            iconSize: 20,
+                            splashRadius: 15.0,
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
               ),
             ),
           ),
-
-          //control buttons
           _msg.trim() == ''
-              ? controlButton(appColors)
-              : IconButton(
+              ? FloatingActionButton(
+                  backgroundColor: appColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  mini: true,
+                  onPressed: () {},
+                  child: const Icon(
+                    Iconsax.microphone,
+                    size: 22,
+                  ),
+                )
+              : FloatingActionButton(
+                  backgroundColor: appColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  mini: true,
                   onPressed: () {
                     firebaseOperations.sendMessage(
                         senderId: widget.senderId,
@@ -70,52 +124,13 @@ class _MessageControlsState extends State<MessageControls> {
                       _msg = '';
                     });
                   },
-                  icon: const Icon(
+                  child: const Icon(
                     Iconsax.send_1,
-                    size: 25,
+                    size: 22,
                   ),
-                  splashRadius: 20,
-                  splashColor: appColors.primaryColor.withOpacity(.3),
-                  color: appColors.primaryColor,
                 )
         ],
       ),
     );
   }
-
-  Widget controlButton(AppColors appColors) => Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Iconsax.camera,
-              size: 25,
-            ),
-            splashRadius: 20,
-            splashColor: appColors.primaryColor.withOpacity(.3),
-            color: appColors.primaryColor,
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Iconsax.document_text_1,
-              size: 25,
-            ),
-            splashRadius: 20,
-            splashColor: appColors.primaryColor.withOpacity(.3),
-            color: appColors.primaryColor,
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Iconsax.microphone,
-              size: 25,
-            ),
-            splashRadius: 20,
-            splashColor: appColors.primaryColor.withOpacity(.3),
-            color: appColors.primaryColor,
-          ),
-        ],
-      );
 }

@@ -6,6 +6,7 @@ class AppColors {
   Color textLightColor = const Color(0xffffffff);
   Color greenColor = const Color(0xff0F9D58);
   Color redColor = const Color(0xffDB4437);
+  Color yellowColor = const Color(0xffF4B400);
 }
 
 enum ConnectionType {

@@ -8,10 +8,10 @@ import 'package:iconsax/iconsax.dart';
 import '../../logic/database/firebase_operations.dart';
 
 class AllFriendsSearch extends StatefulWidget {
-  final UserProfile currentUser;
+  final String currentUserid;
   const AllFriendsSearch({
     super.key,
-    required this.currentUser,
+    required this.currentUserid,
   });
 
   @override
@@ -150,6 +150,7 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                         id: allUsers[index]['id'],
                                         name: allUsers[index]['name'],
                                         username: allUsers[index]['username'],
+                                        status: allUsers[index]['status'],
                                         isVerified: allUsers[index]['verified'],
                                         bio: allUsers[index]['bio'],
                                         imageUrl: allUsers[index]['imageUrl'],
@@ -158,7 +159,7 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                         MaterialPageRoute(
                                           builder: (_) => UserDetail(
                                             targetUser: user,
-                                            currentUser: widget.currentUser,
+                                            currentUserid:widget. currentUserid,
                                           ),
                                         ),
                                       );
@@ -217,13 +218,24 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                           ),
                                     title: Row(
                                       children: [
-                                        Text(
-                                          allUsers[index]['name'],
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        allUsers[index]['name']
+                                                    .toString()
+                                                    .length >
+                                                30
+                                            ? Text(
+                                                '${allUsers[index]['name'].toString().substring(0, 28)}..',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              )
+                                            : Text(
+                                                allUsers[index]['name'],
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
                                         if (allUsers[index]['verified'])
                                           Icon(
                                             Iconsax.verify5,

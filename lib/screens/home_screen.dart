@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/screens/find_friends_screen.dart';
 import 'package:chitchat/screens/chat/chat_screen.dart';
 import 'package:chitchat/screens/profile_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -16,12 +21,36 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late int currentIndex;
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  FirebaseOperations firebaseOperations = FirebaseOperations();
+
   @override
   void initState() {
     currentIndex = widget.index;
+    WidgetsBinding.instance.addObserver(this);
+    firebaseOperations.changeStatus(userId: userId, status: 'online');
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      firebaseOperations.changeStatus(userId: userId, status: 'away');
+    } else if (state == AppLifecycleState.detached ||
+        state == AppLifecycleState.inactive) {
+      firebaseOperations.changeStatus(userId: userId, status: 'offline');
+    } else if (state == AppLifecycleState.resumed) {
+      firebaseOperations.changeStatus(userId: userId, status: 'online');
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   //list of pages

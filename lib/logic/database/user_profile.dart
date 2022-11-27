@@ -4,6 +4,7 @@ class UserProfile {
   final String username;
   final String imageUrl;
   final bool isVerified;
+  final String status;
   final String bio;
   UserProfile({
     required this.id,
@@ -11,6 +12,7 @@ class UserProfile {
     required this.username,
     required this.imageUrl,
     required this.isVerified,
+    required this.status,
     required this.bio,
   });
 }

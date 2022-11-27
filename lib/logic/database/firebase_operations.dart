@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/logic/database/user_model.dart';
+import 'package:chitchat/logic/database/user_profile.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,6 +27,7 @@ class FirebaseOperations {
               'username': data.get('username'),
               'imageUrl': data.get('imageUrl'),
               'bio': data.get('bio'),
+              'status': data.get('status'),
               'verified': data.get('verified'),
             })
         .toList();
@@ -98,6 +100,7 @@ class FirebaseOperations {
                 'imageUrl': url,
                 'bio': 'Hey want to chat? ping me',
                 'verified': false,
+                'status': 'online',
                 'created': createdTime,
               },
               SetOptions(merge: true),
@@ -127,6 +130,7 @@ class FirebaseOperations {
               'username': username,
               'verified': false,
               'bio': 'Hey want to chat? ping me',
+              'status': 'online',
               'created': createdTime,
             },
             SetOptions(merge: true),
@@ -249,6 +253,7 @@ class FirebaseOperations {
         'email': snapshot.get('email'),
         'imageUrl': snapshot.get('imageUrl'),
         'verified': snapshot.get('verified'),
+        'status': snapshot.get('status'),
         'bio': snapshot.get('bio'),
         'joined': snapshot.get('created').toDate(),
       };
@@ -382,6 +387,21 @@ class FirebaseOperations {
       log('error in pw reset ${e.toString()}');
       status = e.toString();
     });
+    return status;
+  }
+
+  //adding status of users
+  void changeStatus({required String userId, required String status}) {
+    database.doc(userId).set(
+      {'status': status},
+      SetOptions(merge: true),
+    );
+  }
+
+  //getting user status
+  Future<String> getUserStatus({required String userId}) async {
+    String status =
+        await database.doc(userId).get().then((value) => value.get('status'));
     return status;
   }
 
