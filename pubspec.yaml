@@ -58,6 +58,8 @@ dependencies:
   percent_indicator: ^4.0.1
   hive_flutter: ^1.1.0
   cached_network_image: ^3.2.2
+  emoji_picker_flutter: ^1.5.1
+  dart_emoji: ^0.2.0+2
 
 
 dev_dependencies:

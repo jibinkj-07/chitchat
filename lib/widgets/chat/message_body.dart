@@ -41,7 +41,7 @@ class MessageBody extends StatelessWidget {
           }
 
           if (snapshot.hasData) {
-            log('length is ${snapshot.data!.docs.length}');
+            // log('length is ${snapshot.data!.docs.length}');
             if (snapshot.data!.docs.isEmpty) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,

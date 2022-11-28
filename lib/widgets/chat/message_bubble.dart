@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
+import 'package:dart_emoji/dart_emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -64,6 +65,8 @@ class MessageBubble extends StatelessWidget {
 
     //MAIN SECTION
 
+    log('$message contains emoji only ${EmojiUtil.hasOnlyEmojis(message)}');
+
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
@@ -121,6 +124,7 @@ class MessageBubble extends StatelessWidget {
                         message,
                         style: TextStyle(
                           color: isMe ? Colors.white : Colors.black,
+                          fontSize: EmojiUtil.hasOnlyEmojis(message) ? 20 : 14,
                           // fontWeight: FontWeight.w500,
                         ),
                       ),

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,19 +25,37 @@ class MessageControls extends StatefulWidget {
 class _MessageControlsState extends State<MessageControls> {
   TextEditingController controller = TextEditingController();
   String _msg = '';
+  bool isEmojiPicker = false;
+  FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    focusNode.addListener(
+      () {
+        if (focusNode.hasFocus) {
+          setState(() {
+            isEmojiPicker = false;
+          });
+        }
+      },
+    );
+    super.initState();
+  }
 
   @override
   void dispose() {
     controller.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+
     final screen = MediaQuery.of(context).size;
     FirebaseOperations firebaseOperations = FirebaseOperations();
-
+    // log('message is $_msg');
     return BlocBuilder<ReplyingMessageCubit, ReplyingMessageState>(
       builder: (context, state) {
         return Container(
@@ -93,7 +112,7 @@ class _MessageControlsState extends State<MessageControls> {
                         color: Colors.grey.withOpacity(.2),
                       ),
                       child: Row(
-                        crossAxisAlignment: _msg.contains('\n')
+                        crossAxisAlignment: _msg.toString().contains('\n')
                             ? CrossAxisAlignment.end
                             : CrossAxisAlignment.center,
                         children: [
@@ -101,14 +120,37 @@ class _MessageControlsState extends State<MessageControls> {
                           SizedBox(
                             height: 25,
                             width: 25,
-                            child: IconButton(
-                              onPressed: () {},
-                              padding: const EdgeInsets.all(0.0),
-                              icon: const Icon(Iconsax.happyemoji),
-                              color: appColors.primaryColor,
-                              iconSize: 20,
-                              splashRadius: 15.0,
-                            ),
+                            child: isEmojiPicker
+                                ? IconButton(
+                                    onPressed: () {
+                                      FocusScope.of(context)
+                                          .requestFocus(focusNode);
+
+                                      setState(() {
+                                        isEmojiPicker = !isEmojiPicker;
+                                      });
+                                    },
+                                    padding: const EdgeInsets.all(0.0),
+                                    icon: const Icon(CupertinoIcons.keyboard),
+                                    color: appColors.primaryColor,
+                                    iconSize: 20,
+                                    splashRadius: 15.0,
+                                  )
+                                : IconButton(
+                                    onPressed: () {
+                                      focusNode.unfocus();
+
+                                      setState(() {
+                                        isEmojiPicker = !isEmojiPicker;
+                                      });
+                                      //emoji picker
+                                    },
+                                    padding: const EdgeInsets.all(0.0),
+                                    icon: const Icon(Iconsax.happyemoji),
+                                    color: appColors.primaryColor,
+                                    iconSize: 20,
+                                    splashRadius: 15.0,
+                                  ),
                           ),
 
                           //textfield
@@ -116,6 +158,7 @@ class _MessageControlsState extends State<MessageControls> {
                             child: CupertinoTextField(
                               controller: controller,
                               autofocus: true,
+                              focusNode: focusNode,
                               minLines: 1,
                               maxLines: 5,
                               textCapitalization: TextCapitalization.sentences,
@@ -207,6 +250,57 @@ class _MessageControlsState extends State<MessageControls> {
                         )
                 ],
               ),
+              if (isEmojiPicker)
+                SizedBox(
+                  height: 250,
+                  child: EmojiPicker(
+                    onEmojiSelected: (Category? category, Emoji emoji) {
+                      setState(() {
+                        _msg = '$_msg${emoji.emoji}';
+                      });
+                    },
+
+                    onBackspacePressed: () {
+                      if (_msg.isNotEmpty) {
+                        final input = _msg.characters.skipLast(1);
+                        setState(() {
+                          _msg = input.toString();
+                        });
+                      }
+                    },
+                    textEditingController:
+                        controller, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
+                    config: Config(
+                      columns: 8,
+                      emojiSizeMax:
+                          32.0, // Issue: https://github.com/flutter/flutter/issues/28894
+                      verticalSpacing: 0,
+                      horizontalSpacing: 0,
+                      gridPadding: EdgeInsets.zero,
+                      initCategory: Category.RECENT,
+                      bgColor: const Color(0xFFFFFFFF),
+                      indicatorColor: appColors.primaryColor,
+                      iconColor: Colors.grey,
+                      iconColorSelected: appColors.primaryColor,
+                      backspaceColor: appColors.primaryColor,
+                      skinToneDialogBgColor: Colors.white,
+                      skinToneIndicatorColor: Colors.grey,
+                      enableSkinTones: true,
+                      showRecentsTab: true,
+                      recentsLimit: 28,
+                      noRecents: const Text(
+                        'No Recents',
+                        style: TextStyle(fontSize: 20, color: Colors.black26),
+                        textAlign: TextAlign.center,
+                      ), // Needs to be const Widget
+                      loadingIndicator:
+                          const SizedBox.shrink(), // Needs to be const Widget
+                      tabIndicatorAnimDuration: kTabScrollDuration,
+                      categoryIcons: const CategoryIcons(),
+                      buttonMode: ButtonMode.MATERIAL,
+                    ),
+                  ),
+                ),
             ],
           ),
         );

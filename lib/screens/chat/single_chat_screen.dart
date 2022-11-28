@@ -23,6 +23,7 @@ class SingleChatScreen extends StatelessWidget {
     final screen = MediaQuery.of(context).size;
     AppColors appColors = AppColors();
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
