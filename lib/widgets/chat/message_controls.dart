@@ -14,9 +14,11 @@ class MessageControls extends StatefulWidget {
     Key? key,
     required this.senderId,
     required this.targetId,
+    required this.scrollController,
   }) : super(key: key);
   final String senderId;
   final String targetId;
+  final ScrollController scrollController;
 
   @override
   State<MessageControls> createState() => _MessageControlsState();
@@ -207,6 +209,11 @@ class _MessageControlsState extends State<MessageControls> {
                                     msg =
                                         '${state.message.substring(0, 28)}...';
                                   }
+                                  widget.scrollController.animateTo(
+                                    0.0,
+                                    curve: Curves.easeOut,
+                                    duration: const Duration(milliseconds: 200),
+                                  );
                                   firebaseOperations.sendMessage(
                                       senderId: widget.senderId,
                                       targetId: widget.targetId,
@@ -223,6 +230,11 @@ class _MessageControlsState extends State<MessageControls> {
                                   });
                                 }
                               : () {
+                                  widget.scrollController.animateTo(
+                                    0.0,
+                                    curve: Curves.easeOut,
+                                    duration: const Duration(milliseconds: 200),
+                                  );
                                   firebaseOperations.sendMessage(
                                       senderId: widget.senderId,
                                       targetId: widget.targetId,

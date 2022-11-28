@@ -11,10 +11,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 class MessageBody extends StatelessWidget {
   final String currentUserid;
   final String targetUserid;
+  final ScrollController scrollController;
   const MessageBody({
     super.key,
     required this.currentUserid,
     required this.targetUserid,
+    required this.scrollController,
   });
 
   @override
@@ -70,38 +72,52 @@ class MessageBody extends StatelessWidget {
             // log('has data');
             //changing single message read status
 
-            return ListView.builder(
-                reverse: true,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (ctx, i) {
-                  final message = snapshot.data!.docs[i].get('body');
-                  final time = snapshot.data!.docs[i].get('time').toDate();
-                  final isMe = snapshot.data!.docs[i].get('sentByMe');
-                  final read = snapshot.data!.docs[i].get('read');
-                  final isReplied =
-                      snapshot.data!.docs[i].get('isReplyingMessage');
-                  final repliedToMessage =
-                      snapshot.data!.docs[i].get('repliedTo');
-                  DateTime? readTime;
-                  try {
-                    readTime = snapshot.data!.docs[i].get('readTime').toDate();
-                  } catch (e) {
-                    // log(e.toString());
-                  }
+            return NotificationListener<OverscrollIndicatorNotification>(
+              onNotification: (overscroll) {
+                overscroll.disallowIndicator();
+                return true;
+              },
+              child: Scrollbar(
+                thickness: 6.0,
+                interactive: true,
+                controller: scrollController,
+                radius: const Radius.circular(30),
+                child: ListView.builder(
+                    reverse: true,
+                    controller: scrollController,
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (ctx, i) {
+                      final message = snapshot.data!.docs[i].get('body');
+                      final time = snapshot.data!.docs[i].get('time').toDate();
+                      final isMe = snapshot.data!.docs[i].get('sentByMe');
+                      final read = snapshot.data!.docs[i].get('read');
+                      final isReplied =
+                          snapshot.data!.docs[i].get('isReplyingMessage');
+                      final repliedToMessage =
+                          snapshot.data!.docs[i].get('repliedTo');
+                      DateTime? readTime;
+                      try {
+                        readTime =
+                            snapshot.data!.docs[i].get('readTime').toDate();
+                      } catch (e) {
+                        // log(e.toString());
+                      }
 
-                  return MessageBubble(
-                    messageId: snapshot.data!.docs[i].id,
-                    message: message,
-                    isReplied: isReplied,
-                    repliedToMessage: repliedToMessage,
-                    currentUserid: currentUserid,
-                    targetUserid: targetUserid,
-                    time: time,
-                    isMe: isMe,
-                    read: read,
-                    readTime: readTime,
-                  );
-                });
+                      return MessageBubble(
+                        messageId: snapshot.data!.docs[i].id,
+                        message: message,
+                        isReplied: isReplied,
+                        repliedToMessage: repliedToMessage,
+                        currentUserid: currentUserid,
+                        targetUserid: targetUserid,
+                        time: time,
+                        isMe: isMe,
+                        read: read,
+                        readTime: readTime,
+                      );
+                    }),
+              ),
+            );
           }
           return const SizedBox();
         },
