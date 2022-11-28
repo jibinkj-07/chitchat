@@ -28,11 +28,28 @@ class ChatListItem extends StatelessWidget {
     required this.currentUserid,
   });
 
+  //date difference calculation function
+  int calculateDifference(DateTime date) {
+    DateTime now = DateTime.now();
+    return DateTime(date.year, date.month, date.day)
+        .difference(DateTime(now.year, now.month, now.day))
+        .inDays;
+  }
+
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     FirebaseOperations firebaseOperations = FirebaseOperations();
 
+    final timeDiff = calculateDifference(time);
+    String messageTime = '';
+    if (timeDiff == 0) {
+      messageTime = DateFormat.jm().format(time);
+    } else if (timeDiff == -1) {
+      messageTime = 'Yesterday';
+    } else {
+      messageTime = DateFormat.yMMMd().format(time);
+    }
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('Users')
@@ -198,7 +215,7 @@ class ChatListItem extends StatelessWidget {
                     size: 18,
                   ),
                 Text(
-                  DateFormat.jm().format(time),
+                  messageTime,
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: isNew ? FontWeight.bold : FontWeight.normal),

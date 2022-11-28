@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,11 +32,18 @@ class MessageBubble extends StatelessWidget {
     this.readTime,
   });
 
+  //date difference calculation function
+  int calculateDifference(DateTime date) {
+    DateTime now = DateTime.now();
+    return DateTime(date.year, date.month, date.day)
+        .difference(DateTime(now.year, now.month, now.day))
+        .inDays;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
     AppColors appColors = AppColors();
-    // final messageLength = message.length;
 
     if (!isMe) {
       FirebaseOperations().changeReadMessageStatus(
@@ -42,6 +51,15 @@ class MessageBubble extends StatelessWidget {
         senderId: currentUserid,
         targetId: targetUserid,
       );
+    }
+    final timeDiff = calculateDifference(time);
+    String messageTime = '';
+    if (timeDiff == 0) {
+      messageTime = DateFormat.jm().format(time);
+    } else if (timeDiff == -1) {
+      messageTime = 'Yesterday ${DateFormat.jm().format(time)}';
+    } else {
+      messageTime = DateFormat.yMMMd().add_jm().format(time);
     }
 
     //MAIN SECTION
@@ -107,7 +125,7 @@ class MessageBubble extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        DateFormat.jm().format(time),
+                        messageTime,
                         style: TextStyle(
                           fontSize: 10,
                           color: isMe
