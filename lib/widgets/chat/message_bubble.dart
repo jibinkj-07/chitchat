@@ -65,7 +65,7 @@ class MessageBubble extends StatelessWidget {
 
     //MAIN SECTION
 
-    log('$message contains emoji only ${EmojiUtil.hasOnlyEmojis(message)}');
+    // log('$message contains emoji only ${EmojiUtil.hasOnlyEmojis(message)}');
 
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,

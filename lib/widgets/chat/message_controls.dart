@@ -28,19 +28,19 @@ class _MessageControlsState extends State<MessageControls> {
   bool isEmojiPicker = false;
   FocusNode focusNode = FocusNode();
 
-  @override
-  void initState() {
-    focusNode.addListener(
-      () {
-        if (focusNode.hasFocus) {
-          setState(() {
-            isEmojiPicker = false;
-          });
-        }
-      },
-    );
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   FocusScope.of(context).addListener(
+  //     () {
+  //       if (FocusScope.of(context).hasFocus) {
+  //         setState(() {
+  //           isEmojiPicker = false;
+  //         });
+  //       }
+  //     },
+  //   );
+  //   super.initState();
+  // }
 
   @override
   void dispose() {
@@ -52,12 +52,16 @@ class _MessageControlsState extends State<MessageControls> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
-
-    final screen = MediaQuery.of(context).size;
     FirebaseOperations firebaseOperations = FirebaseOperations();
+
+    if (FocusScope.of(context).hasFocus) {
+      setState(() {
+        isEmojiPicker = false;
+      });
+    }
     // log('message is $_msg');
     return BlocBuilder<ReplyingMessageCubit, ReplyingMessageState>(
-      builder: (context, state) {
+      builder: (ctx, state) {
         return Container(
           margin: const EdgeInsets.only(bottom: 8, top: 2),
           child: Column(
@@ -117,48 +121,36 @@ class _MessageControlsState extends State<MessageControls> {
                             : CrossAxisAlignment.center,
                         children: [
                           //emoji icon button
-                          SizedBox(
-                            height: 25,
-                            width: 25,
-                            child: isEmojiPicker
-                                ? IconButton(
-                                    onPressed: () {
-                                      FocusScope.of(context)
-                                          .requestFocus(focusNode);
+                          if (!isEmojiPicker)
+                            SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: IconButton(
+                                onPressed: () async {
+                                  FocusScope.of(context).unfocus();
 
-                                      setState(() {
-                                        isEmojiPicker = !isEmojiPicker;
-                                      });
-                                    },
-                                    padding: const EdgeInsets.all(0.0),
-                                    icon: const Icon(CupertinoIcons.keyboard),
-                                    color: appColors.primaryColor,
-                                    iconSize: 20,
-                                    splashRadius: 15.0,
-                                  )
-                                : IconButton(
-                                    onPressed: () {
-                                      focusNode.unfocus();
-
-                                      setState(() {
-                                        isEmojiPicker = !isEmojiPicker;
-                                      });
-                                      //emoji picker
-                                    },
-                                    padding: const EdgeInsets.all(0.0),
-                                    icon: const Icon(Iconsax.happyemoji),
-                                    color: appColors.primaryColor,
-                                    iconSize: 20,
-                                    splashRadius: 15.0,
-                                  ),
-                          ),
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 150),
+                                  );
+                                  setState(() {
+                                    isEmojiPicker = !isEmojiPicker;
+                                  });
+                                  //emoji picker
+                                },
+                                padding: const EdgeInsets.all(0.0),
+                                icon: const Icon(Iconsax.happyemoji),
+                                color: appColors.primaryColor,
+                                iconSize: 20,
+                                splashRadius: 15.0,
+                              ),
+                            ),
 
                           //textfield
                           Expanded(
                             child: CupertinoTextField(
                               controller: controller,
                               autofocus: true,
-                              focusNode: focusNode,
+                              // focusNode: focusNode,
                               minLines: 1,
                               maxLines: 5,
                               textCapitalization: TextCapitalization.sentences,
@@ -300,7 +292,7 @@ class _MessageControlsState extends State<MessageControls> {
                       buttonMode: ButtonMode.MATERIAL,
                     ),
                   ),
-                ),
+                )
             ],
           ),
         );

@@ -23,7 +23,7 @@ class MessageBody extends StatelessWidget {
 
     return Container(
       width: screen.width,
-      decoration: BoxDecoration(color: Colors.white),
+      decoration: const BoxDecoration(color: Colors.white),
       child: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('Users')
@@ -34,11 +34,11 @@ class MessageBody extends StatelessWidget {
             .orderBy('time', descending: true)
             .snapshots(),
         builder: (ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CupertinoActivityIndicator(),
-            );
-          }
+          // if (snapshot.connectionState == ConnectionState.waiting) {
+          //   return const Center(
+          //     child: CupertinoActivityIndicator(),
+          //   );
+          // }
 
           if (snapshot.hasData) {
             // log('length is ${snapshot.data!.docs.length}');

@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/user_profile.dart';
-import 'package:chitchat/screens/chat/single_chat_screen.dart';
+import 'package:chitchat/widgets/chat/single_chat_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chitchat/screens/chat/single_chat_screen.dart';
+import 'package:chitchat/widgets/chat/single_chat_screen.dart';
 import 'package:chitchat/widgets/general/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';

@@ -20,9 +20,9 @@ class SingleChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
     AppColors appColors = AppColors();
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
@@ -36,14 +36,6 @@ class SingleChatScreen extends StatelessWidget {
                     .doc(targetUserid)
                     .snapshots(),
                 builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  // if (snapshot.connectionState == ConnectionState.waiting) {
-                  //   return Center(
-                  //     child: CupertinoActivityIndicator(
-                  //       radius: 30,
-                  //       color: appColors.primaryColor,
-                  //     ),
-                  //   );
-                  // }
                   if (snapshot.hasData) {
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
