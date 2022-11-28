@@ -143,12 +143,38 @@ class ChatListItem extends StatelessWidget {
                         )
                     ],
                   ),
-            title: Text(
-              userDetail.get('name'),
-              style: TextStyle(
-                fontWeight: isNew ? FontWeight.bold : FontWeight.normal,
-              ),
+            // title: Text(
+            //   userDetail.get('name'),
+            //   style: TextStyle(
+            //     fontWeight: isNew ? FontWeight.bold : FontWeight.normal,
+            //   ),
+            // ),
+            title: Row(
+              children: [
+                userDetail.get('name').toString().length > 30
+                    ? Text(
+                        '${userDetail.get('name').toString().substring(0, 28)}..',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    : Text(
+                        userDetail.get('name'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                if (userDetail.get('verified'))
+                  Icon(
+                    Iconsax.verify5,
+                    color: AppColors().primaryColor,
+                    size: 20,
+                  ),
+              ],
             ),
+
             subtitle: lstMsg.length > 30
                 ? Text(
                     '${lstMsg.substring(0, 29)}...',

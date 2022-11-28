@@ -24,6 +24,12 @@ class _MessageControlsState extends State<MessageControls> {
   String _msg = '';
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;

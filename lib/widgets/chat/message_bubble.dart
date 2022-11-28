@@ -1,8 +1,4 @@
-import 'dart:developer';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import '../../logic/database/firebase_operations.dart';
 import '../../utils/app_colors.dart';
@@ -42,9 +38,12 @@ class MessageBubble extends StatelessWidget {
       );
     }
 
+    //MAIN SECTION
+
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
+        //main
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           child: Column(
@@ -55,6 +54,12 @@ class MessageBubble extends StatelessWidget {
                 confirmDismiss: (direction) async {
                   if (direction == DismissDirection.endToStart) {
                     await showBottom(context);
+                  } else if (direction == DismissDirection.startToEnd) {
+                    // replyMessage(
+                    //   message: message,
+                    //   isMine: isMe,
+                    // );
+
                   }
                 },
                 child: Container(
@@ -119,7 +124,6 @@ class MessageBubble extends StatelessWidget {
   }
 
   //bottom sheet
-
   Future<void> showBottom(BuildContext ctx) async {
     AppColors appColors = AppColors();
     FirebaseOperations firebaseOperations = FirebaseOperations();
@@ -139,7 +143,7 @@ class MessageBubble extends StatelessWidget {
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
+            children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: message.length > 30
