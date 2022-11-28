@@ -1,4 +1,6 @@
+import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../logic/database/firebase_operations.dart';
 import '../../utils/app_colors.dart';
@@ -8,6 +10,8 @@ class MessageBubble extends StatelessWidget {
   final String message;
   final String currentUserid;
   final String targetUserid;
+  final bool isReplied;
+  final String repliedToMessage;
   final bool read;
   final DateTime? readTime;
   final DateTime time;
@@ -17,6 +21,8 @@ class MessageBubble extends StatelessWidget {
     required this.messageId,
     required this.message,
     required this.time,
+    required this.isReplied,
+    required this.repliedToMessage,
     required this.currentUserid,
     required this.targetUserid,
     required this.isMe,
@@ -43,7 +49,7 @@ class MessageBubble extends StatelessWidget {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
-        //main
+        //message
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           child: Column(
@@ -55,19 +61,14 @@ class MessageBubble extends StatelessWidget {
                   if (direction == DismissDirection.endToStart) {
                     await showBottom(context);
                   } else if (direction == DismissDirection.startToEnd) {
-                    // replyMessage(
-                    //   message: message,
-                    //   isMine: isMe,
-                    // );
-
+                    context.read<ReplyingMessageCubit>().reply(
+                        isReplying: true, isMine: isMe, message: message);
                   }
                 },
                 child: Container(
-                  // width: messageLength > 30 ? screen.width * .8 : null,
                   constraints: BoxConstraints(maxWidth: screen.width * .8),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-
                   decoration: BoxDecoration(
                     color: isMe ? appColors.primaryColor : Colors.grey[300],
                     borderRadius: isMe
@@ -85,12 +86,24 @@ class MessageBubble extends StatelessWidget {
                           ),
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (isReplied)
+                        Text(
+                          'Replied to "$repliedToMessage"',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: isMe
+                                ? Colors.white.withOpacity(.8)
+                                : Colors.black.withOpacity(.7),
+                          ),
+                        ),
                       Text(
                         message,
                         style: TextStyle(
                           color: isMe ? Colors.white : Colors.black,
+                          // fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(

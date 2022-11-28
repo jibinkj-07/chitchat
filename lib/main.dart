@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
+import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/user_model.dart';
 import 'package:chitchat/sample.dart';
 import 'package:chitchat/screens/auth/authentication_screen.dart';
@@ -63,6 +64,9 @@ class MyApp extends StatelessWidget {
         //cubit for Connectivity feature
         BlocProvider(
           create: (_) => InternetCubit(connectivity: connectivity),
+        ),
+        BlocProvider(
+          create: (_) => ReplyingMessageCubit(),
         ),
       ],
       child: MaterialApp(

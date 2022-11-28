@@ -407,10 +407,14 @@ class FirebaseOperations {
 
   //-----------------CHAT OPERATIONS-----------------------
 
-  void sendMessage(
-      {required String senderId,
-      required String targetId,
-      required String body}) {
+  void sendMessage({
+    required String senderId,
+    required String targetId,
+    required String body,
+    required bool isReplyingMessage,
+    required String repliedToMessage,
+    required bool repliedToMe,
+  }) {
     final time = DateTime.now();
     final senderFolder =
         database.doc(senderId).collection("messages").doc(targetId);
@@ -424,6 +428,9 @@ class FirebaseOperations {
       'read': false,
       'readTime': null,
       'sentByMe': true,
+      'isReplyingMessage': isReplyingMessage,
+      'repliedTo': repliedToMessage,
+      'repliedToMe': repliedToMe,
       'time': time,
     }).then((value) {
       //creating copy in tager folder
@@ -433,6 +440,9 @@ class FirebaseOperations {
         'read': false,
         'readTime': null,
         'sentByMe': false,
+        'isReplyingMessage': isReplyingMessage,
+        'repliedTo': repliedToMessage,
+        'repliedToMe': repliedToMe,
         'time': time,
       });
 

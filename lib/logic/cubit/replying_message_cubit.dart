@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -20,7 +22,15 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
   }) {
     emit(
       ReplyingMessageState(
-          isReplying: isReplying, isMine: isMine, message: message),
+        isReplying: isReplying,
+        isMine: isMine,
+        message: message,
+      ),
     );
+  }
+
+  void clearMessage() {
+    emit(const ReplyingMessageState(
+        isMine: false, isReplying: false, message: ''));
   }
 }

@@ -80,6 +80,10 @@ class MessageBody extends StatelessWidget {
                   final time = snapshot.data!.docs[i].get('time').toDate();
                   final isMe = snapshot.data!.docs[i].get('sentByMe');
                   final read = snapshot.data!.docs[i].get('read');
+                  final isReplied =
+                      snapshot.data!.docs[i].get('isReplyingMessage');
+                  final repliedToMessage =
+                      snapshot.data!.docs[i].get('repliedTo');
                   DateTime? readTime;
                   try {
                     readTime = snapshot.data!.docs[i].get('readTime').toDate();
@@ -90,6 +94,8 @@ class MessageBody extends StatelessWidget {
                   return MessageBubble(
                     messageId: snapshot.data!.docs[i].id,
                     message: message,
+                    isReplied: isReplied,
+                    repliedToMessage: repliedToMessage,
                     currentUserid: currentUserid,
                     targetUserid: targetUserid,
                     time: time,

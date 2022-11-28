@@ -11,7 +11,11 @@ class ReplyingMessageState extends Equatable {
   });
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [
+        isReplying,
+        isMine,
+        message,
+      ];
 }
 
 class ReplyingMessageInitial extends ReplyingMessageState {
