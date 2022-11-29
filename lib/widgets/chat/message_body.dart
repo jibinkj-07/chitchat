@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/chat/message_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -95,6 +92,7 @@ class MessageBody extends StatelessWidget {
                           snapshot.data!.docs[i].get('isReplyingMessage');
                       final repliedToMessage =
                           snapshot.data!.docs[i].get('repliedTo');
+                      final type = snapshot.data!.docs[i].get('type');
                       DateTime? readTime;
                       try {
                         readTime =
@@ -107,6 +105,7 @@ class MessageBody extends StatelessWidget {
                         messageId: snapshot.data!.docs[i].id,
                         message: message,
                         isReplied: isReplied,
+                        type: type,
                         repliedToMessage: repliedToMessage,
                         currentUserid: currentUserid,
                         targetUserid: targetUserid,

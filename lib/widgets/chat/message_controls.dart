@@ -1,5 +1,6 @@
 import 'dart:developer';
-
+import 'dart:io';
+import 'package:chitchat/utils/image_chooser.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MessageControls extends StatefulWidget {
   const MessageControls({
@@ -29,6 +31,7 @@ class _MessageControlsState extends State<MessageControls> {
   String _msg = '';
   bool isEmojiPicker = false;
   FocusNode focusNode = FocusNode();
+  // File? image;
 
   // @override
   // void initState() {
@@ -174,9 +177,11 @@ class _MessageControlsState extends State<MessageControls> {
                                   height: 25,
                                   width: 25,
                                   child: IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      sendImage();
+                                    },
                                     padding: const EdgeInsets.all(0.0),
-                                    icon: const Icon(Iconsax.camera),
+                                    icon: const Icon(Iconsax.gallery),
                                     color: appColors.primaryColor,
                                     iconSize: 20,
                                     splashRadius: 15.0,
@@ -219,6 +224,7 @@ class _MessageControlsState extends State<MessageControls> {
                                       targetId: widget.targetId,
                                       isReplyingMessage: true,
                                       repliedToMessage: msg,
+                                      type: 'text',
                                       repliedToMe: state.isMine,
                                       body: _msg.trim());
                                   controller.clear();
@@ -239,6 +245,7 @@ class _MessageControlsState extends State<MessageControls> {
                                       senderId: widget.senderId,
                                       targetId: widget.targetId,
                                       isReplyingMessage: false,
+                                      type: 'text',
                                       repliedToMessage: '',
                                       repliedToMe: false,
                                       body: _msg.trim());
@@ -305,6 +312,111 @@ class _MessageControlsState extends State<MessageControls> {
                     ),
                   ),
                 )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  sendImage() {
+    FirebaseOperations firebaseOperations = FirebaseOperations();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return Container(
+          // height: 100,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () async {
+                    ImagePicker()
+                        .pickImage(source: ImageSource.gallery)
+                        .then((pickedImage) async {
+                      if (pickedImage == null) return;
+                      final image = File(pickedImage.path);
+                      await firebaseOperations.sendImage(
+                        senderId: widget.senderId,
+                        targetId: widget.targetId,
+                        image: image,
+                      );
+                    });
+                    if (!mounted) return;
+                    Navigator.pop(ctx);
+                  },
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: SizedBox(
+                    height: 50,
+                    child: Row(
+                      children: const [
+                        SizedBox(width: 10),
+                        Icon(Iconsax.gallery),
+                        SizedBox(width: 15),
+                        Text(
+                          "Choose from library",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () async {
+                    ImagePicker()
+                        .pickImage(source: ImageSource.camera)
+                        .then((pickedImage) async {
+                      if (pickedImage == null) return;
+                      final image = File(pickedImage.path);
+                      await firebaseOperations.sendImage(
+                        senderId: widget.senderId,
+                        targetId: widget.targetId,
+                        image: image,
+                      );
+                    });
+                    if (!mounted) return;
+                    Navigator.pop(ctx);
+                  },
+                  child: SizedBox(
+                    height: 50,
+                    child: Row(
+                      children: const [
+                        SizedBox(width: 10),
+                        Icon(Iconsax.camera),
+                        SizedBox(width: 15),
+                        Text(
+                          "Take Photo",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         );

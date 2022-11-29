@@ -339,9 +339,16 @@ class FirebaseOperations {
       await user!.reauthenticateWithCredential(credentials).then((value) async {
         log('success');
         showAlertDialogDeleting(context);
-        await database.doc(id).delete(); // called from database class
+        await database.doc(id).delete();
         await value.user!.delete();
         await deleteAccountHive();
+        try {
+          final storageRef =
+              FirebaseStorage.instance.ref().child("Profile Images");
+          await storageRef.child('$id.jpg').delete();
+        } catch (e) {
+          log('error at deleting account ${e.toString()}');
+        }
         navigator.pushNamedAndRemoveUntil('/welcome', (route) => false);
       });
 
@@ -411,6 +418,7 @@ class FirebaseOperations {
     required String senderId,
     required String targetId,
     required String body,
+    required String type,
     required bool isReplyingMessage,
     required String repliedToMessage,
     required bool repliedToMe,
@@ -424,7 +432,7 @@ class FirebaseOperations {
     //creating copy in sender folder
     senderFolder.collection('chats').add({
       'body': body.trim(),
-      'type': 'text',
+      'type': type,
       'read': false,
       'readTime': null,
       'sentByMe': true,
@@ -503,11 +511,14 @@ class FirebaseOperations {
   }
 
 //deleting message of self
-  void deleteMessageForMe(
-      {required String messageId,
-      required String senderId,
-      required String targetId,
-      required String message}) async {
+  void deleteMessageForMe({
+    required String messageId,
+    required String senderId,
+    required String targetId,
+    required String type,
+    required String message,
+    bool? deleteForAll,
+  }) async {
     String id = '';
     final deleteMsg = database
         .doc(senderId)
@@ -526,6 +537,10 @@ class FirebaseOperations {
       id = value.get('id');
     });
     if (id == messageId) {
+      if (type == 'image' && deleteForAll != null) {
+        log('called delete image');
+        await deleteImageMessage(messageId: messageId, senderId: senderId);
+      }
       deleteMsg.delete();
       database.doc(senderId).collection('messages').doc(targetId).set(
         {
@@ -537,13 +552,27 @@ class FirebaseOperations {
         SetOptions(merge: true),
       );
     } else {
+      if (type == 'image' && deleteForAll != null) {
+        log('called delete image');
+        await deleteImageMessage(messageId: messageId, senderId: senderId);
+      }
       deleteMsg.delete();
     }
+  }
+
+  Future<void> deleteImageMessage({
+    required String messageId,
+    required String senderId,
+  }) async {
+    final storageRef =
+        FirebaseStorage.instance.ref().child("Chat Images").child(senderId);
+    await storageRef.child('$messageId.jpg').delete();
   }
 
   //deleting message for all
   void deleteMessageForAll(
       {required String messageId,
+      required String type,
       required String senderId,
       required String targetId}) async {
     String targetMsgId = '';
@@ -552,7 +581,9 @@ class FirebaseOperations {
         messageId: messageId,
         senderId: senderId,
         targetId: targetId,
-        message: 'Deleted for all');
+        type: type,
+        deleteForAll: true,
+        message: 'Message deleted for all');
 
     final deleteMsgTarget = database
         .doc(targetId)
@@ -574,7 +605,7 @@ class FirebaseOperations {
       deleteMsgTarget.delete();
       database.doc(targetId).collection('messages').doc(senderId).set(
         {
-          'last_message': 'Deleted for all',
+          'last_message': 'Message deleted for all',
           'time': DateTime.now(),
           'isNew': false,
           'id': '',
@@ -646,5 +677,87 @@ class FirebaseOperations {
       },
       SetOptions(merge: true),
     );
+  }
+
+  Future<void> sendImage(
+      {required String senderId,
+      required String targetId,
+      required File image}) async {
+    final time = DateTime.now();
+    String id = '';
+
+    final storageRef =
+        FirebaseStorage.instance.ref().child("Chat Images").child(senderId);
+    // await storageRef.child('$id.jpg').delete();
+    final senderEnd =
+        database.doc(senderId).collection('messages').doc(targetId);
+
+    final targetEnd =
+        database.doc(targetId).collection('messages').doc(senderId);
+    //setting sending message in sender user end
+
+    senderEnd.collection('chats').add({
+      'body': '',
+      'type': 'image',
+      'read': false,
+      'readTime': null,
+      'sentByMe': true,
+      'isReplyingMessage': false,
+      'repliedTo': '',
+      'repliedToMe': false,
+      'time': time,
+    }).then((value) async {
+      id = value.id;
+      senderEnd.set({
+        'id': id,
+        'isNew': false,
+        'last_message': 'sending image',
+        'time': time,
+      }, SetOptions(merge: true));
+
+      //uploading image
+      try {
+        await storageRef.child('$id.jpg').putFile(image).whenComplete(() async {
+          final url = await storageRef.child('$id.jpg').getDownloadURL();
+          final uploadedTime = DateTime.now();
+
+          //setting message
+          senderEnd.collection('chats').doc(id).set({
+            'body': url,
+            'time': uploadedTime,
+          }, SetOptions(merge: true));
+
+          senderEnd.set({
+            'last_message': 'Image sent',
+            'time': uploadedTime,
+          }, SetOptions(merge: true));
+
+          targetEnd.collection('chats').doc(id).set({
+            'body': url,
+            'type': 'image',
+            'read': false,
+            'readTime': null,
+            'sentByMe': false,
+            'isReplyingMessage': false,
+            'repliedTo': '',
+            'repliedToMe': false,
+            'time': uploadedTime,
+          });
+
+          targetEnd.set({
+            'id': id,
+            'isNew': true,
+            'last_message': '🖼️ Image',
+            'time': uploadedTime,
+          }, SetOptions(merge: true));
+        });
+      } catch (e) {
+        log('error on uploading image ${e.toString()}');
+        senderEnd.collection('chats').doc(id).delete();
+        senderEnd.set({
+          'last_message': 'Failed to sent image',
+        }, SetOptions(merge: true));
+      }
+    });
   }
 }
