@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/widgets/chat/imageMessage_preview.dart';
@@ -10,32 +8,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../logic/database/firebase_operations.dart';
 import '../../utils/app_colors.dart';
+import '../../utils/message_Item.dart';
 
 class MessageBubble extends StatelessWidget {
-  final String messageId;
-  final String message;
-  final String currentUserid;
-  final String targetUserid;
-  final bool isReplied;
-  final String repliedToMessage;
-  final bool read;
-  final DateTime? readTime;
-  final DateTime time;
-  final String type;
-  final bool isMe;
+  final MessageItem messageItem;
   const MessageBubble({
     super.key,
-    required this.messageId,
-    required this.message,
-    required this.time,
-    required this.isReplied,
-    required this.type,
-    required this.repliedToMessage,
-    required this.currentUserid,
-    required this.targetUserid,
-    required this.isMe,
-    required this.read,
-    this.readTime,
+    required this.messageItem,
   });
 
   //date difference calculation function
@@ -51,21 +30,21 @@ class MessageBubble extends StatelessWidget {
     final screen = MediaQuery.of(context).size;
     AppColors appColors = AppColors();
 
-    if (!isMe) {
+    if (!messageItem.isMe) {
       FirebaseOperations().changeReadMessageStatus(
-        messageId: messageId,
-        senderId: currentUserid,
-        targetId: targetUserid,
+        messageId: messageItem.messageId,
+        senderId: messageItem.currentUserid,
+        targetId: messageItem.targetUserid,
       );
     }
-    final timeDiff = calculateDifference(time);
+    final timeDiff = calculateDifference(messageItem.time);
     String messageTime = '';
     if (timeDiff == 0) {
-      messageTime = DateFormat.jm().format(time);
+      messageTime = DateFormat.jm().format(messageItem.time);
     } else if (timeDiff == -1) {
-      messageTime = 'Yesterday ${DateFormat.jm().format(time)}';
+      messageTime = 'Yesterday ${DateFormat.jm().format(messageItem.time)}';
     } else {
-      messageTime = DateFormat.yMMMd().add_jm().format(time);
+      messageTime = DateFormat.yMMMd().add_jm().format(messageItem.time);
     }
 
     //MAIN SECTION
@@ -73,23 +52,28 @@ class MessageBubble extends StatelessWidget {
     // log('$message contains emoji only ${EmojiUtil.hasOnlyEmojis(message)}');
 
     return Row(
-      mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment:
+          messageItem.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         //message
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: type.toLowerCase() == 'text'
+          child: messageItem.type.toLowerCase() == 'text'
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Dismissible(
-                      key: ValueKey(messageId),
+                      key: ValueKey(messageItem.messageId),
                       confirmDismiss: (direction) async {
                         if (direction == DismissDirection.endToStart) {
                           await showBottom(context);
                         } else if (direction == DismissDirection.startToEnd) {
                           context.read<ReplyingMessageCubit>().reply(
-                              isReplying: true, isMine: isMe, message: message);
+                                isReplying: true,
+                                isMine: messageItem.isMe,
+                                message: messageItem.message,
+                                type: messageItem.type,
+                              );
                         }
                       },
                       child: Container(
@@ -98,9 +82,10 @@ class MessageBubble extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color:
-                              isMe ? appColors.primaryColor : Colors.grey[300],
-                          borderRadius: isMe
+                          color: messageItem.isMe
+                              ? appColors.primaryColor
+                              : Colors.grey[300],
+                          borderRadius: messageItem.isMe
                               ? const BorderRadius.only(
                                   topLeft: Radius.circular(10),
                                   topRight: Radius.circular(10),
@@ -117,23 +102,27 @@ class MessageBubble extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (isReplied)
+                            if (messageItem.isReplied)
                               Text(
-                                'Replied to "$repliedToMessage"',
+                                'Replied to "${messageItem.repliedToMessage}"',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,
-                                  color: isMe
+                                  color: messageItem.isMe
                                       ? Colors.white.withOpacity(.8)
                                       : Colors.black.withOpacity(.7),
                                 ),
                               ),
                             Text(
-                              message,
+                              messageItem.message,
                               style: TextStyle(
-                                color: isMe ? Colors.white : Colors.black,
+                                color: messageItem.isMe
+                                    ? Colors.white
+                                    : Colors.black,
                                 fontSize:
-                                    EmojiUtil.hasOnlyEmojis(message) ? 20 : 14,
+                                    EmojiUtil.hasOnlyEmojis(messageItem.message)
+                                        ? 20
+                                        : 14,
                                 // fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -141,7 +130,7 @@ class MessageBubble extends StatelessWidget {
                               messageTime,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: isMe
+                                color: messageItem.isMe
                                     ? Colors.white.withOpacity(.8)
                                     : Colors.black.withOpacity(.5),
                               ),
@@ -152,7 +141,7 @@ class MessageBubble extends StatelessWidget {
                     ),
 
                     //read status
-                    if (isMe && read)
+                    if (messageItem.isMe && messageItem.read)
                       const Text(
                         'read',
                         style: TextStyle(
@@ -165,13 +154,17 @@ class MessageBubble extends StatelessWidget {
 
               //image message preview
               : Dismissible(
-                  key: ValueKey(messageId),
+                  key: ValueKey(messageItem.messageId),
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.endToStart) {
                       await showBottom(context);
                     } else if (direction == DismissDirection.startToEnd) {
                       context.read<ReplyingMessageCubit>().reply(
-                          isReplying: true, isMine: isMe, message: 'Image');
+                            isReplying: true,
+                            isMine: messageItem.isMe,
+                            type: messageItem.type,
+                            message: messageItem.message,
+                          );
                     }
                   },
                   child: Column(
@@ -182,7 +175,7 @@ class MessageBubble extends StatelessWidget {
                         height: 250,
                         width: 250,
                         decoration: BoxDecoration(
-                          borderRadius: isMe
+                          borderRadius: messageItem.isMe
                               ? const BorderRadius.only(
                                   topLeft: Radius.circular(10),
                                   topRight: Radius.circular(10),
@@ -195,20 +188,20 @@ class MessageBubble extends StatelessWidget {
                                   // bottomLeft: Radius.circular(10),
                                   bottomRight: Radius.circular(10),
                                 ),
-                          color: isMe
+                          color: messageItem.isMe
                               ? appColors.primaryColor
                               : Colors.grey.withOpacity(.2),
                           border: Border.all(
                             width: 6,
-                            color: isMe
+                            color: messageItem.isMe
                                 ? appColors.primaryColor
                                 : Colors.grey.withOpacity(0),
                           ),
                         ),
-                        child: message == ''
+                        child: messageItem.message == ''
                             ? Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: isMe
+                                  borderRadius: messageItem.isMe
                                       ? const BorderRadius.only(
                                           topLeft: Radius.circular(5),
                                           topRight: Radius.circular(5),
@@ -243,7 +236,8 @@ class MessageBubble extends StatelessWidget {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (_) => ImageMessagePreview(
-                                          url: message, id: messageId),
+                                          url: messageItem.message,
+                                          id: messageItem.messageId),
                                     ),
                                   );
                                 },
@@ -252,7 +246,7 @@ class MessageBubble extends StatelessWidget {
                                     //image
                                     Expanded(
                                       child: ClipRRect(
-                                        borderRadius: isMe
+                                        borderRadius: messageItem.isMe
                                             ? const BorderRadius.only(
                                                 topLeft: Radius.circular(5),
                                                 topRight: Radius.circular(5),
@@ -268,14 +262,14 @@ class MessageBubble extends StatelessWidget {
                                         child: Container(
                                           color: Colors.white,
                                           child: CachedNetworkImage(
-                                            imageUrl: message,
+                                            imageUrl: messageItem.message,
                                             width: MediaQuery.of(context)
                                                 .size
                                                 .width,
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) =>
                                                 CupertinoActivityIndicator(
-                                              color: isMe
+                                              color: messageItem.isMe
                                                   ? appColors.primaryColor
                                                   : Colors.black,
                                               radius: 15,
@@ -297,7 +291,7 @@ class MessageBubble extends StatelessWidget {
                                         messageTime,
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: isMe
+                                          color: messageItem.isMe
                                               ? Colors.white.withOpacity(.8)
                                               : Colors.black.withOpacity(.5),
                                         ),
@@ -309,7 +303,7 @@ class MessageBubble extends StatelessWidget {
                               ),
                       ),
                       //read
-                      if (isMe && read)
+                      if (messageItem.isMe && messageItem.read)
                         const Text(
                           'seen',
                           style: TextStyle(
@@ -348,37 +342,37 @@ class MessageBubble extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: type.toLowerCase() == 'image'
+                child: messageItem.type.toLowerCase() == 'image'
                     ? const Text(
                         'Image',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       )
-                    : message.length > 30
+                    : messageItem.message.length > 30
                         ? Text(
-                            '"${message.substring(0, 28)}..."',
+                            '"${messageItem.message.substring(0, 28)}..."',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           )
                         : Text(
-                            '"$message"',
+                            '"${messageItem.message}"',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
               ),
-              if (isMe)
+              if (messageItem.isMe)
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
                       firebaseOperations.deleteMessageForAll(
-                          messageId: messageId,
-                          type: type,
-                          senderId: currentUserid,
-                          targetId: targetUserid);
+                          messageId: messageItem.messageId,
+                          type: messageItem.type,
+                          senderId: messageItem.currentUserid,
+                          targetId: messageItem.targetUserid);
                       Navigator.of(ctx).pop(true);
                     },
                     borderRadius: const BorderRadius.only(
@@ -405,10 +399,10 @@ class MessageBubble extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     firebaseOperations.deleteMessageForMe(
-                      messageId: messageId,
-                      senderId: currentUserid,
-                      type: type,
-                      targetId: targetUserid,
+                      messageId: messageItem.messageId,
+                      senderId: messageItem.currentUserid,
+                      type: messageItem.type,
+                      targetId: messageItem.targetUserid,
                       message: 'Message deleted for you',
                     );
                     Navigator.of(ctx).pop(true);

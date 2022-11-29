@@ -12,25 +12,32 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
             message: '',
             isMine: false,
             isReplying: false,
+            type: '',
           ),
         );
 
   void reply({
-    required isReplying,
-    required isMine,
-    required message,
+    required bool isReplying,
+    required bool isMine,
+    required String message,
+    required String type,
   }) {
     emit(
       ReplyingMessageState(
         isReplying: isReplying,
         isMine: isMine,
         message: message,
+        type: type,
       ),
     );
   }
 
   void clearMessage() {
     emit(const ReplyingMessageState(
-        isMine: false, isReplying: false, message: ''));
+      isMine: false,
+      isReplying: false,
+      message: '',
+      type: '',
+    ));
   }
 }

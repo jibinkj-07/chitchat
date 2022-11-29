@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/utils/message_Item.dart';
 import 'package:chitchat/widgets/chat/message_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +11,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 class MessageBody extends StatefulWidget {
   final String currentUserid;
   final String targetUserid;
+  final String targetName;
   const MessageBody({
     super.key,
     required this.currentUserid,
     required this.targetUserid,
+    required this.targetName,
   });
 
   @override
@@ -80,14 +83,14 @@ class _MessageBodyState extends State<MessageBody> {
               );
             }
             log('length is ${snapshot.data!.docs.length}');
-            if (snapshot.data!.docs.length > 1) {
-              log('called');
+            if (scrollController.hasClients) {
               scrollController.animateTo(
                 0.0,
                 curve: Curves.easeOut,
                 duration: const Duration(milliseconds: 500),
               );
             }
+
             //changing newMessage read status
             FirebaseOperations().changeNewMessageStatus(
               senderId: widget.currentUserid,
@@ -129,19 +132,22 @@ class _MessageBodyState extends State<MessageBody> {
                         // log(e.toString());
                       }
 
-                      return MessageBubble(
+                      MessageItem messageItem = MessageItem(
                         messageId: snapshot.data!.docs[i].id,
                         message: message,
+                        time: time,
                         isReplied: isReplied,
                         type: type,
                         repliedToMessage: repliedToMessage,
                         currentUserid: widget.currentUserid,
                         targetUserid: widget.targetUserid,
-                        time: time,
                         isMe: isMe,
                         read: read,
                         readTime: readTime,
+                        targetUsername: widget.targetName,
                       );
+
+                      return MessageBubble(messageItem: messageItem);
                     }),
               ),
             );

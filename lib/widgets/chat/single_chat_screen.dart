@@ -21,6 +21,7 @@ class SingleChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+    String targetUserName = '';
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -37,6 +38,7 @@ class SingleChatScreen extends StatelessWidget {
                     .snapshots(),
                 builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
                   if (snapshot.hasData) {
+                    targetUserName = snapshot.data!.get('name');
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -158,6 +160,7 @@ class SingleChatScreen extends StatelessWidget {
               child: MessageBody(
                 currentUserid: currentUserid,
                 targetUserid: targetUserid,
+                targetName: targetUserName,
               ),
             ),
             const Divider(height: 0),
