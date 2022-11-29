@@ -39,7 +39,10 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    Navigator.of(context).pop();
+                  },
                   icon: const Icon(
                     Icons.arrow_back_ios_new_rounded,
                   ),
@@ -143,6 +146,7 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
         }
         if (!mounted) return false;
         Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -156,6 +160,7 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
       }
       if (!mounted) return false;
       Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -170,6 +175,7 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
       print(e);
       if (!mounted) return false;
       Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(

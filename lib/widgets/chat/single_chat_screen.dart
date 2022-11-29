@@ -9,7 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
-class SingleChatScreen extends StatefulWidget {
+class SingleChatScreen extends StatelessWidget {
   const SingleChatScreen({
     super.key,
     required this.currentUserid,
@@ -17,25 +17,6 @@ class SingleChatScreen extends StatefulWidget {
   });
   final String currentUserid;
   final String targetUserid;
-
-  @override
-  State<SingleChatScreen> createState() => _SingleChatScreenState();
-}
-
-class _SingleChatScreenState extends State<SingleChatScreen> {
-  ScrollController scrollController = ScrollController();
-
-  @override
-  void initState() {
-    scrollController = ScrollController(initialScrollOffset: 0.0);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +33,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('Users')
-                    .doc(widget.targetUserid)
+                    .doc(targetUserid)
                     .snapshots(),
                 builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
                   if (snapshot.hasData) {
@@ -175,17 +156,15 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
             //chat screen message body
             Expanded(
               child: MessageBody(
-                currentUserid: widget.currentUserid,
-                targetUserid: widget.targetUserid,
-                scrollController: scrollController,
+                currentUserid: currentUserid,
+                targetUserid: targetUserid,
               ),
             ),
             const Divider(height: 0),
             //chat screen message controller
             MessageControls(
-              senderId: widget.currentUserid,
-              targetId: widget.targetUserid,
-              scrollController: scrollController,
+              senderId: currentUserid,
+              targetId: targetUserid,
             ),
           ],
         ),
@@ -230,8 +209,8 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
                 child: InkWell(
                   onTap: () {
                     firebaseOperations.clearChatForAll(
-                        senderId: widget.currentUserid,
-                        targetId: widget.targetUserid,
+                        senderId: currentUserid,
+                        targetId: targetUserid,
                         message: 'Cleared chat history for both');
                     Navigator.of(ctx).pop(true);
                   },
@@ -259,8 +238,8 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
                 child: InkWell(
                   onTap: () {
                     firebaseOperations.clearChatForMe(
-                        senderId: widget.currentUserid,
-                        targetId: widget.targetUserid,
+                        senderId: currentUserid,
+                        targetId: targetUserid,
                         message: 'Cleared chat history for me');
                     Navigator.of(ctx).pop(true);
                   },

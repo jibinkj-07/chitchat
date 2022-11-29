@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/chat/message_bubble.dart';
@@ -5,16 +7,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class MessageBody extends StatelessWidget {
+class MessageBody extends StatefulWidget {
   final String currentUserid;
   final String targetUserid;
-  final ScrollController scrollController;
   const MessageBody({
     super.key,
     required this.currentUserid,
     required this.targetUserid,
-    required this.scrollController,
   });
+
+  @override
+  State<MessageBody> createState() => _MessageBodyState();
+}
+
+class _MessageBodyState extends State<MessageBody> {
+  ScrollController scrollController = ScrollController();
+
+  @override
+  void initState() {
+    scrollController = ScrollController(initialScrollOffset: 0.0);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +45,9 @@ class MessageBody extends StatelessWidget {
       child: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('Users')
-            .doc(currentUserid)
+            .doc(widget.currentUserid)
             .collection('messages')
-            .doc(targetUserid)
+            .doc(widget.targetUserid)
             .collection('chats')
             .orderBy('time', descending: true)
             .snapshots(),
@@ -60,10 +79,19 @@ class MessageBody extends StatelessWidget {
                 ],
               );
             }
+            log('length is ${snapshot.data!.docs.length}');
+            if (snapshot.data!.docs.length > 1) {
+              log('called');
+              scrollController.animateTo(
+                0.0,
+                curve: Curves.easeOut,
+                duration: const Duration(milliseconds: 500),
+              );
+            }
             //changing newMessage read status
             FirebaseOperations().changeNewMessageStatus(
-              senderId: currentUserid,
-              targetId: targetUserid,
+              senderId: widget.currentUserid,
+              targetId: widget.targetUserid,
             );
 
             // log('has data');
@@ -107,8 +135,8 @@ class MessageBody extends StatelessWidget {
                         isReplied: isReplied,
                         type: type,
                         repliedToMessage: repliedToMessage,
-                        currentUserid: currentUserid,
-                        targetUserid: targetUserid,
+                        currentUserid: widget.currentUserid,
+                        targetUserid: widget.targetUserid,
                         time: time,
                         isMe: isMe,
                         read: read,
