@@ -4,11 +4,13 @@ class ReplyingMessageState extends Equatable {
   final bool isReplying;
   final String message;
   final String type;
+  final String name;
   final bool isMine;
   const ReplyingMessageState({
     required this.isReplying,
     required this.isMine,
     required this.type,
+    required this.name,
     required this.message,
   });
 
@@ -18,6 +20,7 @@ class ReplyingMessageState extends Equatable {
         isMine,
         message,
         type,
+        name,
       ];
 }
 
@@ -26,6 +29,7 @@ class ReplyingMessageInitial extends ReplyingMessageState {
     required super.isReplying,
     required super.isMine,
     required super.message,
+    required super.name,
     required super.type,
   });
 }

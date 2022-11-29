@@ -11,6 +11,7 @@ class MessageItem {
   final String type;
   final String targetUsername;
   final bool isMe;
+  final bool isRepliedToMyself;
   const MessageItem({
     required this.messageId,
     required this.message,
@@ -23,6 +24,7 @@ class MessageItem {
     required this.isMe,
     required this.read,
     required this.targetUsername,
+    required this.isRepliedToMyself,
     this.readTime,
   });
 }

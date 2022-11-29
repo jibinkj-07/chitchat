@@ -121,6 +121,8 @@ class _MessageBodyState extends State<MessageBody> {
                       final read = snapshot.data!.docs[i].get('read');
                       final isReplied =
                           snapshot.data!.docs[i].get('isReplyingMessage');
+                      final isRepliedToMyself =
+                          snapshot.data!.docs[i].get('repliedToMe');
                       final repliedToMessage =
                           snapshot.data!.docs[i].get('repliedTo');
                       final type = snapshot.data!.docs[i].get('type');
@@ -141,6 +143,7 @@ class _MessageBodyState extends State<MessageBody> {
                         repliedToMessage: repliedToMessage,
                         currentUserid: widget.currentUserid,
                         targetUserid: widget.targetUserid,
+                        isRepliedToMyself: isRepliedToMyself,
                         isMe: isMe,
                         read: read,
                         readTime: readTime,

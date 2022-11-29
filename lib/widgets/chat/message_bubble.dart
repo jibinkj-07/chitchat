@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/widgets/chat/imageMessage_preview.dart';
@@ -49,7 +51,7 @@ class MessageBubble extends StatelessWidget {
 
     //MAIN SECTION
 
-    // log('$message contains emoji only ${EmojiUtil.hasOnlyEmojis(message)}');
+    // log('message name are for ${messageItem.message} ${messageItem.targetUsername}');
 
     return Row(
       mainAxisAlignment:
@@ -73,70 +75,186 @@ class MessageBubble extends StatelessWidget {
                                 isMine: messageItem.isMe,
                                 message: messageItem.message,
                                 type: messageItem.type,
+                                name: messageItem.targetUsername,
                               );
                         }
                       },
-                      child: Container(
-                        constraints:
-                            BoxConstraints(maxWidth: screen.width * .8),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: messageItem.isMe
-                              ? appColors.primaryColor
-                              : Colors.grey[300],
-                          borderRadius: messageItem.isMe
-                              ? const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                  // bottomRight: Radius.circular(10),
-                                )
-                              : const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  // bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (messageItem.isReplied)
-                              Text(
-                                'Replied to "${messageItem.repliedToMessage}"',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: messageItem.isMe
-                                      ? Colors.white.withOpacity(.8)
-                                      : Colors.black.withOpacity(.7),
-                                ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          //reply
+                          if (messageItem.isReplied)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 10,
+                                right: 20,
                               ),
-                            Text(
-                              messageItem.message,
-                              style: TextStyle(
-                                color: messageItem.isMe
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontSize:
-                                    EmojiUtil.hasOnlyEmojis(messageItem.message)
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  messageItem.isRepliedToMyself
+                                      ? Text(
+                                          'You replied to yourself',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                              color:
+                                                  Colors.black.withOpacity(.5)
+                                              // color: messageItem.isMe
+                                              //     ? Colors.white.withOpacity(.8)
+                                              //     : Colors.black.withOpacity(.7),
+                                              ),
+                                        )
+                                      : Text(
+                                          'You replied to ${messageItem.targetUsername}',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black.withOpacity(.5),
+                                          ),
+                                        ),
+
+                                  //message
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxWidth: screen.width * .8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: messageItem.isRepliedToMyself
+                                          ? appColors.primaryColor
+                                              .withOpacity(.8)
+                                          : Colors.grey[200],
+                                      borderRadius: messageItem
+                                              .isRepliedToMyself
+                                          ? const BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10),
+                                              // bottomRight: Radius.circular(10),
+                                            )
+                                          : const BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              // bottomLeft: Radius.circular(10),
+                                              bottomRight: Radius.circular(10),
+                                            ),
+                                    ),
+                                    child: messageItem.repliedToMessage.contains(
+                                            'https://firebasestorage.googleapis.com/')
+                                        ? SizedBox(
+                                            height: 80,
+                                            width: 80,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: CachedNetworkImage(
+                                                imageUrl: messageItem
+                                                    .repliedToMessage,
+                                                // width: MediaQuery.of(context)
+                                                //     .size
+                                                //     .width,
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    CupertinoActivityIndicator(
+                                                  radius: 8,
+                                                  color: appColors.primaryColor,
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(
+                                                  Icons.error,
+                                                  color: appColors.redColor,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : messageItem.repliedToMessage.length >
+                                                40
+                                            ? Text(
+                                                '${messageItem.repliedToMessage.substring(0, 38)}....',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: messageItem
+                                                          .isRepliedToMyself
+                                                      ? Colors.white
+                                                          .withOpacity(.9)
+                                                      : Colors.black
+                                                          .withOpacity(.5),
+                                                ),
+                                              )
+                                            : Text(
+                                                messageItem.repliedToMessage,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: messageItem
+                                                          .isRepliedToMyself
+                                                      ? Colors.white
+                                                          .withOpacity(.9)
+                                                      : Colors.black
+                                                          .withOpacity(.5),
+                                                ),
+                                              ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          //message
+                          Container(
+                            constraints:
+                                BoxConstraints(maxWidth: screen.width * .8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: messageItem.isMe
+                                  ? appColors.primaryColor
+                                  : Colors.grey[300],
+                              borderRadius: messageItem.isMe
+                                  ? const BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                      bottomLeft: Radius.circular(10),
+                                      // bottomRight: Radius.circular(10),
+                                    )
+                                  : const BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                      // bottomLeft: Radius.circular(10),
+                                      bottomRight: Radius.circular(10),
+                                    ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  messageItem.message,
+                                  style: TextStyle(
+                                    color: messageItem.isMe
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: EmojiUtil.hasOnlyEmojis(
+                                            messageItem.message)
                                         ? 20
                                         : 14,
-                                // fontWeight: FontWeight.w500,
-                              ),
+                                    // fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  messageTime,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: messageItem.isMe
+                                        ? Colors.white.withOpacity(.8)
+                                        : Colors.black.withOpacity(.5),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              messageTime,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: messageItem.isMe
-                                    ? Colors.white.withOpacity(.8)
-                                    : Colors.black.withOpacity(.5),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
 
@@ -164,8 +282,10 @@ class MessageBubble extends StatelessWidget {
                             isMine: messageItem.isMe,
                             type: messageItem.type,
                             message: messageItem.message,
+                            name: messageItem.targetUsername,
                           );
                     }
+                    return null;
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -218,15 +338,17 @@ class MessageBubble extends StatelessWidget {
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    CupertinoActivityIndicator(
-                                      radius: 10,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      strokeWidth: 1.5,
+                                      color: appColors.primaryColor,
                                     ),
-                                    Text(
-                                      'sending image',
+                                    const SizedBox(height: 5),
+                                    const Text(
+                                      'sending',
                                       style: TextStyle(
-                                        fontSize: 12,
-                                      ),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500),
                                     )
                                   ],
                                 ),

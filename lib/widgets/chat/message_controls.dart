@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/utils/image_chooser.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
@@ -55,42 +56,120 @@ class _MessageControlsState extends State<MessageControls> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (state.isReplying)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8.0),
-                      margin: const EdgeInsets.symmetric(horizontal: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: appColors.primaryColor.withOpacity(.2),
-                      ),
-                      child: state.message.length > 30
-                          ? Text(
-                              'Replying to "${state.message.substring(0, 27)}..."',
-                              style: const TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w500),
-                            )
-                          : Text(
-                              'Replying to "${state.message}"',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                Container(
+                  decoration: const BoxDecoration(
+                    // borderRadius: const BorderRadius.only(
+                    //   topLeft: Radius.circular(8.0),
+                    //   topRight: Radius.circular(8.0),
+                    // ),
+                    // borderRadius: BorderRadius.circular(10),
+                    border: Border(
+                      top: BorderSide(width: .5, color: Colors.grey),
+                      // bottom: BorderSide(width: 1.0, color: Colors.lightBlue),
                     ),
-
-                    //button
-                    IconButton(
-                      onPressed: () {
-                        context.read<ReplyingMessageCubit>().clearMessage();
-                      },
-                      icon: const Icon(Iconsax.close_circle),
-                      iconSize: 20,
-                      color: appColors.redColor,
-                      splashRadius: 20.0,
-                    )
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //body
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              state.isMine
+                                  ? const Text(
+                                      'Replying to yourself',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Replying to ${state.name}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                              const SizedBox(height: 8),
+                              state.type == 'text'
+                                  ? state.message.length > 50
+                                      ? Text(
+                                          '${state.message.substring(0, 48)}.....',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        )
+                                      : Text(
+                                          state.message,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Image',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 80,
+                                          width: 80,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: CachedNetworkImage(
+                                              imageUrl: state.message,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  CupertinoActivityIndicator(
+                                                radius: 8,
+                                                color: appColors.primaryColor,
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) => Icon(
+                                                Icons.error,
+                                                color: appColors.redColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      //cancel button
+                      IconButton(
+                        onPressed: () {
+                          context.read<ReplyingMessageCubit>().clearMessage();
+                        },
+                        icon: const Icon(Iconsax.close_circle),
+                        iconSize: 20,
+                        color: appColors.redColor,
+                        splashRadius: 20.0,
+                      )
+                    ],
+                  ),
                 ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -192,17 +271,11 @@ class _MessageControlsState extends State<MessageControls> {
                           mini: true,
                           onPressed: state.isReplying
                               ? () {
-                                  String msg = state.message;
-                                  if (state.message.length > 30) {
-                                    msg =
-                                        '${state.message.substring(0, 28)}...';
-                                  }
-
                                   firebaseOperations.sendMessage(
                                       senderId: widget.senderId,
                                       targetId: widget.targetId,
                                       isReplyingMessage: true,
-                                      repliedToMessage: msg,
+                                      repliedToMessage: state.message,
                                       type: 'text',
                                       repliedToMe: state.isMine,
                                       body: _msg.trim());
