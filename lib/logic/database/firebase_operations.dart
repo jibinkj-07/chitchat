@@ -653,7 +653,19 @@ class FirebaseOperations {
       {required String senderId,
       required String targetId,
       required String message}) async {
-    // database.doc(senderId).collection('messages').doc(targetId).collection('chats').
+    try {
+      final list = await FirebaseStorage.instance
+          .ref()
+          .child("Chat Images")
+          .child(senderId)
+          .listAll();
+      for (var item in list.items) {
+        item.delete();
+      }
+    } catch (e) {
+      log('error in deleting $senderId storage bucket ${e.toString()}');
+    }
+
     clearChatForMe(senderId: senderId, targetId: targetId, message: message);
     final instance = FirebaseFirestore.instance;
     final batch = instance.batch();

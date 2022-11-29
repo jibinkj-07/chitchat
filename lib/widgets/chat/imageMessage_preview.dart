@@ -29,42 +29,15 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+    final screen = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                  ),
-                  splashRadius: 20.0,
-                  iconSize: 20.0,
-                  color: Colors.white,
-                ),
-
-                //download Button
-                IconButton(
-                  onPressed: () async {
-                    final imageName = 'chitchatImage_${widget.id}.jpeg';
-                    await saveImage(widget.url, imageName);
-                  },
-                  icon: const Icon(Iconsax.import),
-                  splashRadius: 20.0,
-                  iconSize: 25.0,
-                  color: Colors.white,
-                )
-              ],
-            ),
-            Expanded(
+            SizedBox(
+              height: screen.height,
+              width: screen.width,
               child: InteractiveViewer(
                 child: CachedNetworkImage(
                   imageUrl: widget.url,
@@ -78,6 +51,42 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
                     Icons.error,
                     color: appColors.redColor,
                   ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              child: Container(
+                width: screen.width,
+                color: Colors.black.withOpacity(.7),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                      ),
+                      splashRadius: 20.0,
+                      iconSize: 20.0,
+                      color: Colors.white,
+                    ),
+
+                    //download Button
+                    IconButton(
+                      onPressed: () async {
+                        final imageName = 'chitchatImage_${widget.id}.jpeg';
+                        await saveImage(widget.url, imageName);
+                      },
+                      icon: const Icon(Iconsax.import),
+                      splashRadius: 20.0,
+                      iconSize: 25.0,
+                      color: Colors.white,
+                    )
+                  ],
                 ),
               ),
             ),

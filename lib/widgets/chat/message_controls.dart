@@ -4,6 +4,7 @@ import 'package:chitchat/utils/image_chooser.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/chat/image_send_preview.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,27 +29,10 @@ class _MessageControlsState extends State<MessageControls> {
   TextEditingController controller = TextEditingController();
   String _msg = '';
   bool isEmojiPicker = false;
-  FocusNode focusNode = FocusNode();
-  // File? image;
-
-  // @override
-  // void initState() {
-  //   FocusScope.of(context).addListener(
-  //     () {
-  //       if (FocusScope.of(context).hasFocus) {
-  //         setState(() {
-  //           isEmojiPicker = false;
-  //         });
-  //       }
-  //     },
-  //   );
-  //   super.initState();
-  // }
 
   @override
   void dispose() {
     controller.dispose();
-    focusNode.dispose();
     super.dispose();
   }
 
@@ -176,6 +160,7 @@ class _MessageControlsState extends State<MessageControls> {
                                   width: 25,
                                   child: IconButton(
                                     onPressed: () {
+                                      FocusScope.of(context).unfocus();
                                       sendImage();
                                     },
                                     padding: const EdgeInsets.all(0.0),
@@ -309,7 +294,6 @@ class _MessageControlsState extends State<MessageControls> {
   }
 
   sendImage() {
-    FirebaseOperations firebaseOperations = FirebaseOperations();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -336,12 +320,13 @@ class _MessageControlsState extends State<MessageControls> {
                         .pickImage(source: ImageSource.gallery)
                         .then((pickedImage) async {
                       if (pickedImage == null) return;
-                      final image = File(pickedImage.path);
-                      await firebaseOperations.sendImage(
-                        senderId: widget.senderId,
-                        targetId: widget.targetId,
-                        image: image,
-                      );
+
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => ImageSendPreview(
+                                image: File(pickedImage.path),
+                                senderId: widget.senderId,
+                                targetId: widget.targetId,
+                              )));
                     });
                     if (!mounted) return;
                     Navigator.pop(ctx);
@@ -377,12 +362,12 @@ class _MessageControlsState extends State<MessageControls> {
                         .pickImage(source: ImageSource.camera)
                         .then((pickedImage) async {
                       if (pickedImage == null) return;
-                      final image = File(pickedImage.path);
-                      await firebaseOperations.sendImage(
-                        senderId: widget.senderId,
-                        targetId: widget.targetId,
-                        image: image,
-                      );
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => ImageSendPreview(
+                                image: File(pickedImage.path),
+                                senderId: widget.senderId,
+                                targetId: widget.targetId,
+                              )));
                     });
                     if (!mounted) return;
                     Navigator.pop(ctx);
