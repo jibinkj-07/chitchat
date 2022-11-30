@@ -155,10 +155,10 @@ class SingleChatScreen extends StatelessWidget {
                   ),
 
                   //chat screen message controller
-                  MessageControls(
-                    senderId: currentUserid,
-                    targetId: targetUserid,
-                  ),
+                  // MessageControls(
+                  //   senderId: currentUserid,
+                  //   targetId: targetUserid,
+                  // ),
                 ],
               );
             }

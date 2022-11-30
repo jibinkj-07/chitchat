@@ -179,7 +179,7 @@ class _MessageControlsState extends State<MessageControls> {
                       padding: const EdgeInsets.all(6.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
-                        color: Colors.grey.withOpacity(.2),
+                        color: Colors.grey[200],
                       ),
                       child: Row(
                         crossAxisAlignment: _msg.toString().contains('\n')
@@ -221,6 +221,7 @@ class _MessageControlsState extends State<MessageControls> {
                               maxLines: 5,
                               textCapitalization: TextCapitalization.sentences,
                               placeholder: "Type message",
+
                               onChanged: (value) {
                                 setState(() {
                                   _msg = value;
@@ -309,7 +310,8 @@ class _MessageControlsState extends State<MessageControls> {
                 ],
               ),
               if (isEmojiPicker)
-                SizedBox(
+                Container(
+                  margin: const EdgeInsets.only(top: 5),
                   height: 250,
                   child: EmojiPicker(
                     onEmojiSelected: (Category? category, Emoji emoji) {
