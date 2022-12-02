@@ -264,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           backgroundColor:
                                               appColors.primaryColor,
                                           foregroundColor:
-                                              appColors.textLightColor,
+                                              appColors.textColorWhite,
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 12),
                                           shape: RoundedRectangleBorder(

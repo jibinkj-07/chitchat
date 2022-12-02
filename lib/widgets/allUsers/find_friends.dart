@@ -70,7 +70,6 @@ class _FindFriendsState extends State<FindFriends> {
             child: ListView.builder(
               itemCount: usersFromDb.length,
               itemBuilder: (BuildContext context, int index) {
-                final currentId = FirebaseAuth.instance.currentUser!.uid;
                 final id = usersFromDb[index]['id'];
                 final username = usersFromDb[index]['username'];
                 final verified = usersFromDb[index]['verified'];
@@ -108,13 +107,19 @@ class _FindFriendsState extends State<FindFriends> {
                             child: Container(
                               width: 50,
                               height: 50,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
+                                border: Border.all(
+                                  width: .5,
+                                  color: Theme.of(context)
+                                      .hintColor
+                                      .withOpacity(.5),
+                                ),
                               ),
                               child: ClipOval(
                                 child: Image.asset(
                                   'assets/images/profile.png',
-                                  fit: BoxFit.contain,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
@@ -172,25 +177,6 @@ class _FindFriendsState extends State<FindFriends> {
                           ),
                       ],
                     ),
-                    // trailing: currentId == id
-                    //     ? null
-                    //     : ElevatedButton(
-                    //         onPressed: () {},
-                    //         style: ElevatedButton.styleFrom(
-                    //           backgroundColor: Colors.grey.withOpacity(.2),
-                    //           foregroundColor: Colors.black,
-                    //           elevation: 0,
-                    //           shape: RoundedRectangleBorder(
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           padding: const EdgeInsets.symmetric(
-                    //               horizontal: 15, vertical: 0),
-                    //         ),
-                    //         child: const Text(
-                    //           'Message',
-                    //           style: TextStyle(fontWeight: FontWeight.w500),
-                    //         ),
-                    //       ),
                   ),
                 );
               },

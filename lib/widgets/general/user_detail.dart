@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chitchat/widgets/chat/single_chat_screen.dart';
 import 'package:chitchat/widgets/general/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../logic/database/user_profile.dart';
 import '../../utils/app_colors.dart';
+import '../chat/single_chat_screen.dart';
 
 class UserDetail extends StatelessWidget {
   final UserProfile targetUser;
@@ -88,8 +88,12 @@ class UserDetail extends StatelessWidget {
                                   child: Container(
                                     width: 180,
                                     height: 180,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       shape: BoxShape.circle,
+                                      border: Border.all(
+                                        width: .5,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                     child: ClipOval(
                                       child: Image.asset(
@@ -226,7 +230,7 @@ class UserDetail extends StatelessWidget {
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: appColors.primaryColor,
-                              foregroundColor: appColors.textLightColor,
+                              foregroundColor: appColors.textColorWhite,
                               padding: const EdgeInsets.symmetric(
                                   vertical: 8, horizontal: 30),
                               shape: RoundedRectangleBorder(

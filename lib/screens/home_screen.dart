@@ -1,17 +1,15 @@
-import 'dart:async';
-import 'dart:developer';
-
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/screens/find_friends_screen.dart';
-import 'package:chitchat/screens/chat/chat_screen.dart';
 import 'package:chitchat/screens/profile_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../logic/database/hive_operations.dart';
+import 'chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   int index;
@@ -79,10 +77,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     //calling hive method to get user detail
     getUserDetailHive();
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors().primaryColor,
+        elevation: 0.0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0.0,
+      ),
       body: SafeArea(
         child: pages[currentIndex]['page'],
       ),
       bottomNavigationBar: CustomNavigationBar(
+        backgroundColor: Colors.white,
         iconSize: 28.0,
         selectedColor: appColors.primaryColor,
         strokeColor: appColors.primaryColor,
@@ -92,12 +97,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             selectedIcon:
                 const Icon(CupertinoIcons.bubble_left_bubble_right_fill),
             showBadge: true,
-            title: const Text(
+            title: Text(
               'Chats',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: Colors.black54,
+                color: appColors.textColorBlack.withOpacity(.6),
               ),
             ),
             selectedTitle: Text(
@@ -113,12 +118,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           CustomNavigationBarItem(
             icon: const Icon(CupertinoIcons.person_2_square_stack),
             selectedIcon: const Icon(CupertinoIcons.person_2_square_stack_fill),
-            title: const Text(
+            title: Text(
               'Friends',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: Colors.black54,
+                color: appColors.textColorBlack.withOpacity(.6),
               ),
             ),
             selectedTitle: Text(
@@ -133,12 +138,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           CustomNavigationBarItem(
             icon: const Icon(CupertinoIcons.person),
             selectedIcon: const Icon(CupertinoIcons.person_fill),
-            title: const Text(
+            title: Text(
               'Profile',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: Colors.black54,
+                color: appColors.textColorBlack.withOpacity(.6),
               ),
             ),
             selectedTitle: Text(
@@ -146,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: appColors.primaryColor,
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),

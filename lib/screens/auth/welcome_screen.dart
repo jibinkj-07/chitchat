@@ -52,7 +52,7 @@ class WelcomeBody extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
-                  color: appColors.textDarkColor,
+                  color: appColors.textColorBlack,
                 ),
               ),
               Text(
@@ -63,12 +63,12 @@ class WelcomeBody extends StatelessWidget {
                   color: appColors.primaryColor,
                 ),
               ),
-              const Text(
+              Text(
                 "Connect with your favourites",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
-                  color: Colors.black,
+                  color: appColors.textColorBlack,
                 ),
               ),
             ],
@@ -81,7 +81,7 @@ class WelcomeBody extends StatelessWidget {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: appColors.primaryColor,
-              foregroundColor: appColors.textLightColor,
+              foregroundColor: appColors.textColorWhite,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),

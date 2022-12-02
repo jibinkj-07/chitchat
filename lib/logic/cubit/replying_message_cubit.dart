@@ -10,7 +10,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
       : super(
           const ReplyingMessageInitial(
             message: '',
-            isMine: false,
+            isReplyingToMyMessage: false,
             isReplying: false,
             type: '',
             name: '',
@@ -27,7 +27,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
     emit(
       ReplyingMessageState(
         isReplying: isReplying,
-        isMine: isMine,
+        isReplyingToMyMessage: isMine,
         message: message,
         type: type,
         name: name,
@@ -37,7 +37,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
 
   void clearMessage() {
     emit(const ReplyingMessageState(
-      isMine: false,
+      isReplyingToMyMessage: false,
       isReplying: false,
       message: '',
       type: '',

@@ -4,6 +4,7 @@ import 'package:chitchat/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../widgets/settings/user_settings.dart';
 
@@ -16,7 +17,7 @@ class ProfileScreen extends StatelessWidget {
     final screen = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       body: SafeArea(
         child: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
@@ -47,6 +48,7 @@ class SettingScreenBody extends StatelessWidget {
         Container(
           width: screen.width,
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+          color: appColors.primaryColor,
           // height: 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,41 +59,61 @@ class SettingScreenBody extends StatelessWidget {
                   if (state is InternetEnabled) {
                     return CircleAvatar(
                       radius: 8.0,
-                      backgroundColor: appColors.greenColor.withOpacity(.5),
+                      backgroundColor: appColors.textColorWhite.withOpacity(.9),
                       child: CircleAvatar(
-                        radius: 5.0,
+                        radius: 6.0,
                         backgroundColor: appColors.greenColor,
                       ),
                     );
                   } else {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
                           "Searching for network",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
+                            color: appColors.textColorWhite.withOpacity(.85),
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(width: 5),
-                        CupertinoActivityIndicator(
-                          color: Colors.black,
-                          radius: 8.0,
+                        const SizedBox(width: 5),
+                        SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: appColors.textColorWhite.withOpacity(.7),
+                            strokeWidth: 1.5,
+                          ),
                         ),
                       ],
                     );
                   }
                 },
               ),
-              const Text(
-                "Profile",
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Profile",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: appColors.textColorWhite,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: null,
+                    color: appColors.textColorWhite,
+                    disabledColor: appColors.primaryColor,
+                    icon: const Icon(
+                      Iconsax.search_normal_1,
+                    ),
+                    splashRadius: 20.0,
+                  ),
+                ],
               ),
               //implement search bar here
             ],

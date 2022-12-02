@@ -5,10 +5,10 @@ class ReplyingMessageState extends Equatable {
   final String message;
   final String type;
   final String name;
-  final bool isMine;
+  final bool isReplyingToMyMessage;
   const ReplyingMessageState({
     required this.isReplying,
-    required this.isMine,
+    required this.isReplyingToMyMessage,
     required this.type,
     required this.name,
     required this.message,
@@ -17,7 +17,7 @@ class ReplyingMessageState extends Equatable {
   @override
   List<Object> get props => [
         isReplying,
-        isMine,
+        isReplyingToMyMessage,
         message,
         type,
         name,
@@ -27,7 +27,7 @@ class ReplyingMessageState extends Equatable {
 class ReplyingMessageInitial extends ReplyingMessageState {
   const ReplyingMessageInitial({
     required super.isReplying,
-    required super.isMine,
+    required super.isReplyingToMyMessage,
     required super.message,
     required super.name,
     required super.type,

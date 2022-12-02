@@ -179,7 +179,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                   return ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: appColors.primaryColor,
-                                      foregroundColor: appColors.textLightColor,
+                                      foregroundColor: appColors.textColorWhite,
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10),
                                       shape: RoundedRectangleBorder(

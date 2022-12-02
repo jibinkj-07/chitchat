@@ -230,7 +230,7 @@ class _AccountDeletionState extends State<AccountDeletion> {
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: appColors.redColor,
-                                    foregroundColor: appColors.textLightColor,
+                                    foregroundColor: appColors.textColorWhite,
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 0),
                                     shape: RoundedRectangleBorder(

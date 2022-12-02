@@ -87,7 +87,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     //main section
     return Scaffold(
-      backgroundColor: Colors.white,
       body: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (overscroll) {
           overscroll.disallowIndicator();
@@ -446,7 +445,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               backgroundColor:
                                                   appColors.primaryColor,
                                               foregroundColor:
-                                                  appColors.textLightColor,
+                                                  appColors.textColorWhite,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12),

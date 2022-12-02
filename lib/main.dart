@@ -8,6 +8,7 @@ import 'package:chitchat/screens/auth/login_screen.dart';
 import 'package:chitchat/screens/auth/sign_up_screen.dart';
 import 'package:chitchat/screens/auth/welcome_screen.dart';
 import 'package:chitchat/screens/home_screen.dart';
+import 'package:chitchat/utils/chitchat_themes.dart';
 import 'package:chitchat/utils/custom_route_transition.dart';
 import 'package:chitchat/widgets/general/image_updating.dart';
 import 'package:chitchat/widgets/settings/security/password_reset.dart';
@@ -73,12 +74,14 @@ class MyApp extends StatelessWidget {
         title: 'Chit Chat',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: Colors.white,
           fontFamily: 'Poppins',
-          //Overall app pagetransition theme
-          pageTransitionsTheme: PageTransitionsTheme(builders: {
-            TargetPlatform.android: CustomPageTransitionBuilder(),
-            TargetPlatform.iOS: CustomPageTransitionBuilder(),
-          }),
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CustomPageTransitionBuilder(),
+              TargetPlatform.iOS: CustomPageTransitionBuilder(),
+            },
+          ),
         ),
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),

@@ -261,7 +261,7 @@ class _ChangeNameState extends State<ChangeName> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: appColors.primaryColor,
-                              foregroundColor: appColors.textLightColor,
+                              foregroundColor: appColors.textColorWhite,
                               padding: const EdgeInsets.symmetric(vertical: 0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
