@@ -51,36 +51,47 @@ class _MessageControlsState extends State<MessageControls> {
     AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;
 
-    return Column(
-      children: [
-        //MESSAGE CONTROLLER SECTION
-        Container(
-          width: screen.width,
-          margin: const EdgeInsets.only(bottom: 5.0),
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //message controller
-              Expanded(
-                  child: messageContainer(
-                      controller: messageController, appColors: appColors)),
+    return WillPopScope(
+      onWillPop: () async {
+        if (isEmojiPicker) {
+          setState(() {
+            isEmojiPicker = false;
+          });
+          return false;
+        }
+        return true;
+      },
+      child: Column(
+        children: [
+          //MESSAGE CONTROLLER SECTION
+          Container(
+            width: screen.width,
+            margin: const EdgeInsets.only(bottom: 5.0),
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //message controller
+                Expanded(
+                    child: messageContainer(
+                        controller: messageController, appColors: appColors)),
 
-              const SizedBox(width: 10),
+                const SizedBox(width: 10),
 
-              //send button
-              message.isEmpty
-                  ? micButton(appColors: appColors)
-                  : sendButton(appColors: appColors),
-            ],
+                //send button
+                message.isEmpty
+                    ? micButton(appColors: appColors)
+                    : sendButton(appColors: appColors),
+              ],
+            ),
           ),
-        ),
 
-        //SMILEY KEYBOARD SECTION
-        if (isEmojiPicker)
-          emojiKeyboard(appColors: appColors, controller: messageController),
-      ],
+          //SMILEY KEYBOARD SECTION
+          if (isEmojiPicker)
+            emojiKeyboard(appColors: appColors, controller: messageController),
+        ],
+      ),
     );
   }
 
@@ -172,19 +183,19 @@ class _MessageControlsState extends State<MessageControls> {
             horizontalSpacing: 0,
             gridPadding: EdgeInsets.zero,
             initCategory: Category.RECENT,
-            bgColor: const Color(0xFFFFFFFF),
+            bgColor: appColors.textColorWhite,
             indicatorColor: appColors.primaryColor,
             iconColor: Colors.grey,
             iconColorSelected: appColors.primaryColor,
             backspaceColor: appColors.primaryColor,
-            skinToneDialogBgColor: Colors.white,
+            skinToneDialogBgColor: appColors.textColorWhite,
             skinToneIndicatorColor: Colors.grey,
             enableSkinTones: true,
             showRecentsTab: true,
             recentsLimit: 28,
-            noRecents: const Text(
+            noRecents: Text(
               'No Recents',
-              style: TextStyle(fontSize: 20, color: Colors.black26),
+              style: TextStyle(fontSize: 20, color: appColors.textColorBlack),
               textAlign: TextAlign.center,
             ), // Needs to be const Widget
             loadingIndicator:

@@ -62,12 +62,6 @@ class _ChatBodyState extends State<ChatBody> {
                   .orderBy('time', descending: true)
                   .snapshots(),
               builder: (ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-                // if (snapshot.connectionState == ConnectionState.waiting) {
-                //   return const Center(
-                //     child: CupertinoActivityIndicator(),
-                //   );
-                // }
-
                 if (snapshot.hasData) {
                   // log('length is ${snapshot.data!.docs.length}');
                   if (snapshot.data!.docs.isEmpty) {
@@ -82,65 +76,13 @@ class _ChatBodyState extends State<ChatBody> {
                     //   );
                     // }
 
-                    // //changing newMessage read status
+                    //changing newMessage read status
                     FirebaseChatOperations().viewedChat(
                       senderId: widget.currentUserid,
                       targetId: widget.targetUserid,
                     );
 
-                    // log('has data');
-                    //changing single message read status
-
-                    return NotificationListener<
-                        OverscrollIndicatorNotification>(
-                      onNotification: (overscroll) {
-                        overscroll.disallowIndicator();
-                        return true;
-                      },
-                      child: Scrollbar(
-                        thickness: 6.0,
-                        interactive: true,
-                        controller: scrollController,
-                        radius: const Radius.circular(30),
-                        child: ListView.builder(
-                          reverse: true,
-                          controller: scrollController,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (ctx, i) {
-                            DateTime? readTime;
-                            try {
-                              readTime = snapshot.data!.docs[i]
-                                  .get('readTime')
-                                  .toDate();
-                            } catch (e) {
-                              // log(e.toString());
-                            }
-
-                            MessageItem messageItem = MessageItem(
-                              messageId: snapshot.data!.docs[i].id,
-                              message: snapshot.data!.docs[i].get('body'),
-                              time: snapshot.data!.docs[i].get('time').toDate(),
-                              isReplied: snapshot.data!.docs[i]
-                                  .get('isReplyingMessage'),
-                              type: snapshot.data!.docs[i].get('type'),
-                              repliedToMessage:
-                                  snapshot.data!.docs[i].get('repliedTo'),
-                              currentUserid: widget.currentUserid,
-                              targetUserid: widget.targetUserid,
-                              isRepliedToMyself:
-                                  snapshot.data!.docs[i].get('repliedToMe'),
-                              isMe: snapshot.data!.docs[i].get('sentByMe'),
-                              read: snapshot.data!.docs[i].get('read'),
-                              readTime: readTime,
-                              targetUsername: widget.targetName,
-                            );
-
-                            return Text(messageItem.message);
-                            // return SendMessageBubble(message: 'message');
-                          },
-                        ),
-                      ),
-                    );
+                    return messages(snapshot: snapshot);
                   }
                 }
                 return const SizedBox();
@@ -156,6 +98,52 @@ class _ChatBodyState extends State<ChatBody> {
       ),
     );
   }
+
+  Widget messages({required AsyncSnapshot<QuerySnapshot> snapshot}) =>
+      NotificationListener<OverscrollIndicatorNotification>(
+        onNotification: (overscroll) {
+          overscroll.disallowIndicator();
+          return true;
+        },
+        child: Scrollbar(
+          thickness: 6.0,
+          interactive: true,
+          controller: scrollController,
+          radius: const Radius.circular(30),
+          child: ListView.builder(
+            reverse: true,
+            controller: scrollController,
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (ctx, i) {
+              DateTime? readTime;
+              try {
+                readTime = snapshot.data!.docs[i].get('readTime').toDate();
+              } catch (e) {
+                // log(e.toString());
+              }
+
+              MessageItem messageItem = MessageItem(
+                messageId: snapshot.data!.docs[i].id,
+                message: snapshot.data!.docs[i].get('body'),
+                time: snapshot.data!.docs[i].get('time').toDate(),
+                isReplied: snapshot.data!.docs[i].get('isReplyingMessage'),
+                type: snapshot.data!.docs[i].get('type'),
+                repliedToMessage: snapshot.data!.docs[i].get('repliedTo'),
+                currentUserid: widget.currentUserid,
+                targetUserid: widget.targetUserid,
+                isRepliedToMyself: snapshot.data!.docs[i].get('repliedToMe'),
+                isMe: snapshot.data!.docs[i].get('sentByMe'),
+                read: snapshot.data!.docs[i].get('read'),
+                readTime: readTime,
+                targetUsername: widget.targetName,
+              );
+
+              return Text(messageItem.message);
+              // return SendMessageBubble(message: 'message');
+            },
+          ),
+        ),
+      );
 }
 
 Widget emptyMessage({required AppColors appColors}) => Column(
@@ -163,11 +151,11 @@ Widget emptyMessage({required AppColors appColors}) => Column(
       children: [
         SvgPicture.asset(
           'assets/illustrations/add_chat.svg',
-          width: 300,
+          width: 200,
         ),
-        const SizedBox(height: 8.0),
+        const SizedBox(height: 10),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8.0),
           decoration: BoxDecoration(
             color: appColors.primaryColor.withOpacity(.8),
             borderRadius: BorderRadius.circular(20.0),
