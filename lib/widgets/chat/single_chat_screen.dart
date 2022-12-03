@@ -36,6 +36,7 @@ class SingleChatScreen extends StatelessWidget {
                 final name = snapshot.data!.get('name');
                 final status = snapshot.data!.get('status');
                 final url = snapshot.data!.get('imageUrl');
+                final isVerified = snapshot.data!.get('verified');
                 return Column(
                   children: [
                     Material(
@@ -51,10 +52,15 @@ class SingleChatScreen extends StatelessWidget {
                           status: status,
                           url: url,
                           appColors: appColors,
+                          isVerified: isVerified,
                         ),
                       ),
                     ),
-                    const Divider(height: 0),
+                    const Divider(
+                      height: 0,
+                      color: Colors.white,
+                      thickness: .5,
+                    ),
 
                     //chat body
                     NotificationListener<OverscrollIndicatorNotification>(
@@ -86,6 +92,7 @@ Widget chatTopBar(
         required name,
         required status,
         required url,
+        required isVerified,
         required AppColors appColors}) =>
     Row(
       //back arrow
@@ -111,14 +118,30 @@ Widget chatTopBar(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                name,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+              Row(
+                children: [
+                  name.toString().length > 20
+                      ? Text(
+                          '${name.toString().substring(0, 18)}...',
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        )
+                      : Text(
+                          name,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        ),
+                  if (isVerified)
+                    Icon(
+                      Iconsax.verify5,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                ],
               ),
               Text(
                 status,

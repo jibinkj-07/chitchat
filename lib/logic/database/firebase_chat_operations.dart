@@ -60,12 +60,14 @@ class FirebaseChatOperations {
       );
       int unreadCount = 0;
       //getting unread message count from  target end
-      try {
-        unreadCount =
-            await targetFolder.get().then((value) => value.get('unread_count'));
-      } on Exception catch (e) {
-        log('error in getting unread count ${e.toString()}');
-      }
+
+      unreadCount = await targetFolder.get().then((value) {
+        if (value.exists) {
+          return value.get('unread_count');
+        } else {
+          return 0;
+        }
+      });
 
       targetFolder.set(
         {
@@ -83,14 +85,16 @@ class FirebaseChatOperations {
   void viewedChat({required String senderId, required String targetId}) {
     final ref = database.doc(senderId).collection('messages').doc(targetId);
     ref.get().then((value) {
-      if (value.get('isNew')) {
-        ref.set(
-          {
-            'isNew': false,
-            'unread_count': 0,
-          },
-          SetOptions(merge: true),
-        );
+      if (value.exists) {
+        if (value.get('isNew')) {
+          ref.set(
+            {
+              'isNew': false,
+              'unread_count': 0,
+            },
+            SetOptions(merge: true),
+          );
+        }
       }
     });
   }

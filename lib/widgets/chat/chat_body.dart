@@ -1,5 +1,6 @@
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/widgets/chat/message_controls.dart';
+import 'package:chitchat/widgets/chat/messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -68,13 +69,6 @@ class _ChatBodyState extends State<ChatBody> {
                     return emptyMessage(appColors: appColors);
                   } else {
                     // log('length is ${snapshot.data!.docs.length}');
-                    // if (scrollController.hasClients) {
-                    //   scrollController.animateTo(
-                    //     0.0,
-                    //     curve: Curves.easeOut,
-                    //     duration: const Duration(milliseconds: 500),
-                    //   );
-                    // }
 
                     //changing newMessage read status
                     FirebaseChatOperations().viewedChat(
@@ -92,8 +86,10 @@ class _ChatBodyState extends State<ChatBody> {
 
           //chat controller box
           MessageControls(
-              targetUserid: widget.targetUserid,
-              currentUserid: widget.currentUserid),
+            senderId: widget.currentUserid,
+            targetId: widget.targetUserid,
+            scrollController: scrollController,
+          ),
         ],
       ),
     );
@@ -122,6 +118,8 @@ class _ChatBodyState extends State<ChatBody> {
                 // log(e.toString());
               }
 
+              final isMine = snapshot.data!.docs[i].get('sentByMe');
+
               MessageItem messageItem = MessageItem(
                 messageId: snapshot.data!.docs[i].id,
                 message: snapshot.data!.docs[i].get('body'),
@@ -132,13 +130,15 @@ class _ChatBodyState extends State<ChatBody> {
                 currentUserid: widget.currentUserid,
                 targetUserid: widget.targetUserid,
                 isRepliedToMyself: snapshot.data!.docs[i].get('repliedToMe'),
-                isMe: snapshot.data!.docs[i].get('sentByMe'),
+                isMe: isMine,
                 read: snapshot.data!.docs[i].get('read'),
                 readTime: readTime,
                 targetUsername: widget.targetName,
               );
 
-              return Text(messageItem.message);
+              return Messages(
+                messageItem: messageItem,
+              );
               // return SendMessageBubble(message: 'message');
             },
           ),

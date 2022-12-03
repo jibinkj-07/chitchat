@@ -1,20 +1,26 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chitchat/logic/database/firebase_chat_operations.dart';
+import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
+import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/chat/gallery_preview_picker.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../../utils/app_colors.dart';
-
 class MessageControls extends StatefulWidget {
-  final String targetUserid;
-  final String currentUserid;
   const MessageControls({
-    super.key,
-    required this.targetUserid,
-    required this.currentUserid,
-  });
+    Key? key,
+    required this.senderId,
+    required this.targetId,
+    required this.scrollController,
+  }) : super(key: key);
+  final String senderId;
+  final String targetId;
+  final ScrollController scrollController;
 
   @override
   State<MessageControls> createState() => _MessageControlsState();
@@ -22,19 +28,16 @@ class MessageControls extends StatefulWidget {
 
 class _MessageControlsState extends State<MessageControls> {
   TextEditingController messageController = TextEditingController();
-  FocusNode focusNode = FocusNode();
+  // FocusNode focusNode = FocusNode();
   String message = '';
   bool isEmojiPicker = false;
 
   @override
   void initState() {
-    focusNode.addListener(() async {
-      if (focusNode.hasFocus) {
-        await Future.delayed(const Duration(milliseconds: 100));
-        setState(() {
-          isEmojiPicker = false;
-        });
-      }
+    messageController.addListener(() {
+      setState(() {
+        message = messageController.text.trim();
+      });
     });
     super.initState();
   }
@@ -42,241 +45,524 @@ class _MessageControlsState extends State<MessageControls> {
   @override
   void dispose() {
     messageController.dispose();
-    focusNode.dispose();
+    // focusNode.dispose();
     super.dispose();
+  }
+
+  checkFocus() async {
+    if (FocusScope.of(context).hasFocus) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      setState(() {
+        isEmojiPicker = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
-    final screen = MediaQuery.of(context).size;
+    checkFocus();
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (isEmojiPicker) {
-          setState(() {
-            isEmojiPicker = false;
-          });
-          return false;
-        }
-        return true;
-      },
-      child: Column(
-        children: [
-          //MESSAGE CONTROLLER SECTION
-          Container(
-            width: screen.width,
-            margin: const EdgeInsets.only(bottom: 5.0),
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                //message controller
-                Expanded(
-                    child: messageContainer(
-                        controller: messageController, appColors: appColors)),
-
-                const SizedBox(width: 10),
-
-                //send button
-                message.isEmpty
-                    ? micButton(appColors: appColors)
-                    : sendButton(appColors: appColors),
-              ],
-            ),
+    return BlocBuilder<ReplyingMessageCubit, ReplyingMessageState>(
+      builder: (ctx, state) {
+        return WillPopScope(
+          onWillPop: () async {
+            if (isEmojiPicker) {
+              setState(() {
+                isEmojiPicker = false;
+              });
+              return false;
+            }
+            return true;
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 5, left: 5),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: state.isReplying
+                          ? replyingMessageController(
+                              appColors: appColors, state: state)
+                          : generalMessageController(
+                              appColors: appColors, state: state),
+                    ),
+                    message.trim() == ''
+                        ? micButton()
+                        : sendButton(state: state)
+                  ],
+                ),
+              ),
+              if (isEmojiPicker)
+                SizedBox(
+                  height: 250,
+                  child: EmojiPicker(
+                    onBackspacePressed: () {
+                      if (messageController.text.isNotEmpty) {
+                        messageController.text.characters.skipLast(1);
+                      }
+                    },
+                    textEditingController: messageController,
+                    config: Config(
+                      columns: 8,
+                      emojiSizeMax: 32.0,
+                      verticalSpacing: 0,
+                      horizontalSpacing: 0,
+                      gridPadding: EdgeInsets.zero,
+                      initCategory: Category.RECENT,
+                      bgColor: const Color(0xFFFFFFFF),
+                      indicatorColor: appColors.primaryColor,
+                      iconColor: Colors.grey,
+                      iconColorSelected: appColors.primaryColor,
+                      backspaceColor: appColors.primaryColor,
+                      skinToneDialogBgColor: Colors.white,
+                      skinToneIndicatorColor: Colors.grey,
+                      enableSkinTones: true,
+                      showRecentsTab: true,
+                      recentsLimit: 28,
+                      noRecents: const Text(
+                        'No Recents',
+                        style: TextStyle(fontSize: 20, color: Colors.black26),
+                        textAlign: TextAlign.center,
+                      ), // Needs to be const Widget
+                      loadingIndicator:
+                          const SizedBox.shrink(), // Needs to be const Widget
+                      tabIndicatorAnimDuration: kTabScrollDuration,
+                      categoryIcons: const CategoryIcons(),
+                      buttonMode: ButtonMode.MATERIAL,
+                    ),
+                  ),
+                )
+            ],
           ),
-
-          //SMILEY KEYBOARD SECTION
-          if (isEmojiPicker)
-            emojiKeyboard(appColors: appColors, controller: messageController),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget messageContainer({
-    required TextEditingController controller,
-    required AppColors appColors,
-  }) =>
+  Widget replyingMessageController(
+          {required AppColors appColors,
+          required ReplyingMessageState state}) =>
       Material(
         color: appColors.textColorWhite,
-        borderRadius: BorderRadius.circular(30.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            //smiley iconbutton
-            isEmojiPicker
-                ? keyboardButton(appColors: appColors)
-                : smileyButton(appColors: appColors),
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          padding: const EdgeInsets.all(6.0),
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Column(
+            children: [
+              //reply message preview
+              Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 2.0),
+                  // decoration: BoxDecoration(color: Colors.black),
+                  child: state.message
+                          .contains('https://firebasestorage.googleapis.com')
+                      ? imageReplyPreview(appColors: appColors, state: state)
+                      : textReplyPreview(appColors: appColors, state: state)
+                  //image displaying
+                  ),
 
-            //textField
-            Expanded(
-              child: textField(
-                controller: controller,
-                appColors: appColors,
+              //controller
+              Row(
+                children: [
+                  //emoji icon button
+                  isEmojiPicker ? keyboardButton() : emojiButton(),
+
+                  //textfield
+                  Expanded(
+                    child: textField(),
+                  ),
+
+                  //camera button
+                  if (message.trim() == '') photoButton(),
+                  const SizedBox(width: 20),
+                  if (message.trim() == '') cameraButton(),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget textReplyPreview(
+          {required AppColors appColors,
+          required ReplyingMessageState state}) =>
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          //bar
+          Container(
+            height: 40,
+            width: 5,
+            decoration: BoxDecoration(
+              color: state.isReplyingToMyMessage
+                  ? appColors.greenColor
+                  : appColors.redColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          const SizedBox(width: 5),
+          //body
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  //top
+                  state.isReplyingToMyMessage
+                      ? Text(
+                          'You',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: appColors.greenColor,
+                            fontSize: 12,
+                          ),
+                        )
+                      : SizedBox(
+                          width: 200,
+                          child: Text(
+                            state.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: appColors.redColor,
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                  //bottom
+
+                  Text(
+                    state.message,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: appColors.textColorBlack,
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            //image button
-            if (message.isEmpty) imageButton(appColors: appColors),
-
-            //camera button
-            if (message.isEmpty) cameraButton(appColors: appColors),
-          ],
-        ),
-      );
-
-  Widget sendButton({required AppColors appColors}) => SizedBox(
-        height: 50,
-        width: 50,
-        child: FloatingActionButton(
-          backgroundColor: appColors.primaryColor,
-          foregroundColor: Colors.white,
-          onPressed: () {},
-          child: const Icon(
-            Iconsax.send_1,
-            size: 25,
           ),
-        ),
+          //cancel button
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: IconButton(
+              onPressed: () {
+                context.read<ReplyingMessageCubit>().clearMessage();
+              },
+              icon: const Icon(Icons.close_rounded),
+              color: appColors.textColorBlack,
+              iconSize: 18,
+              splashRadius: 20.0,
+            ),
+          )
+        ],
       );
 
-  Widget micButton({required AppColors appColors}) => SizedBox(
-        height: 50,
-        width: 50,
-        child: FloatingActionButton(
-          backgroundColor: appColors.primaryColor,
-          foregroundColor: Colors.white,
-          onPressed: () {},
-          child: const Icon(
-            Iconsax.microphone,
-            size: 25,
-          ),
-        ),
-      );
-
-  Widget emojiKeyboard(
+  Widget imageReplyPreview(
           {required AppColors appColors,
-          required TextEditingController controller}) =>
-      SizedBox(
-        height: 250,
-        child: EmojiPicker(
-          onEmojiSelected: (Category? category, Emoji emoji) {
-            setState(() {
-              message = '$message${emoji.emoji}';
-            });
-          },
-          onBackspacePressed: () {
-            if (message.isNotEmpty) {
-              final input = message.characters.skipLast(1);
-              setState(() {
-                message = input.toString();
-              });
-            }
-          },
-          textEditingController: controller,
-          config: Config(
-            columns: 8,
-            emojiSizeMax: 32.0,
-            verticalSpacing: 0,
-            horizontalSpacing: 0,
-            gridPadding: EdgeInsets.zero,
-            initCategory: Category.RECENT,
-            bgColor: appColors.textColorWhite,
-            indicatorColor: appColors.primaryColor,
-            iconColor: Colors.grey,
-            iconColorSelected: appColors.primaryColor,
-            backspaceColor: appColors.primaryColor,
-            skinToneDialogBgColor: appColors.textColorWhite,
-            skinToneIndicatorColor: Colors.grey,
-            enableSkinTones: true,
-            showRecentsTab: true,
-            recentsLimit: 28,
-            noRecents: Text(
-              'No Recents',
-              style: TextStyle(fontSize: 20, color: appColors.textColorBlack),
-              textAlign: TextAlign.center,
-            ), // Needs to be const Widget
-            loadingIndicator:
-                const SizedBox.shrink(), // Needs to be const Widget
-            tabIndicatorAnimDuration: kTabScrollDuration,
-            categoryIcons: const CategoryIcons(),
-            buttonMode: ButtonMode.MATERIAL,
+          required ReplyingMessageState state}) =>
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          //bar
+          Container(
+            height: 100,
+            width: 5,
+            decoration: BoxDecoration(
+              color: state.isReplyingToMyMessage
+                  ? appColors.greenColor
+                  : appColors.redColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          const SizedBox(width: 5),
+          //body
+          Expanded(
+            child: SizedBox(
+              height: 100,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  //top
+                  state.isReplyingToMyMessage
+                      ? Text(
+                          'You',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: appColors.greenColor,
+                            fontSize: 12,
+                          ),
+                        )
+                      : SizedBox(
+                          width: 200,
+                          child: Text(
+                            state.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: appColors.redColor,
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                  //bottom
+                  // const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //text
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Iconsax.camera5,
+                            size: 15,
+                            color: appColors.textColorBlack.withOpacity(.8),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Photo',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: appColors.textColorBlack,
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      //image
+                      SizedBox(
+                        height: 80,
+                        width: 70,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: CachedNetworkImage(
+                            imageUrl: state.message,
+                            fit: BoxFit.cover,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                    CircularProgressIndicator(
+                                        color: appColors.primaryColor,
+                                        value: downloadProgress.progress),
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.error,
+                              color: appColors.redColor,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          //cancel button
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: IconButton(
+              onPressed: () {
+                context.read<ReplyingMessageCubit>().clearMessage();
+              },
+              icon: const Icon(Icons.close_rounded),
+              color: appColors.textColorBlack,
+              iconSize: 18,
+              splashRadius: 20.0,
+            ),
+          )
+        ],
+      );
+  Widget generalMessageController(
+          {required AppColors appColors,
+          required ReplyingMessageState state}) =>
+      Material(
+        color: appColors.textColorWhite,
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          padding: const EdgeInsets.all(6.0),
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Row(
+            children: [
+              //emoji icon button
+              isEmojiPicker ? keyboardButton() : emojiButton(),
+
+              //textfield
+              Expanded(
+                child: textField(),
+              ),
+
+              //camera button
+              if (message.trim() == '') photoButton(),
+              const SizedBox(width: 20),
+              if (message.trim() == '') cameraButton(),
+            ],
           ),
         ),
       );
-  //smiley button
-  Widget smileyButton({required AppColors appColors}) => IconButton(
-        onPressed: () async {
-          if (focusNode.hasFocus) {
-            focusNode.unfocus();
-          }
-          await Future.delayed(const Duration(milliseconds: 100));
-          setState(
-            () {
-              isEmojiPicker = true;
-            },
-          );
-        },
-        icon: const Icon(Iconsax.happyemoji5),
-        color: appColors.primaryColor,
-        splashRadius: 18.0,
-        iconSize: 22.0,
-        splashColor: appColors.primaryColor.withOpacity(.2),
+
+  Widget emojiButton() => SizedBox(
+        height: 25,
+        width: 25,
+        child: IconButton(
+          onPressed: () async {
+            FocusScope.of(context).unfocus();
+
+            await Future.delayed(
+              const Duration(milliseconds: 100),
+            );
+            setState(() {
+              isEmojiPicker = !isEmojiPicker;
+            });
+            //emoji picker
+          },
+          padding: const EdgeInsets.all(0.0),
+          icon: const Icon(Iconsax.happyemoji5),
+          color: AppColors().primaryColor,
+          splashRadius: 18.0,
+          iconSize: 22.0,
+          splashColor: AppColors().primaryColor.withOpacity(.2),
+        ),
       );
 
-  //keyboard button
-  Widget keyboardButton({required AppColors appColors}) => IconButton(
-        onPressed: () {
-          FocusScope.of(context).requestFocus(focusNode);
-        },
-        icon: const Icon(Iconsax.keyboard5),
-        color: appColors.primaryColor,
-        splashRadius: 18.0,
-        iconSize: 22.0,
-        splashColor: appColors.primaryColor.withOpacity(.2),
+  Widget keyboardButton() => SizedBox(
+        height: 25,
+        width: 25,
+        child: IconButton(
+          onPressed: () async {
+            FocusScope.of(context).requestFocus();
+          },
+          padding: const EdgeInsets.all(0.0),
+          icon: const Icon(Iconsax.keyboard5),
+          color: AppColors().primaryColor,
+          splashRadius: 18.0,
+          iconSize: 22.0,
+          splashColor: AppColors().primaryColor.withOpacity(.2),
+        ),
       );
 
-  //Textfield
-  Widget textField({
-    required TextEditingController controller,
-    required AppColors appColors,
-  }) =>
-      CupertinoTextField(
-        controller: controller,
-        focusNode: focusNode,
+  Widget photoButton() => SizedBox(
+        height: 25,
+        width: 25,
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => GalleryPreviewPicker(
+                    currentUserid: widget.senderId,
+                    targetUserid: widget.targetId)));
+          },
+          padding: const EdgeInsets.all(0.0),
+          icon: const Icon(Iconsax.gallery5),
+          color: AppColors().primaryColor,
+          splashRadius: 18.0,
+          iconSize: 22.0,
+          splashColor: AppColors().primaryColor.withOpacity(.2),
+        ),
+      );
+
+  Widget cameraButton() => SizedBox(
+        height: 25,
+        width: 25,
+        child: IconButton(
+          onPressed: () {
+            // FocusScope.of(context).unfocus();
+            // sendImage();
+          },
+          padding: const EdgeInsets.all(0.0),
+          icon: const Icon(Iconsax.camera5),
+          color: AppColors().primaryColor,
+          splashRadius: 18.0,
+          iconSize: 22.0,
+          splashColor: AppColors().primaryColor.withOpacity(.2),
+        ),
+      );
+
+  Widget textField() => CupertinoTextField(
+        controller: messageController,
+        autofocus: true,
         minLines: 1,
         maxLines: 5,
         textCapitalization: TextCapitalization.sentences,
         placeholder: "Type message",
-        onChanged: (value) {
-          setState(() {
-            message = value.trim();
-          });
-        },
         clearButtonMode: OverlayVisibilityMode.editing,
-        cursorColor: appColors.primaryColor,
+        cursorColor: AppColors().primaryColor,
         decoration: const BoxDecoration(),
       );
 
-  //Image button
-  Widget imageButton({required AppColors appColors}) => IconButton(
-        onPressed: () {},
-        icon: const Icon(Iconsax.gallery5),
-        color: appColors.primaryColor,
-        splashRadius: 18.0,
-        iconSize: 22.0,
-        splashColor: appColors.primaryColor.withOpacity(.2),
+  Widget sendButton({required ReplyingMessageState state}) =>
+      FloatingActionButton(
+        backgroundColor: AppColors().primaryColor,
+        foregroundColor: Colors.white,
+        mini: true,
+        onPressed: () {
+          if (state.isReplying) {
+            FirebaseChatOperations().sendMessage(
+              senderId: widget.senderId,
+              targetId: widget.targetId,
+              body: message.trim(),
+              type: 'text',
+              isReplyingMessage: true,
+              replyingParentMessage: state.message,
+              isReplyingToMyMessage: state.isReplyingToMyMessage,
+            );
+            context.read<ReplyingMessageCubit>().clearMessage();
+          } else {
+            FirebaseChatOperations().sendMessage(
+              senderId: widget.senderId,
+              targetId: widget.targetId,
+              body: message.trim(),
+              type: 'text',
+              isReplyingMessage: false,
+              replyingParentMessage: '',
+              isReplyingToMyMessage: false,
+            );
+          }
+          messageController.clear();
+          setState(() {
+            message = '';
+          });
+          if (widget.scrollController.hasClients) {
+            widget.scrollController.animateTo(
+              0.0,
+              curve: Curves.easeOut,
+              duration: const Duration(seconds: 1),
+            );
+          }
+        },
+        child: const Icon(
+          Iconsax.send_1,
+          size: 22,
+        ),
       );
 
-  //camera button
-  Widget cameraButton({required AppColors appColors}) => IconButton(
+  Widget micButton() => FloatingActionButton(
+        backgroundColor: AppColors().primaryColor,
+        foregroundColor: Colors.white,
+        mini: true,
         onPressed: () {},
-        icon: const Icon(Iconsax.camera5),
-        color: appColors.primaryColor,
-        splashRadius: 18.0,
-        iconSize: 22.0,
-        splashColor: appColors.primaryColor.withOpacity(.2),
+        child: const Icon(
+          Iconsax.microphone,
+          size: 22,
+        ),
       );
 }
