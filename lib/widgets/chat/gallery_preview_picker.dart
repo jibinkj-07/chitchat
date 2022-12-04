@@ -8,11 +8,13 @@ class GalleryPreviewPicker extends StatefulWidget {
   final ScrollController? scrollController;
   final String currentUserid;
   final String targetUserid;
+  final ScrollController listScrollController;
   const GalleryPreviewPicker({
     super.key,
     this.scrollController,
     required this.currentUserid,
     required this.targetUserid,
+    required this.listScrollController,
   });
 
   @override
@@ -105,6 +107,7 @@ class _GalleryPreviewPickerState extends State<GalleryPreviewPicker> {
                 asset: assets[index],
                 currentUserid: widget.currentUserid,
                 targetUserid: widget.targetUserid,
+                scrollController: widget.listScrollController,
               );
             },
           ),
@@ -155,9 +158,11 @@ class AssetThumbnail extends StatelessWidget {
     required this.asset,
     required this.currentUserid,
     required this.targetUserid,
+    required this.scrollController,
   }) : super(key: key);
   final String currentUserid;
   final String targetUserid;
+  final ScrollController scrollController;
   final AssetEntity asset;
 
   @override
@@ -179,7 +184,7 @@ class AssetThumbnail extends StatelessWidget {
                   currentUserid: currentUserid,
                   targetUserid: targetUserid,
                   imageFile: asset.file,
-                  parentContext: context,
+                  scrollController: scrollController,
                 ),
               ),
             );

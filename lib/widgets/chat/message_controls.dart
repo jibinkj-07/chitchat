@@ -1,15 +1,18 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/widgets/chat/gallery_preview_picker.dart';
+import 'package:chitchat/widgets/chat/selected_image_preview.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MessageControls extends StatefulWidget {
   const MessageControls({
@@ -469,6 +472,7 @@ class _MessageControlsState extends State<MessageControls> {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => GalleryPreviewPicker(
                     currentUserid: widget.senderId,
+                    listScrollController: widget.scrollController,
                     targetUserid: widget.targetId)));
           },
           padding: const EdgeInsets.all(0.0),
@@ -485,8 +489,7 @@ class _MessageControlsState extends State<MessageControls> {
         width: 25,
         child: IconButton(
           onPressed: () {
-            // FocusScope.of(context).unfocus();
-            // sendImage();
+            pickImage();
           },
           padding: const EdgeInsets.all(0.0),
           icon: const Icon(Iconsax.camera5),
@@ -565,4 +568,22 @@ class _MessageControlsState extends State<MessageControls> {
           size: 22,
         ),
       );
+
+  void pickImage() {
+    FocusScope.of(context).unfocus();
+    ImagePicker imagePicker = ImagePicker();
+    imagePicker.pickImage(source: ImageSource.camera).then((pickedImage) async {
+      if (pickedImage == null) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SelectedImagePreview(
+            cameraImage: File(pickedImage.path),
+            currentUserid: widget.senderId,
+            targetUserid: widget.targetId,
+            scrollController: widget.scrollController,
+          ),
+        ),
+      );
+    });
+  }
 }

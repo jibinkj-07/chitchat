@@ -10,16 +10,18 @@ import 'package:image_cropper/image_cropper.dart';
 class SelectedImagePreview extends StatefulWidget {
   const SelectedImagePreview({
     Key? key,
-    required this.imageFile,
+    this.imageFile,
+    this.cameraImage,
     required this.targetUserid,
     required this.currentUserid,
-    required this.parentContext,
+    required this.scrollController,
   }) : super(key: key);
 
-  final Future<File?> imageFile;
+  final Future<File?>? imageFile;
+  final File? cameraImage;
   final String currentUserid;
   final String targetUserid;
-  final BuildContext parentContext;
+  final ScrollController scrollController;
 
   @override
   State<SelectedImagePreview> createState() => _SelectedImagePreviewState();
@@ -30,6 +32,9 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
 
   @override
   void initState() {
+    if (widget.cameraImage != null) {
+      sendingImage = widget.cameraImage;
+    }
     super.initState();
   }
 
@@ -117,8 +122,7 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
         builder: (context, state) {
           return FloatingActionButton(
             onPressed: () async {
-              final nav1 = Navigator.of(context);
-              final nav2 = Navigator.of(widget.parentContext);
+              final nav = Navigator.of(context);
               await FirebaseChatOperations().sendImage(
                   senderId: widget.currentUserid,
                   targetId: widget.targetUserid,
@@ -126,12 +130,20 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
                   isReplying: state.isReplying,
                   parentMessage: state.message,
                   image: sendingImage!);
+
+              if (widget.scrollController.hasClients) {
+                widget.scrollController.animateTo(
+                  0.0,
+                  curve: Curves.easeOut,
+                  duration: const Duration(seconds: 1),
+                );
+              }
               if (!mounted) return;
               context.read<ReplyingMessageCubit>().clearMessage();
               //closing both pages
-              nav1.pop();
+              nav.pop();
               await Future.delayed(const Duration(milliseconds: 100));
-              nav2.pop();
+              if (widget.cameraImage == null) nav.pop();
             },
             backgroundColor: appColors.primaryColor,
             child: const Icon(Iconsax.send_1),

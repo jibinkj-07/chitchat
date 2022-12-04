@@ -148,7 +148,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
             height: 280,
             margin: const EdgeInsets.only(top: 8.0),
             decoration: BoxDecoration(
-              color: appColors.textColorWhite,
+              color: appColors.textColorBlack,
               borderRadius: BorderRadius.circular(6.0),
             ),
             child: messageItem.message == ''
