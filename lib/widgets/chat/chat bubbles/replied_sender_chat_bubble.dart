@@ -7,6 +7,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/custom_shape.dart';
 import '../../../utils/message_Item.dart';
+import '../image_message_preview.dart';
 
 class RepliedSenderChatBubble extends StatelessWidget {
   final MessageItem messageItem;
@@ -175,7 +176,15 @@ class RepliedSenderChatBubble extends StatelessWidget {
                     ],
                   )
                 : GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ImageMessagePreview(
+                              url: messageItem.message,
+                              messageItem: messageItem),
+                        ),
+                      );
+                    },
                     onLongPress: () {
                       // MessageBubbleFunctions().showBottom(context, messageItem);
                     },
@@ -336,9 +345,10 @@ class RepliedSenderChatBubble extends StatelessWidget {
                           fit: BoxFit.cover,
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) =>
-                                  CircularProgressIndicator(
-                                      color: appColors.primaryColor,
-                                      value: downloadProgress.progress),
+                                  CupertinoActivityIndicator(
+                            color: appColors.primaryColor,
+                            radius: 8,
+                          ),
                           errorWidget: (context, url, error) => Icon(
                             Icons.error,
                             color: appColors.redColor,

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../utils/custom_shape.dart';
+import '../image_message_preview.dart';
 
 class SenderChatBubble extends StatelessWidget {
   final MessageItem messageItem;
@@ -161,7 +162,15 @@ class SenderChatBubble extends StatelessWidget {
                     ],
                   )
                 : GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ImageMessagePreview(
+                              url: messageItem.message,
+                              messageItem: messageItem),
+                        ),
+                      );
+                    },
                     onLongPress: () {
                       // MessageBubbleFunctions().showBottom(context, messageItem);
                     },

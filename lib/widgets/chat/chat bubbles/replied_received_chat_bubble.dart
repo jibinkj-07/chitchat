@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import '../../../utils/app_colors.dart';
 import '../../../utils/custom_shape.dart';
 import '../../../utils/message_Item.dart';
+import '../image_message_preview.dart';
 
 class RepliedReceivedChatBubble extends StatelessWidget {
   final MessageItem messageItem;
@@ -176,7 +177,15 @@ class RepliedReceivedChatBubble extends StatelessWidget {
                     ],
                   )
                 : GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ImageMessagePreview(
+                              url: messageItem.message,
+                              messageItem: messageItem),
+                        ),
+                      );
+                    },
                     onLongPress: () {},
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6.0),
@@ -321,9 +330,10 @@ class RepliedReceivedChatBubble extends StatelessWidget {
                           fit: BoxFit.cover,
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) =>
-                                  CircularProgressIndicator(
-                                      color: appColors.primaryColor,
-                                      value: downloadProgress.progress),
+                                  CupertinoActivityIndicator(
+                            color: appColors.primaryColor,
+                            radius: 8,
+                          ),
                           errorWidget: (context, url, error) => Icon(
                             Icons.error,
                             color: appColors.redColor,

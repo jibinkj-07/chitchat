@@ -361,9 +361,10 @@ class _MessageControlsState extends State<MessageControls> {
                             fit: BoxFit.cover,
                             progressIndicatorBuilder:
                                 (context, url, downloadProgress) =>
-                                    CircularProgressIndicator(
-                                        color: appColors.primaryColor,
-                                        value: downloadProgress.progress),
+                                    CupertinoActivityIndicator(
+                              color: appColors.primaryColor,
+                              radius: 8,
+                            ),
                             errorWidget: (context, url, error) => Icon(
                               Icons.error,
                               color: appColors.redColor,

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/message_Item.dart';
+import 'package:chitchat/widgets/chat/image_message_preview.dart';
 import 'package:dart_emoji/dart_emoji.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +136,15 @@ class ReceivedMessageBubble extends StatelessWidget {
                     ],
                   )
                 : GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ImageMessagePreview(
+                              url: messageItem.message,
+                              messageItem: messageItem),
+                        ),
+                      );
+                    },
                     onLongPress: () {},
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6.0),
