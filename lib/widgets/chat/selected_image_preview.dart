@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -111,20 +113,30 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
 
   Widget sendButton(
           {required AppColors appColors, required BuildContext context}) =>
-      FloatingActionButton(
-        onPressed: () async {
-          final nav1 = Navigator.of(context);
-          final nav2 = Navigator.of(widget.parentContext);
-          await FirebaseChatOperations().sendImage(
-              senderId: widget.currentUserid,
-              targetId: widget.targetUserid,
-              image: sendingImage!);
-          //closing both pages
-          nav1.pop();
-          nav2.pop();
+      BlocBuilder<ReplyingMessageCubit, ReplyingMessageState>(
+        builder: (context, state) {
+          return FloatingActionButton(
+            onPressed: () async {
+              final nav1 = Navigator.of(context);
+              final nav2 = Navigator.of(widget.parentContext);
+              await FirebaseChatOperations().sendImage(
+                  senderId: widget.currentUserid,
+                  targetId: widget.targetUserid,
+                  isRepliedToMe: state.isReplyingToMyMessage,
+                  isReplying: state.isReplying,
+                  parentMessage: state.message,
+                  image: sendingImage!);
+              if (!mounted) return;
+              context.read<ReplyingMessageCubit>().clearMessage();
+              //closing both pages
+              nav1.pop();
+              await Future.delayed(const Duration(milliseconds: 100));
+              nav2.pop();
+            },
+            backgroundColor: appColors.primaryColor,
+            child: const Icon(Iconsax.send_1),
+          );
         },
-        backgroundColor: appColors.primaryColor,
-        child: const Icon(Iconsax.send_1),
       );
 
   //CROPPING IMAGE

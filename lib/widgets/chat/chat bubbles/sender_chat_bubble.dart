@@ -131,7 +131,7 @@ class SenderChatBubble extends StatelessWidget {
         children: [
           //image preview
           Container(
-            width: 220,
+            width: 240,
             height: 280,
             decoration: BoxDecoration(
               color: appColors.textColorWhite,

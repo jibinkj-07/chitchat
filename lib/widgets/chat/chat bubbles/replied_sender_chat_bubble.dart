@@ -136,12 +136,17 @@ class RepliedSenderChatBubble extends StatelessWidget {
   Widget imageMessage(
           {required BuildContext context, required AppColors appColors}) =>
       Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          messageItem.repliedToMessage
+                  .contains('https://firebasestorage.googleapis.com')
+              ? imageReplyMessage(appColors: appColors)
+              : textReplyMessage(appColors: appColors),
           //image preview
           Container(
-            width: 220,
+            width: 240,
             height: 280,
+            margin: const EdgeInsets.only(top: 8.0),
             decoration: BoxDecoration(
               color: appColors.textColorWhite,
               borderRadius: BorderRadius.circular(6.0),
@@ -268,9 +273,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: !messageItem.isRepliedToMyself
-                          ? appColors.textColorWhite.withOpacity(.7)
-                          : appColors.textColorBlack.withOpacity(.6),
+                      color: appColors.textColorWhite.withOpacity(.7),
                     ),
                   ),
                 ),
@@ -349,21 +352,15 @@ class RepliedSenderChatBubble extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Iconsax.camera5,
-                          size: 15,
-                          color: !messageItem.isRepliedToMyself
-                              ? appColors.textColorWhite.withOpacity(.8)
-                              : appColors.textColorBlack.withOpacity(.8),
-                        ),
+                        Icon(Iconsax.camera5,
+                            size: 15,
+                            color: appColors.textColorWhite.withOpacity(.8)),
                         const SizedBox(width: 2),
                         Text(
                           'Photo',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            color: !messageItem.isRepliedToMyself
-                                ? appColors.textColorWhite.withOpacity(.8)
-                                : appColors.textColorBlack.withOpacity(.8),
+                            color: appColors.textColorWhite.withOpacity(.8),
                             overflow: TextOverflow.ellipsis,
                             fontSize: 10,
                           ),

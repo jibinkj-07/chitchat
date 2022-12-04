@@ -303,6 +303,9 @@ class FirebaseChatOperations {
   Future<void> sendImage(
       {required String senderId,
       required String targetId,
+      required bool isReplying,
+      required bool isRepliedToMe,
+      required String parentMessage,
       required File image}) async {
     final time = DateTime.now();
     String id = '';
@@ -323,9 +326,9 @@ class FirebaseChatOperations {
       'read': false,
       'readTime': null,
       'sentByMe': true,
-      'isReplyingMessage': false,
-      'repliedTo': '',
-      'repliedToMe': false,
+      'isReplyingMessage': isReplying,
+      'repliedTo': parentMessage,
+      'repliedToMe': isRepliedToMe,
       'time': time,
     }).then((value) async {
       id = value.id;
@@ -360,9 +363,9 @@ class FirebaseChatOperations {
             'read': false,
             'readTime': null,
             'sentByMe': false,
-            'isReplyingMessage': false,
-            'repliedTo': '',
-            'repliedToMe': false,
+            'isReplyingMessage': isReplying,
+            'repliedTo': parentMessage,
+            'repliedToMe': isRepliedToMe,
             'time': uploadedTime,
           });
           int unreadCount = 0;

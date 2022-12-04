@@ -137,12 +137,17 @@ class RepliedReceivedChatBubble extends StatelessWidget {
   Widget imageMessage(
           {required BuildContext context, required AppColors appColors}) =>
       Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          messageItem.repliedToMessage
+                  .contains('https://firebasestorage.googleapis.com')
+              ? imageReplyMessage(appColors: appColors)
+              : textReplyMessage(appColors: appColors),
           //image preview
           Container(
-            width: 220,
+            width: 240,
             height: 280,
+            margin: const EdgeInsets.only(top: 8.0),
             decoration: BoxDecoration(
               color: appColors.textColorWhite,
               borderRadius: BorderRadius.circular(6.0),
@@ -197,7 +202,7 @@ class RepliedReceivedChatBubble extends StatelessWidget {
           Text(
             '$messageTime  ',
             style: TextStyle(
-              color: appColors.textColorWhite.withOpacity(.8),
+              color: appColors.textColorBlack.withOpacity(.8),
               fontSize: 11,
             ),
           ),
