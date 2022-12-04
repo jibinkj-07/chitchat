@@ -31,6 +31,10 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: [
             TopTitle(screen: screen, appColors: appColors),
+            Divider(
+              height: 0,
+              color: appColors.textColorBlack.withOpacity(.3),
+            ),
 
             //chat list
             NotificationListener<OverscrollIndicatorNotification>(
@@ -148,7 +152,7 @@ class TopTitle extends StatelessWidget {
         horizontal: 8.0,
         vertical: 10,
       ),
-      color: appColors.primaryColor,
+
       // height: 80,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +163,7 @@ class TopTitle extends StatelessWidget {
               if (state is InternetEnabled) {
                 return CircleAvatar(
                   radius: 8.0,
-                  backgroundColor: appColors.textColorWhite,
+                  backgroundColor: appColors.greenColor.withOpacity(.5),
                   child: CircleAvatar(
                     radius: 6.0,
                     backgroundColor: appColors.greenColor,
@@ -174,7 +178,7 @@ class TopTitle extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 12,
-                        color: appColors.textColorWhite.withOpacity(.85),
+                        color: appColors.textColorBlack.withOpacity(.85),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -183,7 +187,7 @@ class TopTitle extends StatelessWidget {
                       height: 15,
                       width: 15,
                       child: CircularProgressIndicator(
-                        color: appColors.textColorWhite.withOpacity(.7),
+                        color: appColors.textColorBlack.withOpacity(.7),
                         strokeWidth: 1.5,
                       ),
                     ),
@@ -201,7 +205,7 @@ class TopTitle extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: appColors.textColorWhite,
+                  color: appColors.textColorBlack,
                 ),
               ),
               IconButton(
@@ -209,7 +213,7 @@ class TopTitle extends StatelessWidget {
                 icon: const Icon(
                   Iconsax.search_normal_1,
                 ),
-                color: appColors.textColorWhite,
+                color: appColors.textColorBlack,
                 splashRadius: 20.0,
               )
             ],

@@ -19,12 +19,6 @@ class SingleChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        toolbarHeight: 0.0,
-        backgroundColor: appColors.primaryColor,
-        elevation: 0,
-      ),
       body: SafeArea(
         child: StreamBuilder(
             stream: FirebaseFirestore.instance
@@ -40,7 +34,7 @@ class SingleChatScreen extends StatelessWidget {
                 return Column(
                   children: [
                     Material(
-                      color: appColors.primaryColor,
+                      color: appColors.textColorWhite,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 5.0, horizontal: 0),
@@ -56,9 +50,9 @@ class SingleChatScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Divider(
+                    Divider(
                       height: 0,
-                      color: Colors.white,
+                      color: appColors.textColorBlack.withOpacity(.5),
                       thickness: .5,
                     ),
 
@@ -101,13 +95,12 @@ Widget chatTopBar(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          color: Colors.white,
+          color: appColors.textColorBlack,
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
           ),
           iconSize: 20.0,
           splashRadius: 20.0,
-          splashColor: Colors.white60,
         ),
         //image
         ImagePreviewer(
@@ -123,22 +116,24 @@ Widget chatTopBar(
                   name.toString().length > 20
                       ? Text(
                           '${name.toString().substring(0, 18)}...',
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: appColors.textColorBlack,
+                          ),
                         )
                       : Text(
                           name,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: appColors.textColorBlack,
+                          ),
                         ),
                   if (isVerified)
                     Icon(
                       Iconsax.verify5,
-                      color: Colors.white,
+                      color: appColors.primaryColor,
                       size: 20,
                     ),
                 ],
@@ -146,10 +141,14 @@ Widget chatTopBar(
               Text(
                 status,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white70,
+                  color: status == 'online'
+                      ? appColors.greenColor
+                      : status == 'away'
+                          ? Colors.orange
+                          : appColors.textColorBlack.withOpacity(.8),
                 ),
               ),
             ],
@@ -161,8 +160,7 @@ Widget chatTopBar(
           onPressed: () {},
           icon: const Icon(Iconsax.broom),
           splashRadius: 20.0,
-          color: Colors.white,
-          splashColor: Colors.white60,
+          color: appColors.textColorBlack,
         ),
       ],
     );

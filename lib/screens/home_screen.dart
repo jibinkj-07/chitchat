@@ -77,12 +77,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     //calling hive method to get user detail
     getUserDetailHive();
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors().primaryColor,
-        elevation: 0.0,
-        automaticallyImplyLeading: false,
-        toolbarHeight: 0.0,
-      ),
       body: SafeArea(
         child: pages[currentIndex]['page'],
       ),

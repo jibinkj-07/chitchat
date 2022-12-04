@@ -61,23 +61,22 @@ class _GalleryPreviewPickerState extends State<GalleryPreviewPicker> {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: appColors.primaryColor,
-          toolbarHeight: 0.0,
-          automaticallyImplyLeading: false,
-          elevation: 0.0,
-        ),
-        body: Column(
-          children: [
-            //top bar
-            topBar(context: context, appColors: appColors),
-
-            //thumbnail previews
-            Expanded(
-              child: thumbnailPreview(),
-            ),
-          ],
-        ));
+        body: SafeArea(
+      child: Column(
+        children: [
+          //top bar
+          topBar(context: context, appColors: appColors),
+          Divider(
+            height: 0,
+            color: appColors.textColorBlack.withOpacity(.3),
+          ),
+          //thumbnail previews
+          Expanded(
+            child: thumbnailPreview(),
+          ),
+        ],
+      ),
+    ));
   }
 
   Widget thumbnailPreview() =>
@@ -115,13 +114,13 @@ class _GalleryPreviewPickerState extends State<GalleryPreviewPicker> {
   Widget topBar(
           {required BuildContext context, required AppColors appColors}) =>
       Material(
-        color: appColors.primaryColor,
+        color: appColors.textColorWhite,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded),
-              color: appColors.textColorWhite,
+              color: appColors.textColorBlack,
               splashRadius: 20.0,
               iconSize: 20.0,
               onPressed: () => Navigator.of(context).pop(),
@@ -131,7 +130,7 @@ class _GalleryPreviewPickerState extends State<GalleryPreviewPicker> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: appColors.textColorWhite,
+                color: appColors.textColorBlack,
               ),
             ),
             const IconButton(

@@ -48,7 +48,7 @@ class SettingScreenBody extends StatelessWidget {
         Container(
           width: screen.width,
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-          color: appColors.primaryColor,
+          color: appColors.textColorWhite,
           // height: 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +59,7 @@ class SettingScreenBody extends StatelessWidget {
                   if (state is InternetEnabled) {
                     return CircleAvatar(
                       radius: 8.0,
-                      backgroundColor: appColors.textColorWhite.withOpacity(.9),
+                      backgroundColor: appColors.greenColor.withOpacity(.5),
                       child: CircleAvatar(
                         radius: 6.0,
                         backgroundColor: appColors.greenColor,
@@ -74,7 +74,7 @@ class SettingScreenBody extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
-                            color: appColors.textColorWhite.withOpacity(.85),
+                            color: appColors.textColorBlack.withOpacity(.85),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -83,7 +83,7 @@ class SettingScreenBody extends StatelessWidget {
                           height: 15,
                           width: 15,
                           child: CircularProgressIndicator(
-                            color: appColors.textColorWhite.withOpacity(.7),
+                            color: appColors.textColorBlack.withOpacity(.7),
                             strokeWidth: 1.5,
                           ),
                         ),
@@ -101,13 +101,13 @@ class SettingScreenBody extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: appColors.textColorWhite,
+                      color: appColors.textColorBlack,
                     ),
                   ),
                   IconButton(
                     onPressed: null,
                     color: appColors.textColorWhite,
-                    disabledColor: appColors.primaryColor,
+                    disabledColor: appColors.textColorWhite,
                     icon: const Icon(
                       Iconsax.search_normal_1,
                     ),
@@ -118,6 +118,10 @@ class SettingScreenBody extends StatelessWidget {
               //implement search bar here
             ],
           ),
+        ),
+        Divider(
+          height: 0,
+          color: appColors.textColorBlack.withOpacity(.3),
         ),
         const Expanded(
           child: SingleChildScrollView(

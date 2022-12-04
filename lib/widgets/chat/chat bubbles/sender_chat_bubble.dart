@@ -26,7 +26,7 @@ class SenderChatBubble extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.only(
         right: 2.0,
-        left: 100,
+        left: 80,
         bottom: 5,
       ),
       child: Row(

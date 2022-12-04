@@ -50,7 +50,7 @@ class FindFriendsScreenBody extends StatelessWidget {
         Container(
           width: screen.width,
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-          color: appColors.primaryColor,
+          color: appColors.textColorWhite,
           // height: 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +61,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                   if (state is InternetEnabled) {
                     return CircleAvatar(
                       radius: 8.0,
-                      backgroundColor: appColors.textColorWhite.withOpacity(.9),
+                      backgroundColor: appColors.greenColor.withOpacity(.5),
                       child: CircleAvatar(
                         radius: 6.0,
                         backgroundColor: appColors.greenColor,
@@ -76,7 +76,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
-                            color: appColors.textColorWhite.withOpacity(.85),
+                            color: appColors.textColorBlack.withOpacity(.85),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -85,7 +85,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                           height: 15,
                           width: 15,
                           child: CircularProgressIndicator(
-                            color: appColors.textColorWhite.withOpacity(.7),
+                            color: appColors.textColorBlack.withOpacity(.7),
                             strokeWidth: 1.5,
                           ),
                         ),
@@ -103,7 +103,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: appColors.textColorWhite,
+                      color: appColors.textColorBlack,
                     ),
                   ),
                   IconButton(
@@ -116,7 +116,7 @@ class FindFriendsScreenBody extends StatelessWidget {
                         ),
                       );
                     },
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                    color: appColors.textColorBlack,
                     icon: const Icon(
                       Iconsax.search_normal_1,
                     ),
@@ -126,6 +126,10 @@ class FindFriendsScreenBody extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        Divider(
+          height: 0,
+          color: appColors.textColorBlack.withOpacity(.3),
         ),
         Expanded(
           child: FindFriends(

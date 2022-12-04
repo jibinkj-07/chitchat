@@ -4,6 +4,8 @@ import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/chat_functions.dart';
 import 'package:chitchat/widgets/chat/chat%20bubbles/received_chat_bubble.dart';
+import 'package:chitchat/widgets/chat/chat%20bubbles/replied_received_chat_bubble.dart';
+import 'package:chitchat/widgets/chat/chat%20bubbles/replied_sender_chat_bubble.dart';
 import 'package:chitchat/widgets/chat/chat%20bubbles/sender_chat_bubble.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,12 +59,24 @@ class Messages extends StatelessWidget {
         return null;
       },
       child: messageItem.isMe
-          ? SenderChatBubble(
-              messageItem: messageItem,
-              messageTime: messageTime,
-            )
-          : ReceivedMessageBubble(
-              messageItem: messageItem, messageTime: messageTime),
+          ? messageItem.isReplied
+              ? RepliedSenderChatBubble(
+                  messageItem: messageItem,
+                  messageTime: messageTime,
+                )
+              : SenderChatBubble(
+                  messageItem: messageItem,
+                  messageTime: messageTime,
+                )
+          : messageItem.isReplied
+              ? RepliedReceivedChatBubble(
+                  messageItem: messageItem,
+                  messageTime: messageTime,
+                )
+              : ReceivedMessageBubble(
+                  messageItem: messageItem,
+                  messageTime: messageTime,
+                ),
     );
     // return Row(
     //   mainAxisAlignment:

@@ -27,7 +27,7 @@ class ReceivedMessageBubble extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.only(
         left: 2.0,
-        right: 50,
+        right: 80,
         bottom: 5,
       ),
       child: Row(
@@ -162,7 +162,7 @@ class ReceivedMessageBubble extends StatelessWidget {
             messageTime,
             style: TextStyle(
               color: appColors.textColorBlack.withOpacity(.8),
-              fontSize: 10,
+              fontSize: 11,
             ),
           ),
         ],
