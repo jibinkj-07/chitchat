@@ -1,5 +1,11 @@
+import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/chat/single_chat_screen.dart';
+import 'package:chitchat/widgets/general/image_previewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+import '../../utils/chat_functions.dart';
 
 class ChatListItem extends StatelessWidget {
   const ChatListItem({
@@ -23,6 +29,8 @@ class ChatListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = AppColors();
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('Users')
@@ -31,6 +39,107 @@ class ChatListItem extends StatelessWidget {
       builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasData) {
           final userDetail = snapshot.data;
+
+          return ListTile(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => SingleChatScreen(
+                  targetUserid: targetUserid,
+                  currentUserid: currentUserid,
+                ),
+              ),
+            ),
+            leading: Stack(
+              children: [
+                ImagePreviewer(
+                  targetUserid: userDetail!.id,
+                  height: 50,
+                  width: 50,
+                  url: userDetail.get('imageUrl'),
+                ),
+                if (!userDetail.get('status').toString().contains('offline'))
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: CircleAvatar(
+                      backgroundColor: appColors.textColorWhite,
+                      radius: 8,
+                      child: CircleAvatar(
+                        backgroundColor: userDetail
+                                .get('status')
+                                .toString()
+                                .contains('online')
+                            ? appColors.greenColor
+                            : appColors.yellowColor,
+                        radius: 6,
+                      ),
+                    ),
+                  )
+              ],
+            ),
+            horizontalTitleGap: 8.0,
+            title: Row(
+              children: [
+                userDetail.get('name').toString().length > 30
+                    ? Text(
+                        '${userDetail.get('name').toString().substring(0, 28)}..',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isNew ? FontWeight.bold : FontWeight.w500,
+                        ),
+                      )
+                    : Text(
+                        userDetail.get('name'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isNew ? FontWeight.bold : FontWeight.w500,
+                        ),
+                      ),
+                if (userDetail.get('verified'))
+                  Icon(
+                    Iconsax.verify5,
+                    color: AppColors().primaryColor,
+                    size: 20,
+                  ),
+              ],
+            ),
+            subtitle: Text(
+              lastMessage,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                if (isNew)
+                  // Icon(
+                  //   Iconsax.sms_notification5,
+                  //   color: appColors.primaryColor,
+                  //   size: 18,
+                  // ),
+                  CircleAvatar(
+                    radius: 10,
+                    backgroundColor: appColors.primaryColor,
+                    child: Text(
+                      unreadCount.toString(),
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: appColors.textColorWhite),
+                    ),
+                  ),
+                Text(
+                  time,
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isNew ? FontWeight.bold : FontWeight.normal),
+                ),
+              ],
+            ),
+          );
         }
         return const SizedBox();
       },

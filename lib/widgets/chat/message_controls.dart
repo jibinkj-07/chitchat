@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
@@ -514,49 +515,57 @@ class _MessageControlsState extends State<MessageControls> {
       );
 
   Widget sendButton({required ReplyingMessageState state}) =>
-      FloatingActionButton(
-        backgroundColor: AppColors().primaryColor,
-        foregroundColor: Colors.white,
-        mini: true,
-        onPressed: () {
-          if (state.isReplying) {
-            FirebaseChatOperations().sendMessage(
-              senderId: widget.senderId,
-              targetId: widget.targetId,
-              body: message.trim(),
-              type: 'text',
-              isReplyingMessage: true,
-              replyingParentMessage: state.message,
-              isReplyingToMyMessage: state.isReplyingToMyMessage,
-            );
-            context.read<ReplyingMessageCubit>().clearMessage();
-          } else {
-            FirebaseChatOperations().sendMessage(
-              senderId: widget.senderId,
-              targetId: widget.targetId,
-              body: message.trim(),
-              type: 'text',
-              isReplyingMessage: false,
-              replyingParentMessage: '',
-              isReplyingToMyMessage: false,
-            );
-          }
-          messageController.clear();
-          setState(() {
-            message = '';
-          });
-          if (widget.scrollController.hasClients) {
-            widget.scrollController.animateTo(
-              0.0,
-              curve: Curves.easeOut,
-              duration: const Duration(seconds: 1),
-            );
-          }
+      BlocBuilder<InternetCubit, InternetState>(
+        builder: (context, cubitState) {
+          return FloatingActionButton(
+            backgroundColor: AppColors().primaryColor,
+            foregroundColor: Colors.white,
+            mini: true,
+            onPressed: () {
+              if (cubitState is InternetEnabled) {
+                if (state.isReplying) {
+                  FirebaseChatOperations().sendMessage(
+                    senderId: widget.senderId,
+                    targetId: widget.targetId,
+                    body: message.trim(),
+                    type: 'text',
+                    isReplyingMessage: true,
+                    replyingParentMessage: state.message,
+                    isReplyingToMyMessage: state.isReplyingToMyMessage,
+                  );
+                  context.read<ReplyingMessageCubit>().clearMessage();
+                } else {
+                  FirebaseChatOperations().sendMessage(
+                    senderId: widget.senderId,
+                    targetId: widget.targetId,
+                    body: message.trim(),
+                    type: 'text',
+                    isReplyingMessage: false,
+                    replyingParentMessage: '',
+                    isReplyingToMyMessage: false,
+                  );
+                }
+                messageController.clear();
+                setState(() {
+                  message = '';
+                });
+                if (widget.scrollController.hasClients) {
+                  widget.scrollController.animateTo(
+                    0.0,
+                    curve: Curves.easeOut,
+                    duration: const Duration(seconds: 1),
+                  );
+                }
+              } else {
+                showNoInternetAlert();
+              }
+            },
+            child: const Icon(
+              Iconsax.send_1,
+              size: 22,
+            ),
+          );
         },
-        child: const Icon(
-          Iconsax.send_1,
-          size: 22,
-        ),
       );
 
   Widget micButton() => FloatingActionButton(
@@ -586,5 +595,43 @@ class _MessageControlsState extends State<MessageControls> {
         ),
       );
     });
+  }
+
+  void showNoInternetAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          titlePadding:
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+          title: const Text(
+            "No internet",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            "Please enable Mobile data or Wifi to send message",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors().textColorBlack,
+              ),
+              child: const Text("Okay"),
+            )
+          ],
+        );
+      },
+    );
   }
 }

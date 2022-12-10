@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseChatOperations {
   final database = FirebaseFirestore.instance.collection('Users');
@@ -262,17 +264,37 @@ class FirebaseChatOperations {
       {required String senderId,
       required String targetId,
       required String message}) async {
+    final filePathSender = '$senderId$targetId';
+    final filePathTarget = '$targetId$senderId';
     try {
-      final list = await FirebaseStorage.instance
+      final senderImageList = await FirebaseStorage.instance
           .ref()
           .child("Chat Images")
-          .child(senderId)
+          .child(filePathSender)
           .listAll();
-      for (var item in list.items) {
+      // final targetImageList = await FirebaseStorage.instance
+      //     .ref()
+      //     .child("Chat Images")
+      //     .child(filePathTarget)
+      //     .listAll();
+      for (var item in senderImageList.items) {
         item.delete();
       }
     } catch (e) {
-      log('error in deleting $senderId storage bucket ${e.toString()}');
+      log('error in deleting sender storage bucket ${e.toString()}');
+    }
+
+    try {
+      final targetImageList = await FirebaseStorage.instance
+          .ref()
+          .child("Chat Images")
+          .child(filePathTarget)
+          .listAll();
+      for (var item in targetImageList.items) {
+        item.delete();
+      }
+    } catch (e) {
+      log('error in deleting target storage bucket ${e.toString()}');
     }
 
     clearChatForMe(senderId: senderId, targetId: targetId, message: message);
@@ -309,10 +331,9 @@ class FirebaseChatOperations {
       required File image}) async {
     final time = DateTime.now();
     String id = '';
-
+    final filePath = '$senderId$targetId';
     final storageRef =
-        FirebaseStorage.instance.ref().child("Chat Images").child(senderId);
-    // await storageRef.child('$id.jpg').delete();
+        FirebaseStorage.instance.ref().child("Chat Images").child(filePath);
     final senderEnd =
         database.doc(senderId).collection('messages').doc(targetId);
 
@@ -388,7 +409,7 @@ class FirebaseChatOperations {
         log('error on uploading image ${e.toString()}');
         senderEnd.collection('chats').doc(id).delete();
         senderEnd.set({
-          'last_message': 'Failed to sent photo',
+          'last_message': 'Failed to send photo',
         }, SetOptions(merge: true));
       }
     });

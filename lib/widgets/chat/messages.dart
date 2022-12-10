@@ -19,14 +19,6 @@ class Messages extends StatelessWidget {
     required this.messageItem,
   });
 
-  //date difference calculation function
-  int calculateDifference(DateTime date) {
-    DateTime now = DateTime.now();
-    return DateTime(date.year, date.month, date.day)
-        .difference(DateTime(now.year, now.month, now.day))
-        .inDays;
-  }
-
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();

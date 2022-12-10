@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
@@ -120,33 +121,41 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
           {required AppColors appColors, required BuildContext context}) =>
       BlocBuilder<ReplyingMessageCubit, ReplyingMessageState>(
         builder: (context, state) {
-          return FloatingActionButton(
-            onPressed: () async {
-              final nav = Navigator.of(context);
-              await FirebaseChatOperations().sendImage(
-                  senderId: widget.currentUserid,
-                  targetId: widget.targetUserid,
-                  isRepliedToMe: state.isReplyingToMyMessage,
-                  isReplying: state.isReplying,
-                  parentMessage: state.message,
-                  image: sendingImage!);
+          return BlocBuilder<InternetCubit, InternetState>(
+            builder: (context, internetState) {
+              return FloatingActionButton(
+                onPressed: () async {
+                  if (internetState is InternetEnabled) {
+                    final nav = Navigator.of(context);
+                    await FirebaseChatOperations().sendImage(
+                        senderId: widget.currentUserid,
+                        targetId: widget.targetUserid,
+                        isRepliedToMe: state.isReplyingToMyMessage,
+                        isReplying: state.isReplying,
+                        parentMessage: state.message,
+                        image: sendingImage!);
 
-              if (widget.scrollController.hasClients) {
-                widget.scrollController.animateTo(
-                  0.0,
-                  curve: Curves.easeOut,
-                  duration: const Duration(seconds: 1),
-                );
-              }
-              if (!mounted) return;
-              context.read<ReplyingMessageCubit>().clearMessage();
-              //closing both pages
-              nav.pop();
-              await Future.delayed(const Duration(milliseconds: 100));
-              if (widget.cameraImage == null) nav.pop();
+                    if (widget.scrollController.hasClients) {
+                      widget.scrollController.animateTo(
+                        0.0,
+                        curve: Curves.easeOut,
+                        duration: const Duration(seconds: 1),
+                      );
+                    }
+                    if (!mounted) return;
+                    context.read<ReplyingMessageCubit>().clearMessage();
+                    //closing both pages
+                    nav.pop();
+                    await Future.delayed(const Duration(milliseconds: 100));
+                    if (widget.cameraImage == null) nav.pop();
+                  } else {
+                    showNoInternetAlert();
+                  }
+                },
+                backgroundColor: appColors.primaryColor,
+                child: const Icon(Iconsax.send_1),
+              );
             },
-            backgroundColor: appColors.primaryColor,
-            child: const Icon(Iconsax.send_1),
           );
         },
       );
@@ -228,4 +237,42 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
           ],
         ),
       );
+
+  void showNoInternetAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          titlePadding:
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+          title: const Text(
+            "No internet",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            "Please enable Mobile data or Wifi to send message",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors().textColorBlack,
+              ),
+              child: const Text("Okay"),
+            )
+          ],
+        );
+      },
+    );
+  }
 }
