@@ -10,6 +10,7 @@ class MessageItem {
   final DateTime time;
   final String type;
   final String targetUsername;
+  final String replyingParentMessageType;
   final bool isMe;
   final bool isRepliedToMyself;
   const MessageItem({
@@ -19,6 +20,7 @@ class MessageItem {
     required this.isReplied,
     required this.type,
     required this.repliedToMessage,
+    required this.replyingParentMessageType,
     required this.currentUserid,
     required this.targetUserid,
     required this.isMe,

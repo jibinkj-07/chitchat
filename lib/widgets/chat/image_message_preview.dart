@@ -65,7 +65,6 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).dispose();
                         Navigator.of(context).pop();
                       },
                       icon: const Icon(

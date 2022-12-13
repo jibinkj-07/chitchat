@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dart_emoji/dart_emoji.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +10,7 @@ import '../../../utils/custom_shape.dart';
 import '../../../utils/message_Item.dart';
 import '../image_message_preview.dart';
 
-class RepliedSenderChatBubble extends StatelessWidget {
+class RepliedSenderChatBubble extends StatefulWidget {
   final MessageItem messageItem;
   final String messageTime;
   const RepliedSenderChatBubble({
@@ -17,6 +18,71 @@ class RepliedSenderChatBubble extends StatelessWidget {
     required this.messageItem,
     required this.messageTime,
   });
+
+  @override
+  State<RepliedSenderChatBubble> createState() =>
+      _RepliedSenderChatBubbleState();
+}
+
+class _RepliedSenderChatBubbleState extends State<RepliedSenderChatBubble> {
+  final audioPlayer = AudioPlayer();
+  bool isPlaying = false;
+  bool isPaused = false;
+  Duration duraiton = Duration.zero;
+  Duration position = Duration.zero;
+
+  @override
+  void initState() {
+    //listen to player state change
+    if (widget.messageItem.type == 'voice') {
+      audioPlayer.onPlayerStateChanged.listen((state) {
+        if (state == PlayerState.completed) {
+          if (!mounted) return;
+          setState(() {
+            position = Duration.zero;
+          });
+        }
+        if (!mounted) return;
+        setState(() {
+          isPlaying = state == PlayerState.playing;
+        });
+      });
+
+      //listen to audio duration change
+      audioPlayer.onDurationChanged.listen((newDuration) {
+        if (!mounted) return;
+        setState(() {
+          duraiton = newDuration;
+        });
+      });
+
+      //listen to audio position change
+      audioPlayer.onPositionChanged.listen((newPosition) {
+        if (!mounted) return;
+        setState(() {
+          position = newPosition;
+        });
+      });
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (widget.messageItem.type == 'voice') {
+      audioPlayer.dispose();
+    }
+    super.dispose();
+  }
+
+  String formatTime(int seconds) {
+    int sec = seconds % 60;
+    int min = (seconds / 60).floor();
+    String minute = min.toString().length <= 1 ? "0$min" : "$min";
+    String second = sec.toString().length <= 1 ? "0$sec" : "$sec";
+    return "$minute:$second";
+  }
+
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
@@ -24,10 +90,10 @@ class RepliedSenderChatBubble extends StatelessWidget {
 //calculating message length
     const double baseWidth = 80;
     double width = 0;
-    if (messageItem.message.length > 25) {
+    if (widget.messageItem.message.length > 25) {
       width = baseWidth + 200;
     } else {
-      width = baseWidth + (messageItem.message.length * 7.5);
+      width = baseWidth + (widget.messageItem.message.length * 7.5);
     }
     //main
     return Container(
@@ -57,12 +123,11 @@ class RepliedSenderChatBubble extends StatelessWidget {
                         topRight: Radius.circular(10),
                       ),
                     ),
-                    child: messageItem.type == 'text'
-                        ? textMessage(
-                            appColors: appColors,
-                            width: width,
-                          )
-                        : imageMessage(context: context, appColors: appColors),
+                    child: messageChooser(
+                      appColors: appColors,
+                      width: width,
+                      context: context,
+                    ),
                   ),
                 ),
                 CustomPaint(
@@ -77,6 +142,27 @@ class RepliedSenderChatBubble extends StatelessWidget {
     );
   }
 
+  Widget messageChooser({
+    required AppColors appColors,
+    required double width,
+    required BuildContext context,
+  }) {
+    switch (widget.messageItem.type) {
+      case 'text':
+        return textMessage(
+          appColors: appColors,
+          width: width,
+        );
+      case 'image':
+        return imageMessage(context: context, appColors: appColors);
+      case 'voice':
+        return voiceMessage(
+            appColors: appColors, messageItem: widget.messageItem);
+      default:
+        return const SizedBox();
+    }
+  }
+
   Widget textMessage({required AppColors appColors, required double width}) =>
       InkWell(
         onLongPress: () {},
@@ -85,10 +171,11 @@ class RepliedSenderChatBubble extends StatelessWidget {
           children: [
             //replied preview
 
-            messageItem.repliedToMessage
-                    .contains('https://firebasestorage.googleapis.com')
+            widget.messageItem.replyingParentMessageType == 'image'
                 ? imageReplyMessage(appColors: appColors)
-                : textReplyMessage(appColors: appColors),
+                : widget.messageItem.replyingParentMessageType == 'text'
+                    ? textReplyMessage(appColors: appColors)
+                    : voiceReplyMessage(appColors: appColors),
             const SizedBox(height: 5),
             //sent message
             Wrap(
@@ -96,11 +183,13 @@ class RepliedSenderChatBubble extends StatelessWidget {
               crossAxisAlignment: WrapCrossAlignment.end,
               children: [
                 Text(
-                  '${messageItem.message}   ',
+                  '${widget.messageItem.message}   ',
                   style: TextStyle(
                     color: appColors.textColorWhite,
                     fontSize:
-                        EmojiUtil.hasOnlyEmojis(messageItem.message) ? 30 : 15,
+                        EmojiUtil.hasOnlyEmojis(widget.messageItem.message)
+                            ? 30
+                            : 15,
                   ),
                   textAlign: TextAlign.left,
                 ),
@@ -111,13 +200,13 @@ class RepliedSenderChatBubble extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '$messageTime  ',
+                      '${widget.messageTime}  ',
                       style: TextStyle(
                         color: appColors.textColorWhite.withOpacity(.8),
                         fontSize: 11,
                       ),
                     ),
-                    if (messageItem.read)
+                    if (widget.messageItem.read)
                       const Text(
                         'read',
                         style: TextStyle(
@@ -139,10 +228,11 @@ class RepliedSenderChatBubble extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          messageItem.repliedToMessage
-                  .contains('https://firebasestorage.googleapis.com')
+          widget.messageItem.replyingParentMessageType == 'image'
               ? imageReplyMessage(appColors: appColors)
-              : textReplyMessage(appColors: appColors),
+              : widget.messageItem.replyingParentMessageType == 'text'
+                  ? textReplyMessage(appColors: appColors)
+                  : voiceReplyMessage(appColors: appColors),
           //image preview
           Container(
             width: 240,
@@ -152,7 +242,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
               color: appColors.textColorBlack,
               borderRadius: BorderRadius.circular(6.0),
             ),
-            child: messageItem.message == ''
+            child: widget.messageItem.message == ''
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -180,8 +270,8 @@ class RepliedSenderChatBubble extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => ImageMessagePreview(
-                              url: messageItem.message,
-                              messageItem: messageItem),
+                              url: widget.messageItem.message,
+                              messageItem: widget.messageItem),
                         ),
                       );
                     },
@@ -191,7 +281,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6.0),
                       child: CachedNetworkImage(
-                        imageUrl: messageItem.message,
+                        imageUrl: widget.messageItem.message,
                         width: MediaQuery.of(context).size.width,
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
@@ -213,13 +303,13 @@ class RepliedSenderChatBubble extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '$messageTime  ',
+                '${widget.messageTime}  ',
                 style: TextStyle(
                   color: appColors.textColorWhite.withOpacity(.8),
                   fontSize: 11,
                 ),
               ),
-              if (messageItem.read)
+              if (widget.messageItem.read)
                 const Text(
                   'seen',
                   style: TextStyle(
@@ -233,6 +323,149 @@ class RepliedSenderChatBubble extends StatelessWidget {
         ],
       );
 
+  Widget voiceMessage(
+      {required AppColors appColors, required MessageItem messageItem}) {
+    final icon = isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded;
+    return GestureDetector(
+      onLongPress: () {},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          widget.messageItem.replyingParentMessageType == 'image'
+              ? imageReplyMessage(appColors: appColors)
+              : widget.messageItem.replyingParentMessageType == 'text'
+                  ? textReplyMessage(appColors: appColors)
+                  : voiceReplyMessage(appColors: appColors),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //mic icon
+              CircleAvatar(
+                radius: 25,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Iconsax.microphone_2,
+                  size: 25,
+                  color: appColors.primaryColor,
+                ),
+              ),
+
+              //slider
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Column(
+                    children: [
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: appColors.textColorWhite,
+                          inactiveTrackColor: Colors.grey,
+                          trackHeight: 3.0,
+                          thumbColor: appColors.textColorWhite,
+                          thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 8.0),
+                          overlayColor:
+                              appColors.textColorWhite.withOpacity(.3),
+                          overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 14.0),
+                        ),
+                        child: Slider(
+                          min: 0,
+                          max: duraiton.inSeconds.toDouble(),
+                          value: position.inSeconds.toDouble(),
+                          onChanged: (value) async {
+                            final position = Duration(seconds: value.toInt());
+                            await audioPlayer.seek(position);
+
+                            // await audioPlayer.resume();
+                          },
+                        ),
+                      ),
+                      if (messageItem.message != '')
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              formatTime(position.inSeconds),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              formatTime((duraiton - position).inSeconds),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            )
+                          ],
+                        )
+                    ],
+                  ),
+                ),
+              ),
+
+              //time
+              messageItem.message == ''
+                  ? Container(
+                      width: 25,
+                      height: 25,
+                      margin: const EdgeInsets.only(right: 8.0),
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 1.5,
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            if (isPlaying) {
+                              await audioPlayer.pause();
+                            } else {
+                              await audioPlayer.play(
+                                UrlSource(messageItem.message),
+                              );
+                            }
+                          },
+                          icon: Icon(icon),
+                          color: Colors.white,
+                          iconSize: 30.0,
+                          splashRadius: 20.0,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${widget.messageTime}  ',
+                              style: TextStyle(
+                                color: appColors.textColorWhite.withOpacity(.8),
+                                fontSize: 11,
+                              ),
+                            ),
+                            if (widget.messageItem.read)
+                              const Text(
+                                'seen',
+                                style: TextStyle(
+                                  color: Colors.lime,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget textReplyMessage({required AppColors appColors}) => Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -242,7 +475,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: !messageItem.isRepliedToMyself
+              color: !widget.messageItem.isRepliedToMyself
                   ? appColors.yellowColor
                   : appColors.textColorBlack,
             ),
@@ -254,7 +487,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                messageItem.isRepliedToMyself
+                widget.messageItem.isRepliedToMyself
                     ? Text(
                         'You',
                         style: TextStyle(
@@ -264,7 +497,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        messageItem.targetUsername,
+                        widget.messageItem.targetUsername,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appColors.yellowColor,
@@ -277,7 +510,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
                 Container(
                   constraints: const BoxConstraints(maxWidth: 220),
                   child: Text(
-                    messageItem.repliedToMessage,
+                    widget.messageItem.repliedToMessage,
                     style: TextStyle(
                       overflow: TextOverflow.ellipsis,
                       fontSize: 10,
@@ -301,7 +534,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: !messageItem.isRepliedToMyself
+              color: !widget.messageItem.isRepliedToMyself
                   ? appColors.yellowColor
                   : appColors.textColorBlack,
             ),
@@ -313,7 +546,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                messageItem.isRepliedToMyself
+                widget.messageItem.isRepliedToMyself
                     ? Text(
                         'You',
                         style: TextStyle(
@@ -323,7 +556,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        messageItem.targetUsername,
+                        widget.messageItem.targetUsername,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appColors.yellowColor,
@@ -341,7 +574,7 @@ class RepliedSenderChatBubble extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: CachedNetworkImage(
-                          imageUrl: messageItem.repliedToMessage,
+                          imageUrl: widget.messageItem.repliedToMessage,
                           fit: BoxFit.cover,
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) =>
@@ -384,4 +617,78 @@ class RepliedSenderChatBubble extends StatelessWidget {
           )
         ],
       );
+
+  voiceReplyMessage({required AppColors appColors}) {
+    final color = !widget.messageItem.isRepliedToMyself
+        ? appColors.yellowColor
+        : appColors.textColorBlack;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 5,
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: color,
+          ),
+        ),
+        const SizedBox(width: 5),
+        SizedBox(
+          height: 60,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              widget.messageItem.isRepliedToMyself
+                  ? Text(
+                      'You',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: appColors.textColorBlack,
+                        fontSize: 12,
+                      ),
+                    )
+                  : Text(
+                      widget.messageItem.targetUsername,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: appColors.yellowColor,
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 12,
+                      ),
+                    ),
+              Row(
+                children: [
+                  //image
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: color,
+                    foregroundColor: Colors.white,
+                    child: const Icon(
+                      Iconsax.microphone_2,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  //text
+                  Text(
+                    'Voice',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: appColors.textColorWhite.withOpacity(.8),
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
 }

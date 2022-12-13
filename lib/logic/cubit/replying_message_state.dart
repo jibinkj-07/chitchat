@@ -3,13 +3,13 @@ part of 'replying_message_cubit.dart';
 class ReplyingMessageState extends Equatable {
   final bool isReplying;
   final String message;
-  final String type;
+  final String parentMessageType;
   final String name;
   final bool isReplyingToMyMessage;
   const ReplyingMessageState({
     required this.isReplying,
     required this.isReplyingToMyMessage,
-    required this.type,
+    required this.parentMessageType,
     required this.name,
     required this.message,
   });
@@ -19,17 +19,17 @@ class ReplyingMessageState extends Equatable {
         isReplying,
         isReplyingToMyMessage,
         message,
-        type,
+        parentMessageType,
         name,
       ];
 }
 
 class ReplyingMessageInitial extends ReplyingMessageState {
   const ReplyingMessageInitial({
-    required super.isReplying,
+    required super.parentMessageType,
     required super.isReplyingToMyMessage,
     required super.message,
     required super.name,
-    required super.type,
+    required super.isReplying,
   });
 }

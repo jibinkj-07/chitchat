@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class FirebaseChatOperations {
   final database = FirebaseFirestore.instance.collection('Users');
@@ -17,6 +15,7 @@ class FirebaseChatOperations {
     required String type,
     required bool isReplyingMessage,
     required String replyingParentMessage,
+    required String replyingParentMessageType,
     required bool isReplyingToMyMessage,
   }) {
     final time = DateTime.now();
@@ -35,6 +34,7 @@ class FirebaseChatOperations {
       'isReplyingMessage': isReplyingMessage,
       'repliedTo': replyingParentMessage,
       'repliedToMe': isReplyingToMyMessage,
+      'replyingParentMessageType': replyingParentMessageType,
       'time': time,
     }).then((value) async {
       //creating copy in tager folder
@@ -47,6 +47,7 @@ class FirebaseChatOperations {
         'isReplyingMessage': isReplyingMessage,
         'repliedTo': replyingParentMessage,
         'repliedToMe': isReplyingToMyMessage,
+        'replyingParentMessageType': replyingParentMessageType,
         'time': time,
       });
 
@@ -272,6 +273,7 @@ class FirebaseChatOperations {
           .child("Chat Images")
           .child(filePathSender)
           .listAll();
+
       // final targetImageList = await FirebaseStorage.instance
       //     .ref()
       //     .child("Chat Images")
@@ -285,6 +287,19 @@ class FirebaseChatOperations {
     }
 
     try {
+      final senderVoiceList = await FirebaseStorage.instance
+          .ref()
+          .child("Chat Voices")
+          .child(filePathSender)
+          .listAll();
+      for (var item in senderVoiceList.items) {
+        item.delete();
+      }
+    } catch (e) {
+      log('error in deleting sender storage bucket voice ${e.toString()}');
+    }
+
+    try {
       final targetImageList = await FirebaseStorage.instance
           .ref()
           .child("Chat Images")
@@ -295,6 +310,19 @@ class FirebaseChatOperations {
       }
     } catch (e) {
       log('error in deleting target storage bucket ${e.toString()}');
+    }
+
+    try {
+      final targetVoiceList = await FirebaseStorage.instance
+          .ref()
+          .child("Chat Voices")
+          .child(filePathTarget)
+          .listAll();
+      for (var item in targetVoiceList.items) {
+        item.delete();
+      }
+    } catch (e) {
+      log('error in deleting target storage bucket voices${e.toString()}');
     }
 
     clearChatForMe(senderId: senderId, targetId: targetId, message: message);
@@ -328,6 +356,7 @@ class FirebaseChatOperations {
       required bool isReplying,
       required bool isRepliedToMe,
       required String parentMessage,
+      required String replyingParentMessageType,
       required File image}) async {
     final time = DateTime.now();
     String id = '';
@@ -350,6 +379,7 @@ class FirebaseChatOperations {
       'isReplyingMessage': isReplying,
       'repliedTo': parentMessage,
       'repliedToMe': isRepliedToMe,
+      'replyingParentMessageType': replyingParentMessageType,
       'time': time,
     }).then((value) async {
       id = value.id;
@@ -386,6 +416,7 @@ class FirebaseChatOperations {
             'sentByMe': false,
             'isReplyingMessage': isReplying,
             'repliedTo': parentMessage,
+            'replyingParentMessageType': replyingParentMessageType,
             'repliedToMe': isRepliedToMe,
             'time': uploadedTime,
           });
@@ -410,6 +441,105 @@ class FirebaseChatOperations {
         senderEnd.collection('chats').doc(id).delete();
         senderEnd.set({
           'last_message': 'Failed to send photo',
+        }, SetOptions(merge: true));
+      }
+    });
+  }
+
+  Future<void> sendVoice(
+      {required String senderId,
+      required String targetId,
+      required bool isReplying,
+      required bool isRepliedToMe,
+      required String parentMessage,
+      required String replyingParentMessageType,
+      required File voiceMessage}) async {
+    final time = DateTime.now();
+    String id = '';
+    final filePath = '$senderId$targetId';
+    final storageRef =
+        FirebaseStorage.instance.ref().child("Chat Voices").child(filePath);
+    final senderEnd =
+        database.doc(senderId).collection('messages').doc(targetId);
+
+    final targetEnd =
+        database.doc(targetId).collection('messages').doc(senderId);
+    //setting sending message in sender user end
+
+    senderEnd.collection('chats').add({
+      'body': '',
+      'type': 'voice',
+      'read': false,
+      'readTime': null,
+      'sentByMe': true,
+      'isReplyingMessage': isReplying,
+      'repliedTo': parentMessage,
+      'replyingParentMessageType': replyingParentMessageType,
+      'repliedToMe': isRepliedToMe,
+      'time': time,
+    }).then((value) async {
+      id = value.id;
+      senderEnd.set({
+        'id': id,
+        'isNew': false,
+        'last_message': 'sending voice',
+        'time': time,
+        'unread_count': 0,
+      }, SetOptions(merge: true));
+
+      //uploading voice
+      try {
+        await storageRef
+            .child('$id.aac')
+            .putFile(voiceMessage)
+            .whenComplete(() async {
+          final url = await storageRef.child('$id.aac').getDownloadURL();
+          final uploadedTime = DateTime.now();
+
+          //setting message
+          senderEnd.collection('chats').doc(id).set({
+            'body': url,
+            'time': uploadedTime,
+          }, SetOptions(merge: true));
+
+          senderEnd.set({
+            'last_message': '🎙️Voice sent',
+            'time': uploadedTime,
+          }, SetOptions(merge: true));
+
+          targetEnd.collection('chats').doc(id).set({
+            'body': url,
+            'type': 'voice',
+            'read': false,
+            'readTime': null,
+            'sentByMe': false,
+            'isReplyingMessage': isReplying,
+            'repliedTo': parentMessage,
+            'replyingParentMessageType': replyingParentMessageType,
+            'repliedToMe': isRepliedToMe,
+            'time': uploadedTime,
+          });
+          int unreadCount = 0;
+          try {
+            unreadCount = await targetEnd
+                .get()
+                .then((value) => value.get('unread_count'));
+          } on Exception catch (e) {
+            log('error in sending voice ${e.toString()}');
+          }
+          targetEnd.set({
+            'id': id,
+            'isNew': true,
+            'last_message': '🎙️Voice',
+            'time': uploadedTime,
+            'unread_count': unreadCount + 1,
+          }, SetOptions(merge: true));
+        });
+      } catch (e) {
+        log('error on uploading voice on target end ${e.toString()}');
+        senderEnd.collection('chats').doc(id).delete();
+        senderEnd.set({
+          'last_message': 'Failed to send voice',
         }, SetOptions(merge: true));
       }
     });

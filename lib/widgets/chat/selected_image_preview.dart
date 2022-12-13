@@ -130,6 +130,7 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
                     await FirebaseChatOperations().sendImage(
                         senderId: widget.currentUserid,
                         targetId: widget.targetUserid,
+                        replyingParentMessageType: state.parentMessageType,
                         isRepliedToMe: state.isReplyingToMyMessage,
                         isReplying: state.isReplying,
                         parentMessage: state.message,

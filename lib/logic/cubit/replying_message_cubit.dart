@@ -12,7 +12,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
             message: '',
             isReplyingToMyMessage: false,
             isReplying: false,
-            type: '',
+            parentMessageType: '',
             name: '',
           ),
         );
@@ -21,7 +21,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
     required bool isReplying,
     required bool isMine,
     required String message,
-    required String type,
+    required String parentMessageType,
     required String name,
   }) {
     emit(
@@ -29,7 +29,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
         isReplying: isReplying,
         isReplyingToMyMessage: isMine,
         message: message,
-        type: type,
+        parentMessageType: parentMessageType,
         name: name,
       ),
     );
@@ -40,7 +40,7 @@ class ReplyingMessageCubit extends Cubit<ReplyingMessageState> {
       isReplyingToMyMessage: false,
       isReplying: false,
       message: '',
-      type: '',
+      parentMessageType: '',
       name: '',
     ));
   }

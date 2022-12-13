@@ -125,6 +125,8 @@ class _ChatBodyState extends State<ChatBody> {
                 message: snapshot.data!.docs[i].get('body'),
                 time: snapshot.data!.docs[i].get('time').toDate(),
                 isReplied: snapshot.data!.docs[i].get('isReplyingMessage'),
+                replyingParentMessageType:
+                    snapshot.data!.docs[i].get('replyingParentMessageType'),
                 type: snapshot.data!.docs[i].get('type'),
                 repliedToMessage: snapshot.data!.docs[i].get('repliedTo'),
                 currentUserid: widget.currentUserid,

@@ -42,7 +42,7 @@ class Messages extends StatelessWidget {
                 isReplying: true,
                 isMine: messageItem.isMe,
                 message: messageItem.message,
-                type: messageItem.type,
+                parentMessageType: messageItem.type,
                 name: messageItem.targetUsername,
               );
         }
