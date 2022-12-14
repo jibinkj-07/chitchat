@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
@@ -64,6 +65,8 @@ class _MessageControlsState extends State<MessageControls> {
   void resetTimer() {
     setState(() {
       seconds = 0;
+      duraiton = Duration.zero;
+      position = Duration.zero;
     });
   }
 
@@ -360,13 +363,21 @@ class _MessageControlsState extends State<MessageControls> {
                     ),
                   ),
                 if (isRecording)
-                  Text(
-                    'Recording',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: subColor,
-                    ),
+                  AnimatedTextKit(
+                    repeatForever: true,
+                    animatedTexts: [
+                      FadeAnimatedText(
+                        'Recording',
+                        duration: const Duration(milliseconds: 800),
+                        fadeOutBegin: .8,
+                        fadeInEnd: 0.5,
+                        textStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: subColor,
+                        ),
+                      ),
+                    ],
                   ),
                 if (!isRecording)
                   Row(
@@ -415,6 +426,9 @@ class _MessageControlsState extends State<MessageControls> {
         width: 25,
         child: IconButton(
           onPressed: () {
+            if (isPlaying) {
+              audioPlayer.stop();
+            }
             resetTimer();
             if (state.isReplying) {
               context.read<ReplyingMessageCubit>().clearMessage();
@@ -424,10 +438,11 @@ class _MessageControlsState extends State<MessageControls> {
             });
           },
           padding: const EdgeInsets.all(0.0),
-          icon: const Icon(Icons.close_rounded),
-          color: AppColors().textColorBlack,
+          icon: const Icon(CupertinoIcons.delete),
+          color: AppColors().redColor,
+          splashColor: AppColors().redColor.withOpacity(.2),
           splashRadius: 18.0,
-          iconSize: 22.0,
+          iconSize: 20.0,
         ),
       );
 
@@ -449,7 +464,7 @@ class _MessageControlsState extends State<MessageControls> {
               if (state is InternetDisabled) {
                 showNoInternetAlert();
               } else {
-                final bloc=context.read<ReplyingMessageCubit>();
+                final bloc = context.read<ReplyingMessageCubit>();
                 await FirebaseChatOperations().sendVoice(
                   senderId: widget.senderId,
                   targetId: widget.targetId,

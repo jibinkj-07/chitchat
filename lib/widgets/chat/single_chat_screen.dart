@@ -175,7 +175,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
                   style: TextButton.styleFrom(
                     foregroundColor: appColors.redColor,
                   ),
-                  child: const Text("Delete for all"),
+                  child: const Text("Clear for all"),
                 ),
                 //for me button
                 TextButton(
@@ -192,7 +192,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
                   style: TextButton.styleFrom(
                     foregroundColor: appColors.redColor,
                   ),
-                  child: const Text("Delete for me"),
+                  child: const Text("Clear for me"),
                 ),
               ],
             )

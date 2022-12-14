@@ -129,13 +129,13 @@ class FirebaseChatOperations {
   }
 
 //deleting message of self
-  void deleteMessageForMe({
+  Future<void> deleteMessageForMe({
     required String messageId,
     required String senderId,
     required String targetId,
     required String type,
     required String message,
-    required bool deleteImageForAll,
+    required bool deleteForAll,
   }) async {
     String id = '';
     final deleteMsg = database
@@ -155,9 +155,22 @@ class FirebaseChatOperations {
       id = value.get('id');
 
       //deleting message
-      if (type == 'image' && deleteImageForAll) {
+      if (type == 'image' && deleteForAll) {
         log('deleting image');
-        await deleteImageMessage(messageId: messageId, senderId: senderId);
+        await deleteImageMessage(
+          messageId: messageId,
+          senderId: senderId,
+          targetId: targetId,
+        );
+      }
+
+      if (type == 'voice' && deleteForAll) {
+        log('deleting voice');
+        await deleteVoiceMessage(
+          messageId: messageId,
+          senderId: senderId,
+          targetId: targetId,
+        );
       }
       deleteMsg.delete();
       if (id == messageId) {
@@ -177,14 +190,27 @@ class FirebaseChatOperations {
   Future<void> deleteImageMessage({
     required String messageId,
     required String senderId,
+    required String targetId,
   }) async {
+    final filePath = '$senderId$targetId';
     final storageRef =
-        FirebaseStorage.instance.ref().child("Chat Images").child(senderId);
+        FirebaseStorage.instance.ref().child("Chat Images").child(filePath);
     await storageRef.child('$messageId.jpg').delete();
   }
 
+  Future<void> deleteVoiceMessage({
+    required String messageId,
+    required String senderId,
+    required String targetId,
+  }) async {
+    final filePath = '$senderId$targetId';
+    final storageRef =
+        FirebaseStorage.instance.ref().child("Chat Voices").child(filePath);
+    await storageRef.child('$messageId.aac').delete();
+  }
+
   //deleting message for all
-  void deleteMessageForAll(
+  Future<void> deleteMessageForAll(
       {required String messageId,
       required String type,
       required String senderId,
@@ -196,7 +222,7 @@ class FirebaseChatOperations {
         senderId: senderId,
         targetId: targetId,
         type: type,
-        deleteImageForAll: true,
+        deleteForAll: true,
         message: 'Message deleted for all');
 
     final deleteMsgTarget = database

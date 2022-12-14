@@ -164,63 +164,60 @@ class _RepliedSenderChatBubbleState extends State<RepliedSenderChatBubble> {
   }
 
   Widget textMessage({required AppColors appColors, required double width}) =>
-      InkWell(
-        onLongPress: () {},
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //replied preview
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          //replied preview
 
-            widget.messageItem.replyingParentMessageType == 'image'
-                ? imageReplyMessage(appColors: appColors)
-                : widget.messageItem.replyingParentMessageType == 'text'
-                    ? textReplyMessage(appColors: appColors)
-                    : voiceReplyMessage(appColors: appColors),
-            const SizedBox(height: 5),
-            //sent message
-            Wrap(
-              alignment: WrapAlignment.end,
-              crossAxisAlignment: WrapCrossAlignment.end,
-              children: [
-                Text(
-                  '${widget.messageItem.message}   ',
-                  style: TextStyle(
-                    color: appColors.textColorWhite,
-                    fontSize:
-                        EmojiUtil.hasOnlyEmojis(widget.messageItem.message)
-                            ? 30
-                            : 15,
-                  ),
-                  textAlign: TextAlign.left,
+          widget.messageItem.replyingParentMessageType == 'image'
+              ? imageReplyMessage(appColors: appColors)
+              : widget.messageItem.replyingParentMessageType == 'text'
+                  ? textReplyMessage(appColors: appColors)
+                  : voiceReplyMessage(appColors: appColors),
+          const SizedBox(height: 5),
+          //sent message
+          Wrap(
+            alignment: WrapAlignment.end,
+            crossAxisAlignment: WrapCrossAlignment.end,
+            children: [
+              Text(
+                '${widget.messageItem.message}   ',
+                style: TextStyle(
+                  color: appColors.textColorWhite,
+                  fontSize:
+                      EmojiUtil.hasOnlyEmojis(widget.messageItem.message)
+                          ? 30
+                          : 15,
                 ),
+                textAlign: TextAlign.left,
+              ),
 
-                //time and read status
+              //time and read status
 
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${widget.messageTime}  ',
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${widget.messageTime}  ',
+                    style: TextStyle(
+                      color: appColors.textColorWhite.withOpacity(.8),
+                      fontSize: 11,
+                    ),
+                  ),
+                  if (widget.messageItem.read)
+                    const Text(
+                      'read',
                       style: TextStyle(
-                        color: appColors.textColorWhite.withOpacity(.8),
+                        color: Colors.lime,
+                        fontWeight: FontWeight.w500,
                         fontSize: 11,
                       ),
                     ),
-                    if (widget.messageItem.read)
-                      const Text(
-                        'read',
-                        style: TextStyle(
-                          color: Colors.lime,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11,
-                        ),
-                      ),
-                  ],
-                )
-              ],
-            ),
-          ],
-        ),
+                ],
+              )
+            ],
+          ),
+        ],
       );
 
   Widget imageMessage(
@@ -275,9 +272,6 @@ class _RepliedSenderChatBubbleState extends State<RepliedSenderChatBubble> {
                         ),
                       );
                     },
-                    onLongPress: () {
-                      // MessageBubbleFunctions().showBottom(context, messageItem);
-                    },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6.0),
                       child: CachedNetworkImage(
@@ -326,143 +320,139 @@ class _RepliedSenderChatBubbleState extends State<RepliedSenderChatBubble> {
   Widget voiceMessage(
       {required AppColors appColors, required MessageItem messageItem}) {
     final icon = isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded;
-    return GestureDetector(
-      onLongPress: () {},
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          widget.messageItem.replyingParentMessageType == 'image'
-              ? imageReplyMessage(appColors: appColors)
-              : widget.messageItem.replyingParentMessageType == 'text'
-                  ? textReplyMessage(appColors: appColors)
-                  : voiceReplyMessage(appColors: appColors),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //mic icon
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Iconsax.microphone_2,
-                  size: 25,
-                  color: appColors.primaryColor,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        widget.messageItem.replyingParentMessageType == 'image'
+            ? imageReplyMessage(appColors: appColors)
+            : widget.messageItem.replyingParentMessageType == 'text'
+                ? textReplyMessage(appColors: appColors)
+                : voiceReplyMessage(appColors: appColors),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            //mic icon
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Iconsax.microphone_2,
+                size: 25,
+                color: appColors.primaryColor,
               ),
+            ),
 
-              //slider
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: Column(
-                    children: [
-                      SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: appColors.textColorWhite,
-                          inactiveTrackColor: Colors.grey,
-                          trackHeight: 3.0,
-                          thumbColor: appColors.textColorWhite,
-                          thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 8.0),
-                          overlayColor:
-                              appColors.textColorWhite.withOpacity(.3),
-                          overlayShape: const RoundSliderOverlayShape(
-                              overlayRadius: 14.0),
-                        ),
-                        child: Slider(
-                          min: 0,
-                          max: duraiton.inSeconds.toDouble(),
-                          value: position.inSeconds.toDouble(),
-                          onChanged: (value) async {
-                            final position = Duration(seconds: value.toInt());
-                            await audioPlayer.seek(position);
-
-                            // await audioPlayer.resume();
-                          },
-                        ),
+            //slider
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: Column(
+                  children: [
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: appColors.textColorWhite,
+                        inactiveTrackColor: Colors.grey,
+                        trackHeight: 3.0,
+                        thumbColor: appColors.textColorWhite,
+                        thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 8.0),
+                        overlayColor: appColors.textColorWhite.withOpacity(.3),
+                        overlayShape:
+                            const RoundSliderOverlayShape(overlayRadius: 14.0),
                       ),
-                      if (messageItem.message != '')
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              formatTime(position.inSeconds),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
+                      child: Slider(
+                        min: 0,
+                        max: duraiton.inSeconds.toDouble(),
+                        value: position.inSeconds.toDouble(),
+                        onChanged: (value) async {
+                          final position = Duration(seconds: value.toInt());
+                          await audioPlayer.seek(position);
+
+                          // await audioPlayer.resume();
+                        },
+                      ),
+                    ),
+                    if (messageItem.message != '')
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            formatTime(position.inSeconds),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
                             ),
-                            Text(
-                              formatTime((duraiton - position).inSeconds),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        )
-                    ],
-                  ),
+                          ),
+                          Text(
+                            formatTime((duraiton - position).inSeconds),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
+                      )
+                  ],
                 ),
               ),
+            ),
 
-              //time
-              messageItem.message == ''
-                  ? Container(
-                      width: 25,
-                      height: 25,
-                      margin: const EdgeInsets.only(right: 8.0),
-                      child: const CircularProgressIndicator(
+            //time
+            messageItem.message == ''
+                ? Container(
+                    width: 25,
+                    height: 25,
+                    margin: const EdgeInsets.only(right: 8.0),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1.5,
+                    ),
+                  )
+                : Column(
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          if (isPlaying) {
+                            await audioPlayer.pause();
+                          } else {
+                            await audioPlayer.play(
+                              UrlSource(messageItem.message),
+                            );
+                          }
+                        },
+                        icon: Icon(icon),
                         color: Colors.white,
-                        strokeWidth: 1.5,
+                        iconSize: 30.0,
+                        splashRadius: 20.0,
                       ),
-                    )
-                  : Column(
-                      children: [
-                        IconButton(
-                          onPressed: () async {
-                            if (isPlaying) {
-                              await audioPlayer.pause();
-                            } else {
-                              await audioPlayer.play(
-                                UrlSource(messageItem.message),
-                              );
-                            }
-                          },
-                          icon: Icon(icon),
-                          color: Colors.white,
-                          iconSize: 30.0,
-                          splashRadius: 20.0,
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${widget.messageTime}  ',
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${widget.messageTime}  ',
+                            style: TextStyle(
+                              color: appColors.textColorWhite.withOpacity(.8),
+                              fontSize: 11,
+                            ),
+                          ),
+                          if (widget.messageItem.read)
+                            const Text(
+                              'seen',
                               style: TextStyle(
-                                color: appColors.textColorWhite.withOpacity(.8),
+                                color: Colors.lime,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 11,
                               ),
                             ),
-                            if (widget.messageItem.read)
-                              const Text(
-                                'seen',
-                                style: TextStyle(
-                                  color: Colors.lime,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    )
-            ],
-          ),
-        ],
-      ),
+                        ],
+                      ),
+                    ],
+                  )
+          ],
+        ),
+      ],
     );
   }
 
