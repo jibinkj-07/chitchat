@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/widgets/chat/message_controls.dart';
 import 'package:chitchat/widgets/chat/messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/message_Item.dart';
 
@@ -85,10 +88,55 @@ class _ChatBodyState extends State<ChatBody> {
           ),
 
           //chat controller box
-          MessageControls(
-            senderId: widget.currentUserid,
-            targetId: widget.targetUserid,
-            scrollController: scrollController,
+          StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('Users')
+                .doc(widget.currentUserid)
+                .collection('messages')
+                .doc(widget.targetUserid)
+                .snapshots(),
+            builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.hasData) {
+                bool isReported = false;
+                try {
+                  isReported = snapshot.data!.get('isReported');
+                } catch (e) {
+                  log('error in ${e.toString()}');
+                }
+                return isReported
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: appColors.textColorWhite,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Iconsax.information,
+                              size: 18,
+                              color: appColors.redColor,
+                            ),
+                            const SizedBox(width: 5.0),
+                            Text(
+                              'You can\'t chat with reported users.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: appColors.redColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : MessageControls(
+                        senderId: widget.currentUserid,
+                        targetId: widget.targetUserid,
+                        scrollController: scrollController,
+                      );
+              }
+              return const SizedBox();
+            },
           ),
         ],
       ),

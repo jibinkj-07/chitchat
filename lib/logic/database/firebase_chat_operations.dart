@@ -58,6 +58,7 @@ class FirebaseChatOperations {
           'isNew': false,
           'id': value.id,
           'unread_count': 0,
+          'isReported': false,
         },
         SetOptions(merge: true),
       );
@@ -79,6 +80,7 @@ class FirebaseChatOperations {
           'isNew': true,
           'id': value.id,
           'unread_count': unreadCount + 1,
+          'isReported': false,
         },
         SetOptions(merge: true),
       );
@@ -415,6 +417,7 @@ class FirebaseChatOperations {
         'last_message': 'sending photo',
         'time': time,
         'unread_count': 0,
+        'isReported': false,
       }, SetOptions(merge: true));
 
       //uploading image
@@ -460,6 +463,7 @@ class FirebaseChatOperations {
             'last_message': '🖼️ Photo',
             'time': uploadedTime,
             'unread_count': unreadCount + 1,
+            'isReported': false,
           }, SetOptions(merge: true));
         });
       } catch (e) {
@@ -511,6 +515,7 @@ class FirebaseChatOperations {
         'last_message': 'sending voice',
         'time': time,
         'unread_count': 0,
+        'isReported': false,
       }, SetOptions(merge: true));
 
       //uploading voice
@@ -559,6 +564,7 @@ class FirebaseChatOperations {
             'last_message': '🎙️Voice',
             'time': uploadedTime,
             'unread_count': unreadCount + 1,
+            'isReported': false,
           }, SetOptions(merge: true));
         });
       } catch (e) {

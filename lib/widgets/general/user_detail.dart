@@ -144,7 +144,7 @@ class UserDetail extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           textAlign: TextAlign.center,
                         ),

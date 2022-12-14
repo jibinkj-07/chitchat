@@ -2,10 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:chitchat/logic/database/hive_operations.dart';
 import 'package:chitchat/logic/database/user_model.dart';
+import 'package:chitchat/screens/home_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -410,5 +410,209 @@ class FirebaseOperations {
     String status =
         await database.doc(userId).get().then((value) => value.get('status'));
     return status;
+  }
+
+  Future<void> deleteContact({
+    required BuildContext context,
+    required String currentUserid,
+    required String targetUserid,
+    required bool forAll,
+  }) async {
+    final currentUserFilePath = '$currentUserid$targetUserid';
+    final targetUserFilePath = '$targetUserid$currentUserid';
+    final nav = Navigator.of(context);
+
+    final currentUserChatRef =
+        database.doc(currentUserid).collection('messages').doc(targetUserid);
+    final targetUserChatRef =
+        database.doc(targetUserid).collection('messages').doc(currentUserid);
+//storage bucket ref for image
+    final currentUserImageBucket = FirebaseStorage.instance
+        .ref()
+        .child("Chat Images")
+        .child(currentUserFilePath);
+    final targetUserImageBucket = FirebaseStorage.instance
+        .ref()
+        .child("Chat Images")
+        .child(targetUserFilePath);
+
+//storage bucket ref for voice
+    final currentUserVoiceBucket = FirebaseStorage.instance
+        .ref()
+        .child("Chat Voices")
+        .child(currentUserFilePath);
+    final targetUserVoiceBucket = FirebaseStorage.instance
+        .ref()
+        .child("Chat Voices")
+        .child(targetUserFilePath);
+
+    Future<void> deleteAccountForMe(bool forAll) async {
+      final instance = FirebaseFirestore.instance;
+      final batch = instance.batch();
+      try {
+        final data = await currentUserImageBucket.listAll();
+        for (var item in data.items) {
+          item.delete();
+        }
+      } catch (e) {
+        log('error in deleting account section for remove all images ${e.toString()}');
+      }
+
+      try {
+        final data = await currentUserVoiceBucket.listAll();
+        for (var item in data.items) {
+          item.delete();
+        }
+      } catch (e) {
+        log('error in deleting account section for remove all voices ${e.toString()}');
+      }
+      final collection = currentUserChatRef.collection('chats');
+      var snapshots = await collection.get();
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      await currentUserChatRef.delete();
+
+      if (!forAll) {
+        nav.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => HomeScreen(index: 0),
+            ),
+            (route) => false);
+      }
+    }
+
+    Future<void> deleteAccountForAll() async {
+      deleteAccountForMe(true);
+      final instance = FirebaseFirestore.instance;
+      final batch = instance.batch();
+
+      try {
+        final data = await targetUserImageBucket.listAll();
+        for (var item in data.items) {
+          item.delete();
+        }
+      } catch (e) {
+        log('error in deleting account section for remove all images from target ${e.toString()}');
+      }
+
+      try {
+        final data = await targetUserVoiceBucket.listAll();
+        for (var item in data.items) {
+          item.delete();
+        }
+      } catch (e) {
+        log('error in deleting account section for remove all voices from target ${e.toString()}');
+      }
+
+      final collection = targetUserChatRef.collection('chats');
+      var snapshots = await collection.get();
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+      await targetUserChatRef.delete();
+      nav.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => HomeScreen(index: 0),
+          ),
+          (route) => false);
+    }
+
+//deleting account for me only
+    if (forAll) {
+      await deleteAccountForAll();
+    } else {
+      await deleteAccountForMe(false);
+    }
+  }
+
+  Future<void> reportAccount(
+      {required String targetUserid, required String currentUserid}) async {
+    final currentRef =
+        database.doc(currentUserid).collection('messages').doc(targetUserid);
+    final targetRef =
+        database.doc(targetUserid).collection('messages').doc(currentUserid);
+    final time = DateTime.now();
+
+    database
+        .doc(targetUserid)
+        .collection('usersReported')
+        .doc(currentUserid)
+        .set(
+      {
+        'time': time,
+      },
+      SetOptions(merge: true),
+    );
+
+    database
+        .doc(currentUserid)
+        .collection('blockedUsers')
+        .doc(targetUserid)
+        .set(
+      {
+        'time': time,
+      },
+      SetOptions(merge: true),
+    );
+
+    currentRef.set(
+      {
+        'isReported': true,
+        'time': time,
+        'last_message': 'You reported this account',
+      },
+      SetOptions(merge: true),
+    );
+
+    targetRef.set(
+      {
+        'isReported': true,
+        'time': time,
+        'last_message': 'Blocked your account',
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  Future<void> unBlockAccount(
+      {required String targetUserid, required String currentUserid}) async {
+    final currentRef =
+        database.doc(currentUserid).collection('messages').doc(targetUserid);
+    final targetRef =
+        database.doc(targetUserid).collection('messages').doc(currentUserid);
+    final time = DateTime.now();
+
+    database
+        .doc(targetUserid)
+        .collection('usersReported')
+        .doc(currentUserid)
+        .delete();
+
+    database
+        .doc(currentUserid)
+        .collection('blockedUsers')
+        .doc(targetUserid)
+        .delete();
+
+    currentRef.set(
+      {
+        'isReported': false,
+        'last_message': 'You unblocked this account',
+        'time': time,
+      },
+      SetOptions(merge: true),
+    );
+
+    targetRef.set(
+      {
+        'isReported': false,
+        'last_message': 'Unblocked your account',
+        'time': time,
+      },
+      SetOptions(merge: true),
+    );
   }
 }

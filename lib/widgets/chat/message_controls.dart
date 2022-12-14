@@ -13,6 +13,7 @@ import 'package:chitchat/utils/message_Item.dart';
 import 'package:chitchat/widgets/chat/gallery_preview_picker.dart';
 import 'package:chitchat/widgets/chat/selected_image_preview.dart';
 import 'package:chitchat/widgets/chat/sound_recorder.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

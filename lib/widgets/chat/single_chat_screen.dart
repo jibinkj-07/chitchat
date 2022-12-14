@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/widgets/chat/chat_body.dart';
+import 'package:chitchat/widgets/chat/chat_user_detail_screen.dart';
 import 'package:chitchat/widgets/general/image_previewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -225,56 +226,78 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
             iconSize: 20.0,
             splashRadius: 20.0,
           ),
-          //image
-          ImagePreviewer(
-              targetUserid: targetUserid, width: 40, height: 40, url: url),
-          const SizedBox(width: 5),
-          //name and status
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    name.toString().length > 20
-                        ? Text(
-                            '${name.toString().substring(0, 18)}...',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: appColors.textColorBlack,
-                            ),
-                          )
-                        : Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: appColors.textColorBlack,
-                            ),
-                          ),
-                    if (isVerified)
-                      Icon(
-                        Iconsax.verify5,
-                        color: appColors.primaryColor,
-                        size: 20,
-                      ),
-                  ],
-                ),
-                Text(
-                  status,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: status == 'online'
-                        ? appColors.greenColor
-                        : status == 'away'
-                            ? Colors.orange
-                            : appColors.textColorBlack.withOpacity(.8),
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ChatUserDetailScreen(
+                      currentUserid: currentUserid,
+                      targetUserid: targetUserid,
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
+              child: Row(
+                children: [
+                  //image
+                  ImagePreviewer(
+                      targetUserid: targetUserid,
+                      width: 40,
+                      height: 40,
+                      url: url),
+                  const SizedBox(width: 5),
+                  //name and status
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            name.toString().length > 20
+                                ? Text(
+                                    '${name.toString().substring(0, 18)}...',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: appColors.textColorBlack,
+                                    ),
+                                  )
+                                : Text(
+                                    name,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: appColors.textColorBlack,
+                                    ),
+                                  ),
+                            if (isVerified)
+                              Icon(
+                                Iconsax.verify5,
+                                color: appColors.primaryColor,
+                                size: 20,
+                              ),
+                          ],
+                        ),
+                        Text(
+                          status,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: status == 'online'
+                                ? appColors.greenColor
+                                : status == 'away'
+                                    ? Colors.orange
+                                    : appColors.textColorBlack.withOpacity(.8),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
