@@ -21,6 +21,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../screens/home_screen.dart';
+
 class MessageControls extends StatefulWidget {
   const MessageControls({
     Key? key,
@@ -147,8 +149,14 @@ class _MessageControlsState extends State<MessageControls> {
                 isEmojiPicker = false;
               });
               return false;
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (_) => HomeScreen(index: 0),
+                  ),
+                  (route) => false);
+              return true;
             }
-            return true;
           },
           child: isVoiceMessage
               ? voiceMessageController(

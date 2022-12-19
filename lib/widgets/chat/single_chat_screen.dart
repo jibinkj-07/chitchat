@@ -28,74 +28,64 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => HomeScreen(index: 0),
-            ),
-            (route) => false);
-        return true;
-      },
-      child: Scaffold(
-        body: SafeArea(
-          child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(widget.targetUserid)
-                  .snapshots(),
-              builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                if (snapshot.hasData) {
-                  final name = snapshot.data!.get('name');
-                  final status = snapshot.data!.get('status');
-                  final url = snapshot.data!.get('imageUrl');
-                  final isVerified = snapshot.data!.get('verified');
-                  return Column(
-                    children: [
-                      Material(
-                        color: appColors.textColorWhite,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 0),
-                          //user detail top
-                          child: chatTopBar(
-                            context: context,
-                            currentUserid: widget.currentUserid,
-                            targetUserid: widget.targetUserid,
-                            name: name,
-                            status: status,
-                            url: url,
-                            appColors: appColors,
-                            isVerified: isVerified,
-                          ),
+    return Scaffold(
+      body: SafeArea(
+        child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('Users')
+                .doc(widget.targetUserid)
+                .snapshots(),
+            builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.hasData) {
+                final name = snapshot.data!.get('name');
+                final status = snapshot.data!.get('status');
+                final url = snapshot.data!.get('imageUrl');
+                final isVerified = snapshot.data!.get('verified');
+                return Column(
+                  children: [
+                    Material(
+                      color: appColors.textColorWhite,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 0),
+                        //user detail top
+                        child: chatTopBar(
+                          context: context,
+                          currentUserid: widget.currentUserid,
+                          targetUserid: widget.targetUserid,
+                          name: name,
+                          status: status,
+                          url: url,
+                          appColors: appColors,
+                          isVerified: isVerified,
                         ),
                       ),
-                      Divider(
-                        height: 0,
-                        color: appColors.textColorBlack.withOpacity(.5),
-                        thickness: .5,
-                      ),
+                    ),
+                    Divider(
+                      height: 0,
+                      color: appColors.textColorBlack.withOpacity(.5),
+                      thickness: .5,
+                    ),
 
-                      //chat body
-                      NotificationListener<OverscrollIndicatorNotification>(
-                        onNotification: (overscroll) {
-                          overscroll.disallowIndicator();
-                          return true;
-                        },
-                        child: Expanded(
-                          child: ChatBody(
-                            currentUserid: widget.currentUserid,
-                            targetUserid: widget.targetUserid,
-                            targetName: name,
-                          ),
+                    //chat body
+                    NotificationListener<OverscrollIndicatorNotification>(
+                      onNotification: (overscroll) {
+                        overscroll.disallowIndicator();
+                        return true;
+                      },
+                      child: Expanded(
+                        child: ChatBody(
+                          currentUserid: widget.currentUserid,
+                          targetUserid: widget.targetUserid,
+                          targetName: name,
                         ),
                       ),
-                    ],
-                  );
-                }
-                return const SizedBox();
-              }),
-        ),
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox();
+            }),
       ),
     );
   }
