@@ -53,6 +53,7 @@ class ChatUserDetailScreen extends StatelessWidget {
                 final isVerified = snapshot.data!.get('verified');
                 final joined = snapshot.data!.get('created').toDate();
                 final bio = snapshot.data!.get('bio');
+                final username = snapshot.data!.get('username');
 
                 return SizedBox(
                   width: screen.width,
@@ -87,6 +88,7 @@ class ChatUserDetailScreen extends StatelessWidget {
                                   name: name,
                                   status: status,
                                   url: url,
+                                  username: username,
                                 ),
                                 moreButton(),
                               ],
@@ -148,6 +150,7 @@ class ChatUserDetailScreen extends StatelessWidget {
     required String url,
     required bool isVerified,
     required String name,
+    required String username,
   }) {
     final statusColor = status == 'online'
         ? appColors.greenColor
@@ -183,6 +186,14 @@ class ChatUserDetailScreen extends StatelessWidget {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               overflow: TextOverflow.ellipsis,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            username,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),

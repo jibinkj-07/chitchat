@@ -184,10 +184,9 @@ class _RepliedSenderChatBubbleState extends State<RepliedSenderChatBubble> {
                 '${widget.messageItem.message}   ',
                 style: TextStyle(
                   color: appColors.textColorWhite,
-                  fontSize:
-                      EmojiUtil.hasOnlyEmojis(widget.messageItem.message)
-                          ? 30
-                          : 15,
+                  fontSize: EmojiUtil.hasOnlyEmojis(widget.messageItem.message)
+                      ? 30
+                      : 15,
                 ),
                 textAlign: TextAlign.left,
               ),

@@ -1,4 +1,5 @@
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
+import 'package:chitchat/screens/add_chat_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/chat_functions.dart';
 import 'package:chitchat/widgets/chat/all_chat_search.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:page_transition/page_transition.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -114,8 +116,8 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
       floatingActionButton: isFabExtended
-          ? buildFAB(context, appColors)
-          : buildExtendedFAB(context, appColors),
+          ? buildFAB(context, appColors, currentUserid)
+          : buildExtendedFAB(context, appColors, currentUserid),
     );
   }
 }
@@ -238,13 +240,22 @@ class TopTitle extends StatelessWidget {
 }
 
 //floating button
-Widget buildFAB(BuildContext context, AppColors appColors) => AnimatedContainer(
+Widget buildFAB(BuildContext context, AppColors appColors, String currentId) =>
+    AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.linear,
       width: 50,
       height: 50,
       child: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.push(
+          context,
+          PageTransition(
+            reverseDuration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
+            type: PageTransitionType.bottomToTop,
+            child: AddChatScreen(currentUserid: currentId),
+          ),
+        ),
         backgroundColor: appColors.primaryColor,
         child: const Icon(
           Iconsax.add,
@@ -255,7 +266,8 @@ Widget buildFAB(BuildContext context, AppColors appColors) => AnimatedContainer(
       ),
     );
 
-Widget buildExtendedFAB(BuildContext context, AppColors appColors) =>
+Widget buildExtendedFAB(
+        BuildContext context, AppColors appColors, String currentId) =>
     AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -263,7 +275,15 @@ Widget buildExtendedFAB(BuildContext context, AppColors appColors) =>
       height: 50,
       child: FloatingActionButton.extended(
         backgroundColor: appColors.primaryColor,
-        onPressed: () {},
+        onPressed: () => Navigator.push(
+          context,
+          PageTransition(
+            reverseDuration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
+            type: PageTransitionType.bottomToTop,
+            child: AddChatScreen(currentUserid: currentId),
+          ),
+        ),
         icon: const Icon(
           Iconsax.add,
           size: 25,
