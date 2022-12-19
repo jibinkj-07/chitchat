@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitchat/widgets/general/image_preview.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../logic/database/user_profile.dart';
@@ -214,14 +215,35 @@ class UserDetail extends StatelessWidget {
                                 color: appColors.redColor.withOpacity(.8),
                               ),
                               const SizedBox(width: 5),
-                              Text(
-                                '0 Users reported this account',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.normal,
-                                  color: appColors.redColor.withOpacity(.8),
-                                ),
-                                textAlign: TextAlign.center,
+                              StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection('Users')
+                                    .doc(targetUser.id)
+                                    .collection('usersReported')
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasData) {
+                                    final count = snapshot.data!.docs.length;
+
+                                    final text = count > 1
+                                        ? '$count Users reported this account'
+                                        : count == 1
+                                            ? '1 User reported this account'
+                                            : '0 User reported this account';
+                                    return Text(
+                                      text,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.normal,
+                                        color:
+                                            appColors.redColor.withOpacity(.8),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    );
+                                  }
+                                  return const SizedBox();
+                                },
                               ),
                             ],
                           ),

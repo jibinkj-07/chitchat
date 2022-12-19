@@ -283,6 +283,7 @@ class FirebaseChatOperations {
         'time': DateTime.now(),
         'isNew': false,
         'id': '',
+        'unread_count': 0,
       },
       SetOptions(merge: true),
     );
@@ -302,11 +303,6 @@ class FirebaseChatOperations {
           .child(filePathSender)
           .listAll();
 
-      // final targetImageList = await FirebaseStorage.instance
-      //     .ref()
-      //     .child("Chat Images")
-      //     .child(filePathTarget)
-      //     .listAll();
       for (var item in senderImageList.items) {
         item.delete();
       }
@@ -373,6 +369,7 @@ class FirebaseChatOperations {
         'time': DateTime.now(),
         'isNew': false,
         'id': '',
+        'unread_count': 0,
       },
       SetOptions(merge: true),
     );

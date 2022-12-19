@@ -147,14 +147,14 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
             "Clear chat history",
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 15,
             ),
           ),
           content: const Text(
             "Clearing chat will delete all your messages permanently.",
             style: TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 14,
+              fontSize: 12,
             ),
           ),
           actions: [

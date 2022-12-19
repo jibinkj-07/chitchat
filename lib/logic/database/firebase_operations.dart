@@ -560,18 +560,24 @@ class FirebaseOperations {
 
     currentRef.set(
       {
-        'isReported': true,
-        'time': time,
         'last_message': 'You reported this account',
+        'time': time,
+        'isNew': false,
+        'id': '',
+        'unread_count': 0,
+        'isReported': true,
       },
       SetOptions(merge: true),
     );
 
     targetRef.set(
       {
-        'isReported': true,
-        'time': time,
         'last_message': 'Blocked your account',
+        'time': time,
+        'isNew': false,
+        'id': '',
+        'unread_count': 0,
+        'isReported': true,
       },
       SetOptions(merge: true),
     );
@@ -599,18 +605,24 @@ class FirebaseOperations {
 
     currentRef.set(
       {
-        'isReported': false,
         'last_message': 'You unblocked this account',
         'time': time,
+        'isNew': false,
+        'id': '',
+        'unread_count': 0,
+        'isReported': false,
       },
       SetOptions(merge: true),
     );
 
     targetRef.set(
       {
-        'isReported': false,
         'last_message': 'Unblocked your account',
         'time': time,
+        'isNew': false,
+        'id': '',
+        'unread_count': 0,
+        'isReported': false,
       },
       SetOptions(merge: true),
     );

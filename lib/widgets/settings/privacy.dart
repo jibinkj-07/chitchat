@@ -1,3 +1,5 @@
+import 'package:chitchat/widgets/settings/privacy/blocked_users.dart';
+import 'package:chitchat/widgets/settings/privacy/users_reported.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../utils/app_colors.dart';
@@ -14,7 +16,6 @@ class Privacy extends StatelessWidget {
     AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SizedBox(
           width: screen.width,
@@ -79,20 +80,11 @@ class Privacy extends StatelessWidget {
                   const SizedBox(height: 10),
                   //buttons
                   InkWell(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     reverseDuration: const Duration(milliseconds: 300),
-                      //     duration: const Duration(milliseconds: 300),
-                      //     type: PageTransitionType.rightToLeft,
-                      //     child: Account(
-                      //       currentEmail: userDetail[0].email,
-                      //       id: userDetail[0].id,
-                      //     ),
-                      //   ),
-                      // );
-                    },
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => BlockedUsers(currentUserid: id),
+                      ),
+                    ),
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(
                       padding: const EdgeInsets.all(15),
@@ -118,20 +110,11 @@ class Privacy extends StatelessWidget {
                   ),
 
                   InkWell(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   PageTransition(
-                      //     reverseDuration: const Duration(milliseconds: 300),
-                      //     duration: const Duration(milliseconds: 300),
-                      //     type: PageTransitionType.rightToLeft,
-                      //     child: Account(
-                      //       currentEmail: userDetail[0].email,
-                      //       id: userDetail[0].id,
-                      //     ),
-                      //   ),
-                      // );
-                    },
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => UsersReported(currentUserid: id),
+                      ),
+                    ),
                     borderRadius: BorderRadius.circular(8.0),
                     child: Container(
                       padding: const EdgeInsets.all(15),
