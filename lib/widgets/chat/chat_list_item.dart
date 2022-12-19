@@ -41,13 +41,14 @@ class ChatListItem extends StatelessWidget {
           final userDetail = snapshot.data;
 
           return ListTile(
-            onTap: () => Navigator.of(context).push(
+            onTap: () => Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: (_) => SingleChatScreen(
                   targetUserid: targetUserid,
                   currentUserid: currentUserid,
                 ),
               ),
+              (route) => false,
             ),
             leading: Stack(
               children: [

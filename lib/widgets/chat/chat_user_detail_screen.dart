@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:chitchat/widgets/chat/single_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -24,83 +25,96 @@ class ChatUserDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
     final screen = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: appColors.textColorWhite.withAlpha(240),
-      body: SafeArea(
-        child: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('Users')
-              .doc(targetUserid)
-              .snapshots(),
-          builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.hasData) {
-              final name = snapshot.data!.get('name');
-              final status = snapshot.data!.get('status');
-              final url = snapshot.data!.get('imageUrl');
-              final isVerified = snapshot.data!.get('verified');
-              final joined = snapshot.data!.get('created').toDate();
-              final bio = snapshot.data!.get('bio');
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => SingleChatScreen(
+                currentUserid: currentUserid,
+                targetUserid: targetUserid,
+              ),
+            ),
+            (route) => false);
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: appColors.textColorWhite.withAlpha(240),
+        body: SafeArea(
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('Users')
+                .doc(targetUserid)
+                .snapshots(),
+            builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.hasData) {
+                final name = snapshot.data!.get('name');
+                final status = snapshot.data!.get('status');
+                final url = snapshot.data!.get('imageUrl');
+                final isVerified = snapshot.data!.get('verified');
+                final joined = snapshot.data!.get('created').toDate();
+                final bio = snapshot.data!.get('bio');
 
-              return SizedBox(
-                width: screen.width,
-                height: screen.height,
-                child: NotificationListener<OverscrollIndicatorNotification>(
-                  onNotification: (overscroll) {
-                    overscroll.disallowIndicator();
-                    return true;
-                  },
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: screen.width,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5.0, vertical: 15.0),
-                          decoration: BoxDecoration(
-                            color: appColors.textColorWhite,
+                return SizedBox(
+                  width: screen.width,
+                  height: screen.height,
+                  child: NotificationListener<OverscrollIndicatorNotification>(
+                    onNotification: (overscroll) {
+                      overscroll.disallowIndicator();
+                      return true;
+                    },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: screen.width,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5.0, vertical: 15.0),
+                            decoration: BoxDecoration(
+                              color: appColors.textColorWhite,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                topBar(context: context, screen: screen),
+                                userDetails(
+                                  context: context,
+                                  id: targetUserid,
+                                  appColors: appColors,
+                                  screen: screen,
+                                  isVerified: isVerified,
+                                  name: name,
+                                  status: status,
+                                  url: url,
+                                ),
+                                moreButton(),
+                              ],
+                            ),
                           ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              topBar(context: context, screen: screen),
-                              userDetails(
-                                context: context,
-                                id: targetUserid,
-                                appColors: appColors,
-                                screen: screen,
-                                isVerified: isVerified,
-                                name: name,
-                                status: status,
-                                url: url,
-                              ),
-                              moreButton(),
-                            ],
-                          ),
-                        ),
-                        userBio(
-                          appColors: appColors,
-                          screen: screen,
-                          bio: bio,
-                        ),
-                        joinedInfo(
-                          appColors: appColors,
-                          screen: screen,
-                          joined: joined,
-                        ),
-                        buttons(
+                          userBio(
                             appColors: appColors,
                             screen: screen,
-                            context: context)
-                      ],
+                            bio: bio,
+                          ),
+                          joinedInfo(
+                            appColors: appColors,
+                            screen: screen,
+                            joined: joined,
+                          ),
+                          buttons(
+                              appColors: appColors,
+                              screen: screen,
+                              context: context)
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }
-            return const SizedBox();
-          },
+                );
+              }
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );
@@ -111,7 +125,14 @@ class ChatUserDetailScreen extends StatelessWidget {
     required Size screen,
   }) {
     return IconButton(
-      onPressed: () => Navigator.of(context).pop(),
+      onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => SingleChatScreen(
+              currentUserid: currentUserid,
+              targetUserid: targetUserid,
+            ),
+          ),
+          (route) => false),
       icon: const Icon(Icons.arrow_back_ios_new_rounded),
       iconSize: 20.0,
       splashRadius: 20.0,
@@ -356,48 +377,51 @@ class ChatUserDetailScreen extends StatelessWidget {
             builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 bool isReported = false;
+                bool isReportedByMe = true;
                 try {
                   isReported = snapshot.data!.get('isReported');
+                  isReportedByMe = snapshot.data!.get('isReportedByMe');
                 } catch (e) {
                   log('error in ${e.toString()}');
                 }
                 return isReported
-                    ? Material(
-                        color: appColors.textColorWhite,
-                        child: InkWell(
-                          onTap: () {
-                            FirebaseOperations().unBlockAccount(
-                              targetUserid: targetUserid,
-                              currentUserid: currentUserid,
-                            );
-                            Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Iconsax.slash,
-                                  size: 20,
-                                  color:
-                                      appColors.textColorBlack.withOpacity(.8),
+                    ? isReportedByMe
+                        ? Material(
+                            color: appColors.textColorWhite,
+                            child: InkWell(
+                              onTap: () {
+                                FirebaseOperations().unBlockAccount(
+                                  targetUserid: targetUserid,
+                                  currentUserid: currentUserid,
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(15),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Iconsax.slash,
+                                      size: 20,
+                                      color: appColors.textColorBlack
+                                          .withOpacity(.8),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    Text(
+                                      'Unblock',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: appColors.textColorBlack,
+                                      ),
+                                    ),
+                                    //arrow icon
+                                  ],
                                 ),
-                                const SizedBox(width: 15),
-                                Text(
-                                  'Unblock',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: appColors.textColorBlack,
-                                  ),
-                                ),
-                                //arrow icon
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      )
+                          )
+                        : const SizedBox()
                     : Material(
                         color: appColors.textColorWhite,
                         child: InkWell(
