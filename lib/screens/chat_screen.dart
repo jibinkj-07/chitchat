@@ -1,6 +1,7 @@
 import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/utils/app_colors.dart';
 import 'package:chitchat/utils/chat_functions.dart';
+import 'package:chitchat/widgets/chat/all_chat_search.dart';
 import 'package:chitchat/widgets/chat/chat_list_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,7 +31,11 @@ class _ChatScreenState extends State<ChatScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            TopTitle(screen: screen, appColors: appColors),
+            TopTitle(
+              screen: screen,
+              appColors: appColors,
+              currentUserid: currentUserid,
+            ),
             Divider(
               height: 0,
               color: appColors.textColorBlack.withOpacity(.3),
@@ -139,10 +144,12 @@ class TopTitle extends StatelessWidget {
     Key? key,
     required this.screen,
     required this.appColors,
+    required this.currentUserid,
   }) : super(key: key);
 
   final Size screen;
   final AppColors appColors;
+  final String currentUserid;
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +216,13 @@ class TopTitle extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AllChatSearch(
+                      currentUserid: currentUserid,
+                    ),
+                  ),
+                ),
                 icon: const Icon(
                   Iconsax.search_normal_1,
                 ),

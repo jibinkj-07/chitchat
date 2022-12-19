@@ -34,6 +34,21 @@ class FirebaseOperations {
     return allData;
   }
 
+  //READING ALL CHAT USERS
+  Future<List<Map<String, dynamic>>> getChatUsers(
+      {required currentUserid}) async {
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot =
+        await database.doc(currentUserid).collection('messages').get();
+    // Get data from docs and convert map to List
+    final allData = querySnapshot.docs
+        .map((data) => {
+              'targetUserid': data.id,
+            })
+        .toList();
+    return allData;
+  }
+
   //METHOD TO AUTHENTICATION THE USER
   Future<String> authenticateUser({required String userEmail}) async {
     try {
