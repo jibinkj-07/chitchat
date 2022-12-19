@@ -1,3 +1,4 @@
+import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/widgets/general/user_detail.dart';
 import 'package:chitchat/widgets/settings/security/password_reset.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -122,9 +123,10 @@ class Security extends StatelessWidget {
 
               InkWell(
                 onTap: () async {
-                  FirebaseAuth.instance.signOut();
+                  FirebaseOperations()
+                      .changeStatus(userId: id, status: 'offline');
                   await deleteAccountHive();
-
+                  await FirebaseAuth.instance.signOut();
                   navigator.pushNamedAndRemoveUntil('/auth', (route) => false);
                 },
                 splashColor: appColors.redColor.withOpacity(.2),

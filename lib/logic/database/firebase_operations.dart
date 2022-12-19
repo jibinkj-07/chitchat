@@ -117,6 +117,7 @@ class FirebaseOperations {
                 'verified': false,
                 'status': 'online',
                 'created': createdTime,
+                'chat_count':0,
               },
               SetOptions(merge: true),
             );
@@ -146,7 +147,7 @@ class FirebaseOperations {
               'verified': false,
               'bio': 'Hey want to chat? ping me',
               'status': 'online',
-              'created': createdTime,
+              'created': createdTime,'chat_count':0,
             },
             SetOptions(merge: true),
           );

@@ -28,6 +28,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = AppColors();
+
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder(

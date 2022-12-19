@@ -8,6 +8,37 @@ class FirebaseChatOperations {
   final database = FirebaseFirestore.instance.collection('Users');
   //-----------------CHAT OPERATIONS-----------------------
 
+  void incrementChatCount(
+      {required String targetId, required String senderId}) {
+    final targetFolder =
+        database.doc(targetId).collection("messages").doc(senderId);
+    database.doc(targetId).get().then((value) {
+      targetFolder.get().then((data) {
+        log('called increment function ${data.get('unread_count')}');
+        if (data.get('isNew') && data.get('unread_count') == 1) {
+          database.doc(targetId).set(
+            {
+              'chat_count': value.get('chat_count') + 1,
+            },
+            SetOptions(merge: true),
+          );
+        }
+      });
+    });
+  }
+
+  void decrementChatCount({required String currentId}) {
+    //changing chat_count for target user
+    database.doc(currentId).get().then((value) {
+      database.doc(currentId).set(
+        {
+          'chat_count': value.get('chat_count') - 1,
+        },
+        SetOptions(merge: true),
+      );
+    });
+  }
+
   void sendMessage({
     required String senderId,
     required String targetId,
@@ -65,7 +96,6 @@ class FirebaseChatOperations {
       );
       int unreadCount = 0;
       //getting unread message count from  target end
-
       unreadCount = await targetFolder.get().then((value) {
         if (value.exists) {
           return value.get('unread_count');
@@ -85,7 +115,9 @@ class FirebaseChatOperations {
           'isReportedByMe': false,
         },
         SetOptions(merge: true),
-      );
+      ).then((_) {
+        incrementChatCount(targetId: targetId, senderId: senderId);
+      });
     });
   }
 
@@ -93,15 +125,13 @@ class FirebaseChatOperations {
     final ref = database.doc(senderId).collection('messages').doc(targetId);
     ref.get().then((value) {
       if (value.exists) {
-        if (value.get('isNew')) {
-          ref.set(
-            {
-              'isNew': false,
-              'unread_count': 0,
-            },
-            SetOptions(merge: true),
-          );
-        }
+        ref.set(
+          {
+            'isNew': false,
+            'unread_count': 0,
+          },
+          SetOptions(merge: true),
+        );
       }
     });
   }
@@ -457,6 +487,21 @@ class FirebaseChatOperations {
           } on Exception catch (e) {
             log('error in sending image ${e.toString()}');
           }
+
+          //changing chat_count for target user
+          database.doc(targetId).get().then((value) {
+            targetEnd.get().then((data) {
+              if (data.get('unread_count') == 0) {
+                database.doc(targetId).set(
+                  {
+                    'chat_count': value.get('chat_count') + 1,
+                  },
+                  SetOptions(merge: true),
+                );
+              }
+            });
+          });
+
           targetEnd.set({
             'id': id,
             'isNew': true,
@@ -465,7 +510,9 @@ class FirebaseChatOperations {
             'unread_count': unreadCount + 1,
             'isReported': false,
             'isReportedByMe': false,
-          }, SetOptions(merge: true));
+          }, SetOptions(merge: true)).then((_) {
+            incrementChatCount(targetId: targetId, senderId: senderId);
+          });
         });
       } catch (e) {
         log('error on uploading image ${e.toString()}');
@@ -560,6 +607,7 @@ class FirebaseChatOperations {
           } on Exception catch (e) {
             log('error in sending voice ${e.toString()}');
           }
+
           targetEnd.set({
             'id': id,
             'isNew': true,
@@ -568,7 +616,9 @@ class FirebaseChatOperations {
             'unread_count': unreadCount + 1,
             'isReported': false,
             'isReportedByMe': false,
-          }, SetOptions(merge: true));
+          }, SetOptions(merge: true)).then((_) {
+            incrementChatCount(targetId: targetId, senderId: senderId);
+          });
         });
       } catch (e) {
         log('error on uploading voice on target end ${e.toString()}');

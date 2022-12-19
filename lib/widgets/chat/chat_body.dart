@@ -79,6 +79,20 @@ class _ChatBodyState extends State<ChatBody> {
                       targetId: widget.targetUserid,
                     );
 
+                    FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(widget.currentUserid)
+                        .collection('messages')
+                        .doc(widget.targetUserid)
+                        .get()
+                        .then((value) {
+                      if (value.get('isNew')) {
+                        log('called decrement');
+                        FirebaseChatOperations().decrementChatCount(
+                            currentId: widget.currentUserid);
+                      }
+                    });
+
                     return messages(snapshot: snapshot);
                   }
                 }

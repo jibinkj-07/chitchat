@@ -2,6 +2,7 @@ import 'package:chitchat/logic/database/firebase_operations.dart';
 import 'package:chitchat/screens/find_friends_screen.dart';
 import 'package:chitchat/screens/profile_screen.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -76,89 +77,109 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     AppColors appColors = AppColors();
     //calling hive method to get user detail
     getUserDetailHive();
-    return Scaffold(
-      body: SafeArea(
-        child: pages[currentIndex]['page'],
-      ),
-      bottomNavigationBar: CustomNavigationBar(
-        backgroundColor: Colors.white,
-        iconSize: 28.0,
-        selectedColor: appColors.primaryColor,
-        strokeColor: appColors.primaryColor,
-        items: [
-          CustomNavigationBarItem(
-            icon: const Icon(CupertinoIcons.bubble_left_bubble_right),
-            selectedIcon:
-                const Icon(CupertinoIcons.bubble_left_bubble_right_fill),
-            showBadge: true,
-            title: Text(
-              'Chats',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: appColors.textColorBlack.withOpacity(.6),
-              ),
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+            body: SafeArea(
+              child: pages[currentIndex]['page'],
             ),
-            selectedTitle: Text(
-              'Chats',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: appColors.primaryColor,
-              ),
+            bottomNavigationBar: CustomNavigationBar(
+              backgroundColor: Colors.white,
+              iconSize: 28.0,
+              selectedColor: appColors.primaryColor,
+              strokeColor: appColors.primaryColor,
+              items: [
+                CustomNavigationBarItem(
+                  icon: const Icon(CupertinoIcons.bubble_left_bubble_right),
+                  selectedIcon:
+                      const Icon(CupertinoIcons.bubble_left_bubble_right_fill),
+                  showBadge:
+                      snapshot.data!.get('chat_count') == 0 ? false : true,
+                  title: Text(
+                    'Chats',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: appColors.textColorBlack.withOpacity(.6),
+                    ),
+                  ),
+                  selectedTitle: Text(
+                    'Chats',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: appColors.primaryColor,
+                    ),
+                  ),
+                  badgeCount: snapshot.data!.get('chat_count'),
+                ),
+                CustomNavigationBarItem(
+                  icon: const Icon(CupertinoIcons.person_2_square_stack),
+                  selectedIcon:
+                      const Icon(CupertinoIcons.person_2_square_stack_fill),
+                  title: Text(
+                    'Friends',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: appColors.textColorBlack.withOpacity(.6),
+                    ),
+                  ),
+                  selectedTitle: Text(
+                    'Friends',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: appColors.primaryColor,
+                    ),
+                  ),
+                ),
+                CustomNavigationBarItem(
+                  icon: const Icon(CupertinoIcons.person),
+                  selectedIcon: const Icon(CupertinoIcons.person_fill),
+                  title: Text(
+                    'Profile',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: appColors.textColorBlack.withOpacity(.6),
+                    ),
+                  ),
+                  selectedTitle: Text(
+                    'Profile',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+              ],
+              currentIndex: currentIndex,
+              onTap: (index) {
+                setState(
+                  () {
+                    currentIndex = index;
+                  },
+                );
+              },
             ),
-            badgeCount: 4,
-          ),
-          CustomNavigationBarItem(
-            icon: const Icon(CupertinoIcons.person_2_square_stack),
-            selectedIcon: const Icon(CupertinoIcons.person_2_square_stack_fill),
-            title: Text(
-              'Friends',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: appColors.textColorBlack.withOpacity(.6),
-              ),
-            ),
-            selectedTitle: Text(
-              'Friends',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: appColors.primaryColor,
-              ),
-            ),
-          ),
-          CustomNavigationBarItem(
-            icon: const Icon(CupertinoIcons.person),
-            selectedIcon: const Icon(CupertinoIcons.person_fill),
-            title: Text(
-              'Profile',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: appColors.textColorBlack.withOpacity(.6),
-              ),
-            ),
-            selectedTitle: Text(
-              'Profile',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        ],
-        currentIndex: currentIndex,
-        onTap: (index) {
-          setState(
-            () {
-              currentIndex = index;
-            },
           );
-        },
-      ),
+        }
+        return Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(
+              color: appColors.primaryColor,
+              strokeWidth: 2.0,
+            ),
+          ),
+        );
+      },
     );
   }
 }
