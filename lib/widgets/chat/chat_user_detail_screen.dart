@@ -8,6 +8,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../logic/database/firebase_chat_operations.dart';
+import '../general/image_preview.dart';
 import '../general/image_previewer.dart';
 
 class ChatUserDetailScreen extends StatelessWidget {
@@ -65,6 +66,8 @@ class ChatUserDetailScreen extends StatelessWidget {
                             children: [
                               topBar(context: context, screen: screen),
                               userDetails(
+                                context: context,
+                                id: targetUserid,
                                 appColors: appColors,
                                 screen: screen,
                                 isVerified: isVerified,
@@ -116,6 +119,8 @@ class ChatUserDetailScreen extends StatelessWidget {
   }
 
   Widget userDetails({
+    required BuildContext context,
+    required String id,
     required Size screen,
     required AppColors appColors,
     required String status,
@@ -132,11 +137,23 @@ class ChatUserDetailScreen extends StatelessWidget {
       // width: screen.width,
       child: Column(
         children: [
-          ImagePreviewer(
-            targetUserid: targetUserid,
-            width: 120,
-            height: 120,
-            url: url,
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ImagePreview(
+                  id: id,
+                  url: url,
+                  title: 'Profile Photo',
+                  isEditable: false,
+                ),
+              ),
+            ),
+            child: ImagePreviewer(
+              targetUserid: targetUserid,
+              width: 120,
+              height: 120,
+              url: url,
+            ),
           ),
           const SizedBox(height: 5.0),
           Text(
