@@ -68,52 +68,47 @@ class _ChatScreenState extends State<ChatScreen> {
                   return true;
                 },
                 child: Expanded(
-                  child: ListView.builder(itemBuilder: (ctx, i) {
-                    return ListTile(
-                      title: Text('user $i'),
-                    );
-                  }),
-                  // child: StreamBuilder(
-                  //   stream: FirebaseFirestore.instance
-                  //       .collection('Users')
-                  //       .doc(currentUserid)
-                  //       .collection('messages')
-                  //       .orderBy('time', descending: true)
-                  //       .snapshots(),
-                  //   builder: (ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  //     if (snapshot.hasData) {
-                  //       if (snapshot.data!.docs.isNotEmpty) {
-                  //         return ListView.builder(
-                  //           physics: const BouncingScrollPhysics(),
-                  //           itemCount: snapshot.data!.docs.length,
-                  //           itemBuilder: (ctx, i) {
-                  //             final lstMsg = snapshot.data!.docs[i]
-                  //                 .get('last_message')
-                  //                 .toString();
-                  //             final isNew = snapshot.data!.docs[i].get('isNew');
-                  //             final timeFromDb =
-                  //                 snapshot.data!.docs[i].get('time').toDate();
-                  //             final unreadCount =
-                  //                 snapshot.data!.docs[i].get('unread_count');
-                  //             final time = ChatFuntions(time: timeFromDb)
-                  //                 .formattedTime();
-                  //             return ChatListItem(
-                  //               screen: screen,
-                  //               currentUserid: currentUserid,
-                  //               isNew: isNew,
-                  //               lastMessage: lstMsg,
-                  //               targetUserid: snapshot.data!.docs[i].id,
-                  //               time: time,
-                  //               unreadCount: unreadCount,
-                  //             );
-                  //           },
-                  //         );
-                  //       }
-                  //       return emptyChatList(context, appColors);
-                  //     }
-                  //     return const SizedBox();
-                  //   },
-                  // ),
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(currentUserid)
+                        .collection('messages')
+                        .orderBy('time', descending: true)
+                        .snapshots(),
+                    builder: (ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data!.docs.isNotEmpty) {
+                          return ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (ctx, i) {
+                              final lstMsg = snapshot.data!.docs[i]
+                                  .get('last_message')
+                                  .toString();
+                              final isNew = snapshot.data!.docs[i].get('isNew');
+                              final timeFromDb =
+                                  snapshot.data!.docs[i].get('time').toDate();
+                              final unreadCount =
+                                  snapshot.data!.docs[i].get('unread_count');
+                              final time = ChatFuntions(time: timeFromDb)
+                                  .formattedTime();
+                              return ChatListItem(
+                                screen: screen,
+                                currentUserid: currentUserid,
+                                isNew: isNew,
+                                lastMessage: lstMsg,
+                                targetUserid: snapshot.data!.docs[i].id,
+                                time: time,
+                                unreadCount: unreadCount,
+                              );
+                            },
+                          );
+                        }
+                        return emptyChatList(context, appColors);
+                      }
+                      return const SizedBox();
+                    },
+                  ),
                 ),
               ),
             ),
