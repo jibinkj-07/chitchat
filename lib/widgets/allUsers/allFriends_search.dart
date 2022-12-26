@@ -159,7 +159,7 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                         MaterialPageRoute(
                                           builder: (_) => UserDetail(
                                             targetUser: user,
-                                            currentUserid:widget. currentUserid,
+                                            currentUserid: widget.currentUserid,
                                           ),
                                         ),
                                       );
@@ -170,8 +170,13 @@ class _AllFriendsSearchState extends State<AllFriendsSearch> {
                                             child: Container(
                                               width: 50,
                                               height: 50,
-                                              decoration: const BoxDecoration(
+                                              decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  width: .5,
+                                                  color: Colors.grey
+                                                      .withOpacity(.5),
+                                                ),
                                               ),
                                               child: ClipOval(
                                                 child: Image.asset(

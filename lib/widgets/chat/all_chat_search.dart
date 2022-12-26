@@ -127,119 +127,124 @@ class _AllChatSearchState extends State<AllChatSearch> {
                 return true;
               },
               child: Expanded(
-                child: allUsers.isNotEmpty
-                    ? ListView.builder(
-                        itemBuilder: (context, index) {
-                          // return ChatFriendsDetails(
-                          //     targetid: allUsers[index]['targetUserid']);
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: ListTile(
-                              onTap: () {
-                                // UserProfile user = UserProfile(
-                                //   id: allUsers[index]['id'],
-                                //   name: allUsers[index]['name'],
-                                //   username: allUsers[index]['username'],
-                                //   status: allUsers[index]['status'],
-                                //   isVerified: allUsers[index]['verified'],
-                                //   bio: allUsers[index]['bio'],
-                                //   imageUrl: allUsers[index]['imageUrl'],
-                                // );
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => SingleChatScreen(
-                                      targetUserid: allUsers[index]['id'],
-                                      currentUserid: widget.currentUserid,
-                                    ),
-                                  ),
-                                );
-                              },
-                              leading: allUsers[index]['imageUrl'] == ''
-                                  ? Hero(
-                                      tag: allUsers[index]['id'],
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: ClipOval(
-                                          child: Image.asset(
-                                            'assets/images/profile.png',
-                                            fit: BoxFit.contain,
-                                          ),
+                child: query == ''
+                    ? const SizedBox()
+                    : allUsers.isNotEmpty
+                        ? ListView.builder(
+                            itemBuilder: (context, index) {
+                              // return ChatFriendsDetails(
+                              //     targetid: allUsers[index]['targetUserid']);
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => SingleChatScreen(
+                                          targetUserid: allUsers[index]['id'],
+                                          currentUserid: widget.currentUserid,
                                         ),
                                       ),
-                                    )
-                                  : Hero(
-                                      tag: allUsers[index]['id'],
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            width: .5,
-                                            color: Colors.grey,
+                                    );
+                                  },
+                                  leading: allUsers[index]['imageUrl'] == ''
+                                      ? Hero(
+                                          tag: allUsers[index]['id'],
+                                          child: Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                width: .5,
+                                                color:
+                                                    Colors.grey.withOpacity(.5),
+                                              ),
+                                            ),
+                                            child: ClipOval(
+                                              child: Image.asset(
+                                                'assets/images/profile.png',
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        child: ClipOval(
-                                          child: CachedNetworkImage(
-                                            imageUrl: allUsers[index]
-                                                ['imageUrl'],
-                                            progressIndicatorBuilder: (context,
-                                                    url, downloadProgress) =>
-                                                CircularProgressIndicator(
-                                                    color: AppColors()
-                                                        .primaryColor,
-                                                    value: downloadProgress
-                                                        .progress),
-                                            errorWidget:
-                                                (context, url, error) => Icon(
-                                              Icons.error,
-                                              color: AppColors().redColor,
+                                        )
+                                      : Hero(
+                                          tag: allUsers[index]['id'],
+                                          child: Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                width: .5,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            child: ClipOval(
+                                              child: CachedNetworkImage(
+                                                imageUrl: allUsers[index]
+                                                    ['imageUrl'],
+                                                progressIndicatorBuilder:
+                                                    (context, url,
+                                                            downloadProgress) =>
+                                                        CircularProgressIndicator(
+                                                            color: AppColors()
+                                                                .primaryColor,
+                                                            value:
+                                                                downloadProgress
+                                                                    .progress),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(
+                                                  Icons.error,
+                                                  color: AppColors().redColor,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                              title: Row(
-                                children: [
-                                  allUsers[index]['name'].toString().length > 30
-                                      ? Text(
-                                          '${allUsers[index]['name'].toString().substring(0, 28)}..',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )
-                                      : Text(
-                                          allUsers[index]['name'],
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                  title: Row(
+                                    children: [
+                                      allUsers[index]['name']
+                                                  .toString()
+                                                  .length >
+                                              30
+                                          ? Text(
+                                              '${allUsers[index]['name'].toString().substring(0, 28)}..',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            )
+                                          : Text(
+                                              allUsers[index]['name'],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                      if (allUsers[index]['verified'])
+                                        Icon(
+                                          Iconsax.verify5,
+                                          color: AppColors().primaryColor,
+                                          size: 20,
                                         ),
-                                  if (allUsers[index]['verified'])
-                                    Icon(
-                                      Iconsax.verify5,
-                                      color: AppColors().primaryColor,
-                                      size: 20,
-                                    ),
-                                ],
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount: allUsers.length)
+                        : query.trim() == ''
+                            ? const SizedBox()
+                            : Text(
+                                "No friends found with '$query'",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        itemCount: allUsers.length)
-                    : query.trim() == ''
-                        ? const SizedBox()
-                        : Text(
-                            "No friends found with '$query'",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
               ),
             )
           ],

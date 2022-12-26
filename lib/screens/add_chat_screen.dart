@@ -141,22 +141,28 @@ class _AddChatScreenState extends State<AddChatScreen> {
           ? ListView.builder(
               itemBuilder: (c, index) {
                 return ListTile(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => SingleChatScreen(
-                        targetUserid: allUsers[index]['id'],
-                        currentUserid: widget.currentUserid,
-                      ),
-                    ),
-                  ),
+                  onTap: () => widget.currentUserid == allUsers[index]['id']
+                      ? null
+                      : Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => SingleChatScreen(
+                              targetUserid: allUsers[index]['id'],
+                              currentUserid: widget.currentUserid,
+                            ),
+                          ),
+                        ),
                   leading: allUsers[index]['imageUrl'] == ''
                       ? Hero(
                           tag: allUsers[index]['id'],
                           child: Container(
                             width: 50,
                             height: 50,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                width: .5,
+                                color: Colors.grey.withOpacity(.5),
+                              ),
                             ),
                             child: ClipOval(
                               child: Image.asset(
@@ -196,21 +202,29 @@ class _AddChatScreenState extends State<AddChatScreen> {
                         ),
                   title: Row(
                     children: [
-                      allUsers[index]['name'].toString().length > 30
-                          ? Text(
-                              '${allUsers[index]['name'].toString().substring(0, 28)}..',
-                              style: const TextStyle(
+                      widget.currentUserid == allUsers[index]['id']
+                          ? const Text(
+                              'You',
+                              style: TextStyle(
                                 fontSize: 15,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
                               ),
                             )
-                          : Text(
-                              allUsers[index]['name'],
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                          : allUsers[index]['name'].toString().length > 30
+                              ? Text(
+                                  '${allUsers[index]['name'].toString().substring(0, 28)}..',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              : Text(
+                                  allUsers[index]['name'],
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                       if (allUsers[index]['verified'])
                         Icon(
                           Iconsax.verify5,
@@ -221,9 +235,11 @@ class _AddChatScreenState extends State<AddChatScreen> {
                   ),
                   subtitle: Text(
                     allUsers[index]['bio'],
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: widget.currentUserid == allUsers[index]['id']
+                          ? FontWeight.bold
+                          : FontWeight.w500,
                     ),
                   ),
                 );

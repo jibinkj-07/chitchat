@@ -58,8 +58,12 @@ class UserSettings extends StatelessWidget {
                               ? Container(
                                   width: 150,
                                   height: 150,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    border: Border.all(
+                                      width: .5,
+                                      color: Colors.grey.withOpacity(.5),
+                                    ),
                                   ),
                                   child: ClipOval(
                                     child: Image.asset(

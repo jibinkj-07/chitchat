@@ -168,8 +168,8 @@ class _AccountDeletionState extends State<AccountDeletion> {
                                       color: appColors.primaryColor,
                                       icon: Icon(
                                         isVisible
-                                            ? Icons.lock_outline
-                                            : Icons.lock_open,
+                                            ? Icons.visibility_off_rounded
+                                            : Icons.visibility_rounded,
                                         // size: 20,
                                         // color: appColors.primaryColor,
                                       ),

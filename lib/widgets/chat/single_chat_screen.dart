@@ -118,12 +118,14 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
                     // backgroundColor: appColors.primaryColor,
                   ),
                 ),
-                const SizedBox(width: 10.0),
-                const Text(
-                  'Clearing messages',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
+                const Expanded(
+                  child: Text(
+                    'Clearing messages',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],

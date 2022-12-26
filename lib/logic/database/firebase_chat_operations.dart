@@ -30,12 +30,21 @@ class FirebaseChatOperations {
   void decrementChatCount({required String currentId}) {
     //changing chat_count for target user
     database.doc(currentId).get().then((value) {
-      database.doc(currentId).set(
-        {
-          'chat_count': value.get('chat_count') - 1,
-        },
-        SetOptions(merge: true),
-      );
+      if (value.get('chat_count') > 0) {
+        database.doc(currentId).set(
+          {
+            'chat_count': value.get('chat_count') - 1,
+          },
+          SetOptions(merge: true),
+        );
+      } else {
+        database.doc(currentId).set(
+          {
+            'chat_count': 0,
+          },
+          SetOptions(merge: true),
+        );
+      }
     });
   }
 

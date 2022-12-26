@@ -97,7 +97,7 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
                     //download Button
                     IconButton(
                       onPressed: () async {
-                        ScaffoldMessenger.of(context).deactivate();
+                        ScaffoldMessenger.of(context).clearSnackBars();
                         final imageName =
                             'chitchatImage_${widget.messageItem.messageId}.jpeg';
                         await saveImage(widget.url, imageName);
@@ -117,17 +117,39 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
     );
   }
 
-  void showAlertDialog(BuildContext context) {
-    showCupertinoModalPopup<void>(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) => const CupertinoAlertDialog(
-        title: Text('Saving image'),
-        content: CupertinoActivityIndicator(
-          radius: 15,
-          color: Colors.black,
-        ),
-      ),
+  void showAlertDialog(BuildContext ctx) {
+    showDialog(
+      context: ctx,
+      builder: (BuildContext ctx1) {
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 80, vertical: 320),
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors().textColorWhite,
+                  backgroundColor: AppColors().primaryColor,
+                ),
+              ),
+              Text(
+                'Saving image',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: AppColors().textColorWhite,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -139,7 +161,7 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
         if (await _requestPermission(Permission.storage)) {
           directory = (await getExternalStorageDirectory())!;
           String newPath = "";
-          print(directory);
+          // print(directory);
           List<String> paths = directory.path.split("/");
           for (int x = 1; x < paths.length; x++) {
             String folder = paths[x];

@@ -111,9 +111,7 @@ class _FindFriendsState extends State<FindFriends> {
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   width: .5,
-                                  color: Theme.of(context)
-                                      .hintColor
-                                      .withOpacity(.5),
+                                  color: Colors.grey.withOpacity(.5),
                                 ),
                               ),
                               child: ClipOval(

@@ -103,12 +103,14 @@ class Messages extends StatelessWidget {
                     // backgroundColor: appColors.primaryColor,
                   ),
                 ),
-                const SizedBox(width: 10.0),
-                const Text(
-                  'Deleting message',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
+                const Expanded(
+                  child: Text(
+                    'Deleting message',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
