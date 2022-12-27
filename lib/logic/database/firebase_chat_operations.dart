@@ -48,6 +48,33 @@ class FirebaseChatOperations {
     });
   }
 
+  void clearChatCount({required String targetId, required String senderId}) {
+    final targetFolder =
+        database.doc(targetId).collection("messages").doc(senderId);
+    database.doc(targetId).get().then((value) {
+      targetFolder.get().then((data) {
+        log('called clear chatcount function ${data.get('unread_count')}');
+        if (data.get('isNew') && data.get('unread_count') > 0) {
+          if (value.get('chat_count') > 0) {
+            database.doc(targetId).set(
+              {
+                'chat_count': value.get('chat_count') - 1,
+              },
+              SetOptions(merge: true),
+            );
+          } else {
+            database.doc(targetId).set(
+              {
+                'chat_count': 0,
+              },
+              SetOptions(merge: true),
+            );
+          }
+        }
+      });
+    });
+  }
+
   void sendMessage({
     required String senderId,
     required String targetId,
@@ -289,7 +316,7 @@ class FirebaseChatOperations {
           {
             'last_message': 'Message deleted for all',
             'time': DateTime.now(),
-            'isNew': false,
+            'isNew': true,
             'id': '',
           },
           SetOptions(merge: true),
@@ -337,6 +364,7 @@ class FirebaseChatOperations {
       required String message}) async {
     final filePathSender = '$senderId$targetId';
     final filePathTarget = '$targetId$senderId';
+
     try {
       final senderImageList = await FirebaseStorage.instance
           .ref()
@@ -414,6 +442,8 @@ class FirebaseChatOperations {
       },
       SetOptions(merge: true),
     );
+
+    clearChatCount(targetId: targetId, senderId: senderId);
   }
 
   Future<void> sendImage(
