@@ -6,7 +6,6 @@ import 'package:chitchat/widgets/chat/all_chat_search.dart';
 import 'package:chitchat/widgets/chat/chat_list_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -92,6 +91,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   snapshot.data!.docs[i].get('unread_count');
                               final time = ChatFuntions(time: timeFromDb)
                                   .formattedTime();
+
                               return ChatListItem(
                                 screen: screen,
                                 currentUserid: currentUserid,

@@ -18,12 +18,16 @@ class SelectedImagePreview extends StatefulWidget {
     required this.targetUserid,
     required this.currentUserid,
     required this.scrollController,
+    required this.sName,
+    required this.tName,
   }) : super(key: key);
 
   final Future<File?>? imageFile;
   final File? cameraImage;
   final String currentUserid;
   final String targetUserid;
+  final String sName;
+  final String tName;
   final ScrollController scrollController;
 
   @override
@@ -180,6 +184,8 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
                     await FirebaseChatOperations().sendImage(
                         senderId: widget.currentUserid,
                         targetId: widget.targetUserid,
+                        senderName: widget.sName,
+                        targetName: widget.tName,
                         replyingParentMessageType: state.parentMessageType,
                         isRepliedToMe: state.isReplyingToMyMessage,
                         isReplying: state.isReplying,

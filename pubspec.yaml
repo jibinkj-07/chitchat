@@ -68,6 +68,7 @@ dependencies:
   flutter_sound: ^9.2.13
   audioplayers: ^1.1.1
   animated_text_kit: ^4.2.1
+  flutter_local_notifications: ^13.0.0
 
 dev_dependencies:
   flutter_test:

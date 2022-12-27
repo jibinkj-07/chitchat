@@ -14,11 +14,13 @@ class ChatBody extends StatefulWidget {
   final String currentUserid;
   final String targetUserid;
   final String targetName;
+  final String senderName;
   const ChatBody({
     super.key,
     required this.currentUserid,
     required this.targetUserid,
     required this.targetName,
+    required this.senderName,
   });
 
   @override
@@ -147,6 +149,8 @@ class _ChatBodyState extends State<ChatBody> {
                         senderId: widget.currentUserid,
                         targetId: widget.targetUserid,
                         scrollController: scrollController,
+                        sName: widget.senderName,
+                        tName: widget.targetName,
                       );
               }
               return const SizedBox();

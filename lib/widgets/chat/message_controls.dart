@@ -28,10 +28,14 @@ class MessageControls extends StatefulWidget {
     Key? key,
     required this.senderId,
     required this.targetId,
+    required this.sName,
+    required this.tName,
     required this.scrollController,
   }) : super(key: key);
   final String senderId;
   final String targetId;
+  final String tName;
+  final String sName;
   final ScrollController scrollController;
 
   @override
@@ -477,6 +481,8 @@ class _MessageControlsState extends State<MessageControls> {
                 await FirebaseChatOperations().sendVoice(
                   senderId: widget.senderId,
                   targetId: widget.targetId,
+                  targetName: widget.tName,
+                  senderName: widget.sName,
                   replyingParentMessageType:
                       replyingMessageState.parentMessageType,
                   isReplying: replyingMessageState.isReplying,
@@ -957,6 +963,8 @@ class _MessageControlsState extends State<MessageControls> {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => GalleryPreviewPicker(
                     currentUserid: widget.senderId,
+                    sName: widget.sName,
+                    tName: widget.tName,
                     listScrollController: widget.scrollController,
                     targetUserid: widget.targetId)));
           },
@@ -1010,6 +1018,8 @@ class _MessageControlsState extends State<MessageControls> {
                   FirebaseChatOperations().sendMessage(
                     senderId: widget.senderId,
                     targetId: widget.targetId,
+                    senderName: widget.sName,
+                    targetName: widget.tName,
                     body: message.trim(),
                     type: 'text',
                     replyingParentMessageType: state.parentMessageType,
@@ -1022,6 +1032,8 @@ class _MessageControlsState extends State<MessageControls> {
                   FirebaseChatOperations().sendMessage(
                     senderId: widget.senderId,
                     targetId: widget.targetId,
+                    senderName: widget.sName,
+                    targetName: widget.tName,
                     body: message.trim(),
                     type: 'text',
                     isReplyingMessage: false,
@@ -1084,6 +1096,8 @@ class _MessageControlsState extends State<MessageControls> {
             cameraImage: File(pickedImage.path),
             currentUserid: widget.senderId,
             targetUserid: widget.targetId,
+            sName: widget.sName,
+            tName: widget.tName,
             scrollController: widget.scrollController,
           ),
         ),

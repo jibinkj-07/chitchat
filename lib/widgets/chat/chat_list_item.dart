@@ -5,8 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../../utils/chat_functions.dart';
-
 class ChatListItem extends StatelessWidget {
   const ChatListItem({
     Key? key,
@@ -39,6 +37,9 @@ class ChatListItem extends StatelessWidget {
       builder: (ctx, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasData) {
           final userDetail = snapshot.data;
+          final name = userDetail!.get('name').toString().length > 30
+              ? '${userDetail.get('name').toString().substring(0, 28)}..'
+              : userDetail.get('name');
 
           return ListTile(
             onTap: () => Navigator.of(context).pushAndRemoveUntil(
@@ -53,7 +54,7 @@ class ChatListItem extends StatelessWidget {
             leading: Stack(
               children: [
                 ImagePreviewer(
-                  targetUserid: userDetail!.id,
+                  targetUserid: userDetail.id,
                   height: 50,
                   width: 50,
                   url: userDetail.get('imageUrl'),
@@ -81,21 +82,13 @@ class ChatListItem extends StatelessWidget {
             horizontalTitleGap: 8.0,
             title: Row(
               children: [
-                userDetail.get('name').toString().length > 30
-                    ? Text(
-                        '${userDetail.get('name').toString().substring(0, 28)}..',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: isNew ? FontWeight.bold : FontWeight.w500,
-                        ),
-                      )
-                    : Text(
-                        userDetail.get('name'),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: isNew ? FontWeight.bold : FontWeight.w500,
-                        ),
-                      ),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: isNew ? FontWeight.bold : FontWeight.w500,
+                  ),
+                ),
                 if (userDetail.get('verified'))
                   Icon(
                     Iconsax.verify5,
@@ -116,11 +109,6 @@ class ChatListItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 if (isNew)
-                  // Icon(
-                  //   Iconsax.sms_notification5,
-                  //   color: appColors.primaryColor,
-                  //   size: 18,
-                  // ),
                   CircleAvatar(
                     radius: 10,
                     backgroundColor: appColors.primaryColor,

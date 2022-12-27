@@ -8,6 +8,8 @@ import 'package:chitchat/widgets/general/image_previewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import '../../logic/database/hive_operations.dart';
+import '../../logic/database/user_model.dart';
 import '../../utils/app_colors.dart';
 
 class SingleChatScreen extends StatefulWidget {
@@ -75,11 +77,17 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
                         return true;
                       },
                       child: Expanded(
-                        child: ChatBody(
-                          currentUserid: widget.currentUserid,
-                          targetUserid: widget.targetUserid,
-                          targetName: name,
-                        ),
+                        child: ValueListenableBuilder(
+                            valueListenable: userDetailNotifier,
+                            builder: (BuildContext ctx,
+                                List<UserModel> userDetail, Widget? child) {
+                              return ChatBody(
+                                currentUserid: widget.currentUserid,
+                                targetUserid: widget.targetUserid,
+                                targetName: name,
+                                senderName: userDetail[0].name,
+                              );
+                            }),
                       ),
                     ),
                   ],

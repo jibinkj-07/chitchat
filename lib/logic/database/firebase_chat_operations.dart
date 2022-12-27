@@ -78,6 +78,8 @@ class FirebaseChatOperations {
   void sendMessage({
     required String senderId,
     required String targetId,
+    required String targetName,
+    required String senderName,
     required String body,
     required String type,
     required bool isReplyingMessage,
@@ -124,6 +126,9 @@ class FirebaseChatOperations {
           'time': time,
           'isNew': false,
           'id': value.id,
+          'senderName': senderName,
+          'targetName': targetName,
+          'isNotified': true,
           'unread_count': 0,
           'isReported': false,
           'isReportedByMe': false,
@@ -145,7 +150,10 @@ class FirebaseChatOperations {
           'last_message': body,
           'time': time,
           'isNew': true,
+          'isNotified': false,
           'id': value.id,
+          'senderName': senderName,
+          'targetName': targetName,
           'unread_count': unreadCount + 1,
           'isReported': false,
           'isReportedByMe': false,
@@ -452,6 +460,8 @@ class FirebaseChatOperations {
       required bool isReplying,
       required bool isRepliedToMe,
       required String parentMessage,
+      required String targetName,
+      required String senderName,
       required String replyingParentMessageType,
       required String caption,
       required File image}) async {
@@ -484,9 +494,12 @@ class FirebaseChatOperations {
       senderEnd.set({
         'id': id,
         'isNew': false,
+        'isNotified': true,
         'last_message': 'sending photo',
         'time': time,
         'unread_count': 0,
+        'senderName': senderName,
+        'targetName': targetName,
         'isReported': false,
         'isReportedByMe': false,
       }, SetOptions(merge: true));
@@ -547,10 +560,13 @@ class FirebaseChatOperations {
           targetEnd.set({
             'id': id,
             'isNew': true,
+            'isNotified': false,
             'last_message': '🖼️ Photo',
             'time': uploadedTime,
             'unread_count': unreadCount + 1,
             'isReported': false,
+            'senderName': senderName,
+            'targetName': targetName,
             'isReportedByMe': false,
           }, SetOptions(merge: true)).then((_) {
             incrementChatCount(targetId: targetId, senderId: senderId);
@@ -570,6 +586,8 @@ class FirebaseChatOperations {
       {required String senderId,
       required String targetId,
       required bool isReplying,
+      required String targetName,
+      required String senderName,
       required bool isRepliedToMe,
       required String parentMessage,
       required String replyingParentMessageType,
@@ -602,10 +620,13 @@ class FirebaseChatOperations {
       senderEnd.set({
         'id': id,
         'isNew': false,
+        'isNotified': true,
         'last_message': 'sending voice',
         'time': time,
         'unread_count': 0,
         'isReported': false,
+        'senderName': senderName,
+        'targetName': targetName,
         'isReportedByMe': false,
       }, SetOptions(merge: true));
 
@@ -653,11 +674,14 @@ class FirebaseChatOperations {
           targetEnd.set({
             'id': id,
             'isNew': true,
+            'isNotified': false,
             'last_message': '🎙️Voice',
             'time': uploadedTime,
             'unread_count': unreadCount + 1,
             'isReported': false,
             'isReportedByMe': false,
+            'senderName': senderName,
+            'targetName': targetName,
           }, SetOptions(merge: true)).then((_) {
             incrementChatCount(targetId: targetId, senderId: senderId);
           });
