@@ -222,6 +222,17 @@ class _ReceivedMessageBubbleState extends State<ReceivedMessageBubble> {
             ),
           ),
           const SizedBox(height: 5),
+          if (widget.messageItem.caption != '')
+            SizedBox(
+              width: 240,
+              child: Text(
+                widget.messageItem.caption,
+                style: TextStyle(
+                  color: appColors.textColorBlack,
+                  fontSize: 15,
+                ),
+              ),
+            ),
           //time
           Text(
             widget.messageTime,

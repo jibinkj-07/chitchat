@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -33,7 +34,9 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
     final screen = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
+      body: SizedBox(
+        height: screen.height,
+        width: screen.width,
         child: Stack(
           children: [
             SizedBox(
@@ -57,57 +60,65 @@ class _ImageMessagePreviewState extends State<ImageMessagePreview> {
             ),
             Positioned(
               top: 0,
-              child: Container(
+              child: SizedBox(
                 width: screen.width,
-                color: Colors.black.withOpacity(.7),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                      ),
-                      splashRadius: 20.0,
-                      iconSize: 20.0,
-                      color: Colors.white,
+                child: Material(
+                  color: Colors.black.withOpacity(.6),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).viewPadding.top,
+                      bottom: 5.0,
                     ),
-
-                    //text
-                    widget.messageItem.isMe
-                        ? const Text(
-                            'You',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
-                          )
-                        : Text(
-                            widget.messageItem.targetUsername,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
                           ),
+                          splashRadius: 20.0,
+                          iconSize: 20.0,
+                          color: Colors.white,
+                        ),
 
-                    //download Button
-                    IconButton(
-                      onPressed: () async {
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        final imageName =
-                            'chitchatImage_${widget.messageItem.messageId}.jpeg';
-                        await saveImage(widget.url, imageName);
-                      },
-                      icon: const Icon(Iconsax.import),
-                      splashRadius: 20.0,
-                      iconSize: 25.0,
-                      color: Colors.white,
-                    )
-                  ],
+                        //text
+                        widget.messageItem.isMe
+                            ? const Text(
+                                'You',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              )
+                            : Text(
+                                widget.messageItem.targetUsername,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+
+                        //download Button
+                        IconButton(
+                          onPressed: () async {
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                            final imageName =
+                                'chitchatImage_${widget.messageItem.messageId}.jpeg';
+                            await saveImage(widget.url, imageName);
+                          },
+                          icon: const Icon(Iconsax.import),
+                          splashRadius: 20.0,
+                          iconSize: 25.0,
+                          color: Colors.white,
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

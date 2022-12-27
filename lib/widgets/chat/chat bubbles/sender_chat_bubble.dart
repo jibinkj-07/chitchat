@@ -256,6 +256,17 @@ class _SenderChatBubbleState extends State<SenderChatBubble> {
                   ),
           ),
           const SizedBox(height: 5),
+          if (widget.messageItem.caption != '')
+            SizedBox(
+              width: 240,
+              child: Text(
+                widget.messageItem.caption,
+                style: TextStyle(
+                  color: appColors.textColorWhite,
+                  fontSize: 15,
+                ),
+              ),
+            ),
           //time and read status
           Row(
             mainAxisSize: MainAxisSize.min,

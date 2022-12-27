@@ -269,12 +269,28 @@ class _RepliedReceivedChatBubbleState extends State<RepliedReceivedChatBubble> {
             ),
           ),
           const SizedBox(height: 5),
+          if (widget.messageItem.caption != '')
+            SizedBox(
+              width: 240,
+              child: Text(
+                widget.messageItem.caption,
+                style: TextStyle(
+                  color: appColors.textColorBlack,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+
           //time and read status
-          Text(
-            '${widget.messageTime}  ',
-            style: TextStyle(
-              color: appColors.textColorBlack.withOpacity(.8),
-              fontSize: 11,
+          SizedBox(
+            width: 240,
+            child: Text(
+              '${widget.messageTime}  ',
+              style: TextStyle(
+                color: appColors.textColorBlack.withOpacity(.8),
+                fontSize: 11,
+              ),
+              textAlign: TextAlign.right,
             ),
           ),
         ],
@@ -322,8 +338,8 @@ class _RepliedReceivedChatBubbleState extends State<RepliedReceivedChatBubble> {
                         thumbShape: const RoundSliderThumbShape(
                             enabledThumbRadius: 8.0),
                         overlayColor: appColors.primaryColor.withOpacity(.3),
-                        overlayShape: const RoundSliderOverlayShape(
-                            overlayRadius: 14.0),
+                        overlayShape:
+                            const RoundSliderOverlayShape(overlayRadius: 14.0),
                       ),
                       child: Slider(
                         min: 0,

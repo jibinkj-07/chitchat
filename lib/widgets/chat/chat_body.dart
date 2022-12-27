@@ -181,6 +181,9 @@ class _ChatBodyState extends State<ChatBody> {
               }
 
               final isMine = snapshot.data!.docs[i].get('sentByMe');
+              final caption = snapshot.data!.docs[i].get('type') == 'image'
+                  ? snapshot.data!.docs[i].get('caption')
+                  : '';
 
               MessageItem messageItem = MessageItem(
                 messageId: snapshot.data!.docs[i].id,
@@ -192,6 +195,7 @@ class _ChatBodyState extends State<ChatBody> {
                 type: snapshot.data!.docs[i].get('type'),
                 repliedToMessage: snapshot.data!.docs[i].get('repliedTo'),
                 currentUserid: widget.currentUserid,
+                caption: caption,
                 targetUserid: widget.targetUserid,
                 isRepliedToMyself: snapshot.data!.docs[i].get('repliedToMe'),
                 isMe: isMine,

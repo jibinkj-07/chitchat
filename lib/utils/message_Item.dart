@@ -13,12 +13,14 @@ class MessageItem {
   final String replyingParentMessageType;
   final bool isMe;
   final bool isRepliedToMyself;
+  final String caption;
   const MessageItem({
     required this.messageId,
     required this.message,
     required this.time,
     required this.isReplied,
     required this.type,
+    required this.caption,
     required this.repliedToMessage,
     required this.replyingParentMessageType,
     required this.currentUserid,

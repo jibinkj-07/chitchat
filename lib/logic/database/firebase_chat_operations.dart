@@ -423,6 +423,7 @@ class FirebaseChatOperations {
       required bool isRepliedToMe,
       required String parentMessage,
       required String replyingParentMessageType,
+      required String caption,
       required File image}) async {
     final time = DateTime.now();
     String id = '';
@@ -442,6 +443,7 @@ class FirebaseChatOperations {
       'read': false,
       'readTime': null,
       'sentByMe': true,
+      'caption': caption,
       'isReplyingMessage': isReplying,
       'repliedTo': parentMessage,
       'repliedToMe': isRepliedToMe,
@@ -482,6 +484,7 @@ class FirebaseChatOperations {
             'read': false,
             'readTime': null,
             'sentByMe': false,
+            'caption': caption,
             'isReplyingMessage': isReplying,
             'repliedTo': parentMessage,
             'replyingParentMessageType': replyingParentMessageType,

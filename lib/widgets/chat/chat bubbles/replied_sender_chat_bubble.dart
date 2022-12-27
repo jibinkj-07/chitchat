@@ -291,27 +291,42 @@ class _RepliedSenderChatBubbleState extends State<RepliedSenderChatBubble> {
                   ),
           ),
           const SizedBox(height: 5),
-          //time and read status
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${widget.messageTime}  ',
+          if (widget.messageItem.caption != '')
+            SizedBox(
+              width: 240,
+              child: Text(
+                widget.messageItem.caption,
                 style: TextStyle(
-                  color: appColors.textColorWhite.withOpacity(.8),
-                  fontSize: 11,
+                  color: appColors.textColorWhite,
+                  fontSize: 15,
                 ),
               ),
-              if (widget.messageItem.read)
-                const Text(
-                  'seen',
+            ),
+          //time and read status
+          SizedBox(
+            width: 240,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  '${widget.messageTime}  ',
                   style: TextStyle(
-                    color: Colors.lime,
-                    fontWeight: FontWeight.w500,
+                    color: appColors.textColorWhite.withOpacity(.8),
                     fontSize: 11,
                   ),
                 ),
-            ],
+                if (widget.messageItem.read)
+                  const Text(
+                    'seen',
+                    style: TextStyle(
+                      color: Colors.lime,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       );

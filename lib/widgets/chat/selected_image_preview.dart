@@ -3,6 +3,8 @@ import 'package:chitchat/logic/cubit/internet_cubit.dart';
 import 'package:chitchat/logic/cubit/replying_message_cubit.dart';
 import 'package:chitchat/logic/database/firebase_chat_operations.dart';
 import 'package:chitchat/utils/app_colors.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -30,13 +32,27 @@ class SelectedImagePreview extends StatefulWidget {
 
 class _SelectedImagePreviewState extends State<SelectedImagePreview> {
   File? sendingImage;
+  bool isEmojiPicker = false;
+  String message = '';
+  TextEditingController messageController = TextEditingController();
 
   @override
   void initState() {
     if (widget.cameraImage != null) {
       sendingImage = widget.cameraImage;
     }
+    messageController.addListener(() {
+      setState(() {
+        message = messageController.text.trim();
+      });
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,12 +86,23 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
                 context: context,
               ),
 
-            //send button
             Positioned(
-              bottom: 20,
-              right: 20,
-              child: sendButton(appColors: appColors, context: context),
-            ),
+              bottom: 0,
+              child: Container(
+                color: Colors.black.withOpacity(.6),
+                padding: const EdgeInsets.symmetric(vertical: 15.0),
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: generalMessageController(),
+                    ),
+                    sendButton(appColors: appColors, context: context),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -117,6 +144,28 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
         },
       );
 
+  Widget generalMessageController() => Container(
+        padding: const EdgeInsets.all(6.0),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          color: Colors.white,
+        ),
+        child: textField(),
+      );
+
+  Widget textField() => CupertinoTextField(
+        controller: messageController,
+        textInputAction: TextInputAction.done,
+        minLines: 1,
+        maxLines: 5,
+        textCapitalization: TextCapitalization.sentences,
+        placeholder: "Give a caption",
+        clearButtonMode: OverlayVisibilityMode.editing,
+        cursorColor: AppColors().primaryColor,
+        decoration: const BoxDecoration(),
+      );
+
   Widget sendButton(
           {required AppColors appColors, required BuildContext context}) =>
       BlocBuilder<ReplyingMessageCubit, ReplyingMessageState>(
@@ -124,6 +173,7 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
           return BlocBuilder<InternetCubit, InternetState>(
             builder: (context, internetState) {
               return FloatingActionButton(
+                mini: true,
                 onPressed: () async {
                   if (internetState is InternetEnabled) {
                     final nav = Navigator.of(context);
@@ -134,6 +184,7 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
                         isRepliedToMe: state.isReplyingToMyMessage,
                         isReplying: state.isReplying,
                         parentMessage: state.message,
+                        caption: message,
                         image: sendingImage!);
 
                     if (widget.scrollController.hasClients) {
@@ -195,47 +246,34 @@ class _SelectedImagePreviewState extends State<SelectedImagePreview> {
     required AppColors appColors,
     required BuildContext context,
   }) =>
-      Container(
-        margin: EdgeInsets.only(
-          top: MediaQuery.of(context).viewPadding.top,
-        ),
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Material(
-              color: appColors.primaryColor,
-              borderRadius: BorderRadius.circular(40),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  color: appColors.textColorWhite,
-                  splashRadius: 20.0,
-                  iconSize: 20.0,
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
+      Material(
+        color: Colors.black.withOpacity(.6),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).viewPadding.top,
+            bottom: 5.0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                splashRadius: 20.0,
+                color: Colors.white,
               ),
-            ),
-            Material(
-              color: appColors.primaryColor,
-              borderRadius: BorderRadius.circular(40),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: IconButton(
-                  icon: const Icon(Icons.crop),
-                  color: appColors.textColorWhite,
-                  splashRadius: 20.0,
-                  iconSize: 20.0,
-                  onPressed: () {
-                    cropImage(sendingImage!);
-                  },
-                ),
+
+              //crop button
+              IconButton(
+                onPressed: () {
+                  cropImage(sendingImage!);
+                },
+                icon: const Icon(Icons.crop),
+                color: Colors.white,
+                splashRadius: 20.0,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 
