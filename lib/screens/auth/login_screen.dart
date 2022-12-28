@@ -97,8 +97,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Container(
                                 width: 180,
                                 height: 180,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: .5,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 child: ClipOval(
                                   child: Image.asset(
