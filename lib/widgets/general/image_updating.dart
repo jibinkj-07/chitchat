@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../utils/app_colors.dart';
+
 class ImageUpdating extends StatelessWidget {
   File? image;
   ImageUpdating({super.key, required this.image});
@@ -61,9 +63,15 @@ class ImageUpdating extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 40),
-                        const CupertinoActivityIndicator(
-                          radius: 15,
-                          color: Colors.black,
+                        SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors().primaryColor,
+                            backgroundColor:
+                                AppColors().primaryColor.withOpacity(.2),
+                          ),
                         ),
                         const SizedBox(height: 30),
                         Padding(

@@ -389,16 +389,38 @@ class FirebaseOperations {
   }
 
   void showAlertDialogDeleting(BuildContext context) {
-    showCupertinoModalPopup<void>(
-      barrierDismissible: false,
+    showDialog(
       context: context,
-      builder: (BuildContext context) => const CupertinoAlertDialog(
-        title: Text('Deleting Account'),
-        content: CupertinoActivityIndicator(
-          radius: 15,
-          color: Colors.black,
-        ),
-      ),
+      builder: (BuildContext ctx1) {
+        return AlertDialog(
+          backgroundColor: AppColors().textColorWhite,
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 80, vertical: 325),
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors().redColor,
+                  backgroundColor: AppColors().redColor.withOpacity(.2),
+                ),
+              ),
+              Text(
+                'Removing',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: AppColors().textColorBlack,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

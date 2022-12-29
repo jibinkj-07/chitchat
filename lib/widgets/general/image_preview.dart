@@ -37,16 +37,38 @@ class _ImagePreviewState extends State<ImagePreview> {
     FirebaseOperations firebaseOperations = FirebaseOperations();
     // This shows a CupertinoModalPopup which hosts a CupertinoAlertDialog.
     void showAlertDialog(BuildContext context) {
-      showCupertinoModalPopup<void>(
-        barrierDismissible: false,
+      showDialog(
         context: context,
-        builder: (BuildContext context) => const CupertinoAlertDialog(
-          title: Text('Removing'),
-          content: CupertinoActivityIndicator(
-            radius: 15,
-            color: Colors.black,
-          ),
-        ),
+        builder: (BuildContext ctx1) {
+          return AlertDialog(
+            backgroundColor: appColors.textColorWhite,
+            insetPadding:
+                const EdgeInsets.symmetric(horizontal: 80, vertical: 325),
+            content: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: appColors.redColor,
+                    backgroundColor: appColors.redColor.withOpacity(.2),
+                  ),
+                ),
+                Text(
+                  'Removing',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: appColors.textColorBlack,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        },
       );
     }
 
@@ -152,7 +174,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                           image: image, id: widget.id);
                       navigator.pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (_) => HomeScreen(index: 2),
+                            builder: (_) => const HomeScreen(index: 2),
                           ),
                           (route) => false);
                     },
@@ -185,7 +207,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                         await firebaseOperations.deleteImage(id: widget.id);
                         navigator.pushAndRemoveUntil(
                             MaterialPageRoute(
-                              builder: (_) => HomeScreen(index: 2),
+                              builder: (_) => const HomeScreen(index: 2),
                             ),
                             (route) => false);
                       },

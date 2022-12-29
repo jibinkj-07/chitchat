@@ -140,6 +140,13 @@ class _AddChatScreenState extends State<AddChatScreen> {
       child: allUsers.isNotEmpty
           ? ListView.builder(
               itemBuilder: (c, index) {
+                final bio = allUsers[index]['bio'].toString().length > 40
+                    ? '${allUsers[index]['bio'].toString().substring(0, 37)}....'
+                    : allUsers[index]['bio'];
+
+                final name = allUsers[index]['name'].toString().length > 30
+                    ? '${allUsers[index]['name'].toString().substring(0, 27)}...'
+                    : allUsers[index]['name'];
                 return ListTile(
                   onTap: () => widget.currentUserid == allUsers[index]['id']
                       ? null
@@ -210,21 +217,13 @@ class _AddChatScreenState extends State<AddChatScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             )
-                          : allUsers[index]['name'].toString().length > 30
-                              ? Text(
-                                  '${allUsers[index]['name'].toString().substring(0, 28)}..',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )
-                              : Text(
-                                  allUsers[index]['name'],
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                          : Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                       if (allUsers[index]['verified'])
                         Icon(
                           Iconsax.verify5,
@@ -234,13 +233,14 @@ class _AddChatScreenState extends State<AddChatScreen> {
                     ],
                   ),
                   subtitle: Text(
-                    allUsers[index]['bio'],
+                    bio,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: widget.currentUserid == allUsers[index]['id']
                           ? FontWeight.bold
                           : FontWeight.w500,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 );
               },

@@ -20,7 +20,6 @@ class ChangeName extends StatefulWidget {
 
 class _ChangeNameState extends State<ChangeName> {
   final formKey = GlobalKey<FormState>();
-  bool isVisible = false;
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
@@ -32,33 +31,37 @@ class _ChangeNameState extends State<ChangeName> {
       required String title,
       required String content,
     }) {
-      showCupertinoModalPopup<void>(
+      showDialog(
         barrierDismissible: false,
         context: context,
-        builder: (BuildContext ctx) => CupertinoAlertDialog(
+        builder: (BuildContext ctx) => AlertDialog(
+          titlePadding: const EdgeInsets.only(top: 8.0),
+          contentPadding: const EdgeInsets.all(8.0),
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 8.0),
           title: Text(
             title,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
           content: Text(
             content,
             style: const TextStyle(
               fontSize: 14,
             ),
+            textAlign: TextAlign.center,
           ),
-          actions: <CupertinoDialogAction>[
-            CupertinoDialogAction(
-              /// This parameter indicates this action is the default,
-              /// and turns the action's text to bold text.
-              isDefaultAction: true,
+          actions: [
+            TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
                 Navigator.pop(context);
               },
-              child: const Text('Close'),
+              style:
+                  TextButton.styleFrom(foregroundColor: appColors.primaryColor),
+              child: const Text("Close"),
             ),
           ],
         ),
@@ -70,6 +73,9 @@ class _ChangeNameState extends State<ChangeName> {
       FocusScope.of(context).unfocus();
       final valid = formKey.currentState!.validate();
       if (valid) {
+        setState(() {
+          isLoading = true;
+        });
         formKey.currentState!.save();
         bool result = await FirebaseOperations().updateName(
           name: name.trim(),
@@ -256,26 +262,36 @@ class _ChangeNameState extends State<ChangeName> {
                   BlocBuilder<InternetCubit, InternetState>(
                     builder: (context, state) {
                       if (state is InternetEnabled) {
-                        return SizedBox(
-                          width: screen.width * .5,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: appColors.primaryColor,
-                              foregroundColor: appColors.textColorWhite,
-                              padding: const EdgeInsets.symmetric(vertical: 0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            onPressed: () {
-                              changeName(userDetail[0].id);
-                            },
-                            child: const Text(
-                              "Update",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        );
+                        return isLoading
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.5,
+                                  color: appColors.primaryColor,
+                                ),
+                              )
+                            : SizedBox(
+                                width: screen.width * .5,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: appColors.primaryColor,
+                                    foregroundColor: appColors.textColorWhite,
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    changeName(userDetail[0].id);
+                                  },
+                                  child: const Text(
+                                    "Update",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              );
                       } else {
                         return const Text(
                           "Turn on Mobile data or Wifi to continue",

@@ -57,16 +57,38 @@ class _EditProfileState extends State<EditProfile> {
     FirebaseOperations firebaseOperations = FirebaseOperations();
 
     void showAlertDialog(BuildContext context) {
-      showCupertinoModalPopup<void>(
-        barrierDismissible: false,
+      showDialog(
         context: context,
-        builder: (BuildContext context) => const CupertinoAlertDialog(
-          title: Text('Updating profile'),
-          content: CupertinoActivityIndicator(
-            radius: 15,
-            color: Colors.black,
-          ),
-        ),
+        builder: (BuildContext ctx1) {
+          return AlertDialog(
+            backgroundColor: appColors.textColorWhite,
+            insetPadding:
+                const EdgeInsets.symmetric(horizontal: 80, vertical: 325),
+            content: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: appColors.primaryColor,
+                    backgroundColor: appColors.primaryColor.withOpacity(.2),
+                  ),
+                ),
+                Text(
+                  'Updating profile',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: appColors.textColorBlack,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        },
       );
     }
 
@@ -223,7 +245,7 @@ class _EditProfileState extends State<EditProfile> {
       }
       navigator.pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (_) => HomeScreen(index: 2),
+            builder: (_) => const HomeScreen(index: 2),
           ),
           (route) => false);
     }
@@ -338,8 +360,12 @@ class _EditProfileState extends State<EditProfile> {
                               ? Container(
                                   width: 150,
                                   height: 150,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    border: Border.all(
+                                      width: .5,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                   child: ClipOval(
                                     child: Image.asset(
