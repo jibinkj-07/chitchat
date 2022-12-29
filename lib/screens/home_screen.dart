@@ -5,15 +5,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final int index;
   const HomeScreen({super.key, required this.index});
 
   @override
-  Widget build(BuildContext context) {
-    final userid = FirebaseAuth.instance.currentUser!.uid;
-    NotificationService notificationService = NotificationService();
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final userid = FirebaseAuth.instance.currentUser!.uid;
+  NotificationService notificationService = NotificationService();
+
+  @override
+  void initState() {
+    notificationService.initializePlatformNotifications();
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('Users')
@@ -55,7 +65,7 @@ class HomeScreen extends StatelessWidget {
         }
 
         //main section
-        return UserHomeScreen(index: index, userid: userid);
+        return UserHomeScreen(index: widget.index, userid: userid);
       },
     );
   }

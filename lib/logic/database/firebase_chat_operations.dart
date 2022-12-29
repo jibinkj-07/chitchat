@@ -75,6 +75,35 @@ class FirebaseChatOperations {
     });
   }
 
+  void editMessage(
+      {required String senderid,
+      required String targetid,
+      required String messageId,
+      required String message}) {
+    final target = database
+        .doc(targetid)
+        .collection('messages')
+        .doc(senderid)
+        .collection('chats')
+        .doc(messageId);
+
+    final sender = database
+        .doc(senderid)
+        .collection('messages')
+        .doc(targetid)
+        .collection('chats')
+        .doc(messageId);
+
+    sender.set(
+      {'body': message},
+      SetOptions(merge: true),
+    );
+    target.set(
+      {'body': message},
+      SetOptions(merge: true),
+    );
+  }
+
   void sendMessage({
     required String senderId,
     required String targetId,

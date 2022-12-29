@@ -1,8 +1,5 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
-
 import '../utils/app_colors.dart';
 
 class NotificationService {
@@ -10,7 +7,6 @@ class NotificationService {
 
   //init
   Future<void> initializePlatformNotifications() async {
-    tz.initializeTimeZones();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@drawable/android12splash');
 
@@ -48,7 +44,6 @@ class NotificationService {
     required String user,
   }) async {
     final detail = await _notificationDetails();
-
     await _notifications.show(id, user, message, detail);
   }
 

@@ -210,6 +210,8 @@ class _ChatBodyState extends State<ChatBody> {
 
               return Messages(
                 messageItem: messageItem,
+                sender: widget.currentUserid,
+                target: widget.targetUserid,
               );
               // return SendMessageBubble(message: 'message');
             },

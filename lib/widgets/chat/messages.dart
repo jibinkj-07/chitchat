@@ -9,41 +9,65 @@ import 'package:chitchat/widgets/chat/chat%20bubbles/sender_chat_bubble.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../logic/cubit/replying_message_cubit.dart';
 import '../../utils/message_Item.dart';
 
-class Messages extends StatelessWidget {
+class Messages extends StatefulWidget {
   final MessageItem messageItem;
+  final String sender;
+  final String target;
   Messages({
     super.key,
     required this.messageItem,
+    required this.sender,
+    required this.target,
   });
 
   @override
+  State<Messages> createState() => _MessagesState();
+}
+
+class _MessagesState extends State<Messages> {
+  late TextEditingController editMessageController;
+
+  @override
+  void initState() {
+    editMessageController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    editMessageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    AppColors appColors = AppColors();
-    if (!messageItem.isMe) {
+    if (!widget.messageItem.isMe) {
       FirebaseChatOperations().readMessage(
-        messageId: messageItem.messageId,
-        senderId: messageItem.currentUserid,
-        targetId: messageItem.targetUserid,
+        messageId: widget.messageItem.messageId,
+        senderId: widget.messageItem.currentUserid,
+        targetId: widget.messageItem.targetUserid,
       );
     }
 
-    final messageTime = ChatFuntions(time: messageItem.time).formattedTime();
+    final messageTime =
+        ChatFuntions(time: widget.messageItem.time).formattedTime();
 
 //MAIN SECTION
     return Dismissible(
-        key: ValueKey(messageItem.messageId),
+        key: ValueKey(widget.messageItem.messageId),
         direction: DismissDirection.startToEnd,
         confirmDismiss: (direction) async {
           if (direction == DismissDirection.startToEnd) {
             context.read<ReplyingMessageCubit>().reply(
                   isReplying: true,
-                  isMine: messageItem.isMe,
-                  message: messageItem.message,
-                  parentMessageType: messageItem.type,
-                  name: messageItem.targetUsername,
+                  isMine: widget.messageItem.isMe,
+                  message: widget.messageItem.message,
+                  parentMessageType: widget.messageItem.type,
+                  name: widget.messageItem.targetUsername,
                 );
           }
           return null;
@@ -52,29 +76,95 @@ class Messages extends StatelessWidget {
           onLongPress: () {
             deleteMessage(
               context: context,
-              messageItem: messageItem,
+              messageItem: widget.messageItem,
             );
           },
-          child: messageItem.isMe
-              ? messageItem.isReplied
+          child: widget.messageItem.isMe
+              ? widget.messageItem.isReplied
                   ? RepliedSenderChatBubble(
-                      messageItem: messageItem,
+                      messageItem: widget.messageItem,
                       messageTime: messageTime,
                     )
                   : SenderChatBubble(
-                      messageItem: messageItem,
+                      messageItem: widget.messageItem,
                       messageTime: messageTime,
                     )
-              : messageItem.isReplied
+              : widget.messageItem.isReplied
                   ? RepliedReceivedChatBubble(
-                      messageItem: messageItem,
+                      messageItem: widget.messageItem,
                       messageTime: messageTime,
                     )
                   : ReceivedMessageBubble(
-                      messageItem: messageItem,
+                      messageItem: widget.messageItem,
                       messageTime: messageTime,
                     ),
         ));
+  }
+
+  editMessage({
+    required BuildContext context,
+    required MessageItem messageItem,
+  }) {
+    //for editing message
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      builder: (context) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                editMessageController.text == messageItem.message;
+              },
+              style: TextButton.styleFrom(
+                  foregroundColor: AppColors().primaryColor),
+              child: const Text('Cancel'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CupertinoTextField(
+                controller: editMessageController,
+                autofocus: true,
+                minLines: 1,
+                maxLines: 5,
+                onSubmitted: (value) {
+                  if (value.trim().isEmpty) {
+                    Navigator.of(context).pop();
+                  } else {
+                    FirebaseChatOperations().editMessage(
+                      senderid: widget.sender,
+                      targetid: widget.target,
+                      messageId: messageItem.messageId,
+                      message: value.trim(),
+                    );
+                    Navigator.of(context).pop();
+                  }
+                },
+                textCapitalization: TextCapitalization.sentences,
+                placeholder: "edit message",
+                clearButtonMode: OverlayVisibilityMode.editing,
+                textInputAction: TextInputAction.done,
+                cursorColor: AppColors().primaryColor,
+                decoration: const BoxDecoration(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   //showing dialog box for clearing chat
@@ -85,6 +175,13 @@ class Messages extends StatelessWidget {
     FocusScope.of(context).unfocus();
     AppColors appColors = AppColors();
     FirebaseChatOperations firebaseChatOperations = FirebaseChatOperations();
+    final content = messageItem.type == 'text'
+        ? messageItem.message.length > 30
+            ? '${messageItem.message.substring(0, 27)}...'
+            : messageItem.message
+        : messageItem.type == 'image'
+            ? 'Image message'
+            : 'Voice message';
 
     showProgress(BuildContext context1) {
       showDialog(
@@ -121,47 +218,61 @@ class Messages extends StatelessWidget {
     }
 
     // show the dialog
-    showDialog(
+    showModalBottomSheet<void>(
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext ctx) {
-        final content = messageItem.type == 'text'
-            ? messageItem.message.length > 20
-                ? '${messageItem.message.substring(0, 17)}...'
-                : messageItem.message
-            : messageItem.type == 'image'
-                ? 'Image message'
-                : 'Voice message';
-        return
-            //clearing chat history dialog box
-            AlertDialog(
-          titlePadding:
-              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-          actionsPadding:
-              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-          title: const Text(
-            "Delete message",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
             ),
+            color: Colors.white,
           ),
-          content: Text(
-            content,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: messageItem.isMe
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.end,
-              children: [
-                //for all button
-                if (messageItem.isMe)
-                  TextButton(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  content,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const Divider(height: 0),
+              if (messageItem.isMe && messageItem.type == 'text')
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      editMessageController =
+                          TextEditingController(text: messageItem.message);
+                      editMessage(context: context, messageItem: messageItem);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: appColors.textColorBlack,
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                    child: const Text(
+                      'Edit message',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              if (messageItem.isMe)
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
                     onPressed: () async {
                       final nav = Navigator.of(ctx);
                       nav.pop(true);
@@ -176,11 +287,20 @@ class Messages extends StatelessWidget {
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: appColors.redColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                     ),
-                    child: const Text("Delete for all"),
+                    child: const Text(
+                      'Delete for all',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
-                //for me button
-                TextButton(
+                ),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
                   onPressed: () async {
                     final nav = Navigator.of(ctx);
                     nav.pop(true);
@@ -197,12 +317,19 @@ class Messages extends StatelessWidget {
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: appColors.redColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
                   ),
-                  child: const Text("Delete for me"),
+                  child: const Text(
+                    'Delete for me',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-              ],
-            )
-          ],
+              ),
+            ],
+          ),
         );
       },
     );
